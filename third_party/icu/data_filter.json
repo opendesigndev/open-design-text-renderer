@@ -1,0 +1,15 @@
+{
+    "featureFilters": {
+        "brkitr_dictionaries": "include",
+        "brkitr_rules": "include",
+        "brkitr_tree": "include",
+        "cnvalias": "include"
+    },
+    "localeFilter": {
+        "filterType": "regex",
+        "whitelist": [
+            "^.*$"
+        ]
+    },
+    "strategy": "additive"
+}
