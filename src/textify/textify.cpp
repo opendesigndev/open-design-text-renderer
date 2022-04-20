@@ -394,8 +394,6 @@ TextDrawResult drawText(Context* ctx,
     auto viewAreaTextSpace = utils::transform(toFRectangle(viewArea), T_inv);
     viewAreaTextSpace = scaleRect(viewAreaTextSpace, scale);
 
-    utils::printRect("view area in text space:", viewAreaTextSpace);
-
     auto drawResult = drawTextInner(
             *ctx,
             dry,
