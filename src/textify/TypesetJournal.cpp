@@ -1,6 +1,7 @@
 #include "TypesetJournal.h"
 
 #include <algorithm>
+#include <cmath>
 
 namespace textify {
 namespace priv {

@@ -20,6 +20,7 @@
 
 #include <octopus/text.h>
 
+#include <cmath>
 #include <cstdio>
 #include <iterator>
 #include <optional>

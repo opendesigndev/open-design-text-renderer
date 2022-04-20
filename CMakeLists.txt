@@ -25,9 +25,31 @@ if (TEXTIFY_DEBUG)
     add_definitions(-DTEXTIFY_DEBUG)
 endif()
 
+# set platform
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
+if (EMSCRIPTEN OR ${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+    set(PLATFORM "emscripten")
+
+    set(CMAKE_CROSSCOMPILING TRUE)
+    set(CMAKE_SYSTEM_PROCESSOR x86)
+
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER)
+
+elseif(LINUX)
+    set(PLATFORM "linux")
+    link_libraries("-ldl")
+elseif (WIN32)
+    set(PLATFORM "win32_x64")
+elseif (APPLE)
+    set(PLATFORM "macOS")
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/third_party/platform/macOS)
+set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/third_party/platform/${PLATFORM})
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 if (NOT TEXTIFY_HAVE_LIBOCTOPUS)

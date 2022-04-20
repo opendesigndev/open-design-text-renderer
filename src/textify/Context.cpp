@@ -27,7 +27,6 @@ int Context::removeInactiveShapes()
         std::remove_if(std::begin(shapes), std::end(shapes), [](const auto& shape) { return !shape->active; }),
         std::end(shapes)
     );
-    printf("shapes before: %ld after: %ld\n", before, shapes.size());
     return before - shapes.size();
 }
 

@@ -1,5 +1,7 @@
 #include "GlyphShape.h"
 
+#include <cmath>
+
 namespace textify {
 namespace priv {
 

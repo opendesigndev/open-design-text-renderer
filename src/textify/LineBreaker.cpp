@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <cmath>
 
 namespace textify {
 namespace priv {

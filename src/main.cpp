@@ -136,7 +136,7 @@ bool minimalExample() {
     textify::addFontFile(ctx, "IBMPlexSans", "", "fonts/IBMPlexSans-Regular.ttf", false);
     textify::addFontFile(ctx, "IBMPlexSans-Regular", "", "fonts/IBMPlexSans-Regular.ttf", false);
     for (const auto& missing : textify::listMissingFonts(ctx, text)) {
-        fmt::print("missing font: %s\n", missing.c_str());
+        fmt::print("missing font: {}\n", missing.c_str());
     }
 
     std::vector<textify::TextShape*> shapes;

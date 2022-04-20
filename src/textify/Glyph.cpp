@@ -2,6 +2,8 @@
 #include "compat/bitmap-ops.hpp"
 #include "compat/pixel-conversion.h"
 
+#include <cmath>
+
 namespace textify {
 
 using namespace compat;
