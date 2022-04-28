@@ -1,0 +1,14 @@
+--- Makefile.in.back	2019-01-22 13:32:33.000000000 +0000
++++ Makefile.in	2019-01-22 13:33:24.000000000 +0000
+@@ -47,9 +47,9 @@
+ CURDIR=.
+ endif
+ ifeq ($(OS390BATCH),1)
+-PKGDATA = $(TOOLBINDIR)/pkgdata $(PKGDATA_OPTS) -z -q -c -s $(CURDIR)/out/build/$(ICUDATA_PLATFORM_NAME) -d $(ICUPKGDATA_OUTDIR)
++PKGDATA = $(TOOLBINDIR)/pkgdata $(PKGDATA_OPTS) -z -q -c -s $(CURDIR)/out/build/$(ICUDATA_PLATFORM_NAME) -d $(ICUPKGDATA_OUTDIR) --without-assembly
+ else
+-PKGDATA = $(TOOLBINDIR)/pkgdata $(PKGDATA_OPTS) -q -c -s $(CURDIR)/out/build/$(ICUDATA_PLATFORM_NAME) -d $(ICUPKGDATA_OUTDIR)
++PKGDATA = $(TOOLBINDIR)/pkgdata $(PKGDATA_OPTS) -q -c -s $(CURDIR)/out/build/$(ICUDATA_PLATFORM_NAME) -d $(ICUPKGDATA_OUTDIR) --without-assembly
+ endif
+ OS390_PDS_NAME = -z -L $(BATCH_STUB_TARGET)
+ 
