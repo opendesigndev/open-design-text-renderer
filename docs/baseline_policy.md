@@ -36,7 +36,7 @@ The first baseline starts exactly in the origin.
 
 The first baseline is shifted such that the text is centered within the line height (there's a gap of the same size above ascender line and bellow the descender line).
 
-![CENTER]
+![CENTER1]
 
 ### `OFFSET_ASCENDER`
 
@@ -52,13 +52,18 @@ So, for the same text transformation the following situation might happen:
 
 ![OFFSET_BEARING1]
 ![OFFSET_BEARING2]
-![OFFSET_BEARING3]
 
-[OFFSET_ASCENDER](img/OFFSET_ASCENDER.png) "OFFSET_ASCENDER"
-[OFFSET_BEARING1](img/OFFSET_BEARING1.png) "OFFSET_BEARING"
-[OFFSET_BEARING2](img/OFFSET_BEARING2.png) "OFFSET_BEARING"
-[OFFSET_BEARING3](img/OFFSET_BEARING3.png) "OFFSET_BEARING"
-[CENTER1](img/OFFSET_CENTER1.png) "CENTER"
-[CENTER2](img/OFFSET_CENTER2.png) "CENTER"
-[SET](img/SET.png) "SET"
+Here's an example how `CENTER` is different to `OFFSET_BEARING`:
+
+![OFFSET_BEARING3]
+![CENTER2]
+
+
+[OFFSET_ASCENDER]: img/OFFSET_ASCENDER.png "OFFSET_ASCENDER"
+[OFFSET_BEARING1]: img/OFFSET_BEARING1.png "OFFSET_BEARING"
+[OFFSET_BEARING2]: img/OFFSET_BEARING2.png "OFFSET_BEARING"
+[OFFSET_BEARING3]: img/OFFSET_BEARING3.png "OFFSET_BEARING"
+[CENTER1]: img/OFFSET_CENTER1.png "CENTER"
+[CENTER2]: img/OFFSET_CENTER2.png "CENTER"
+[SET]: img/SET.png "SET"
 
