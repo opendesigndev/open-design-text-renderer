@@ -1,4 +1,5 @@
 #include "FormattedText.h"
+#include "textify/text-format.h"
 
 #include <algorithm>
 #include <cmath>
@@ -14,12 +15,14 @@ FormattedText::FormattedText(VerticalAlign verticalAlign,
                              BoundsMode boundsMode,
                              float baseline,
                              HorizontalPositionPolicy horizontalPositioning,
-                             BaselinePolicy baselinePolicy)
+                             BaselinePolicy baselinePolicy,
+                             OverflowPolicy overflowPolicy)
     : verticalAlign_(verticalAlign),
       boundsMode_(boundsMode),
       baseline_(baseline),
       horizontalPositioning_(horizontalPositioning),
-      baselinePolicy_(baselinePolicy)
+      baselinePolicy_(baselinePolicy),
+      overflowPolicy_(overflowPolicy)
 {
 }
 
@@ -269,6 +272,11 @@ HorizontalPositionPolicy FormattedText::horizontalPositionPolicy() const
 BaselinePolicy FormattedText::baselinePolicy() const
 {
     return baselinePolicy_;
+}
+
+OverflowPolicy FormattedText::overflowPolicy() const
+{
+    return overflowPolicy_;
 }
 
 std::string FormattedText::getPreview(int len) const

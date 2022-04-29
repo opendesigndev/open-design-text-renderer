@@ -118,6 +118,35 @@ enum class BaselinePolicy
     OFFSET_BEARING
 };
 
+/**
+ * Describes behaviour of a text that overflows its frame.
+ *
+ * Applicable only to 'FIXED' text frame.
+ */
+enum class OverflowPolicy
+{
+    /**
+     * Text strictly clipped by the frame.
+     */
+    NO_OVERFLOW,
+
+    /**
+     * The last line which doesn't fit the frame is entirely clipped.
+     */
+    CLIP_LINE,
+
+    /**
+     * Visible text is extended by the last line that at least partially fits the frame.
+     */
+    EXTEND_LINE,
+
+    /**
+     * The whole text overflow is visible.
+     */
+    EXTEND_ALL
+};
+
+
 struct TypeFeature
 {
     std::string tag;

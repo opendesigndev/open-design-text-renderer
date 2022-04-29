@@ -42,8 +42,9 @@ TextParser::ParseResult TextParser::parseText() const
     auto boundsMode            = parseBoundsMode();
     auto horizontalPositioning = HorizontalPositionPolicy::ALIGN_TO_FRAME;
     auto baselinePolicy        = parseBaselinePolicy();
+    auto overflowPolicy        = parseOverflowPolicy();
 
-    res.text = std::make_unique<FormattedText>(verticalAlign, boundsMode, 0.0f, horizontalPositioning, baselinePolicy);
+    res.text = std::make_unique<FormattedText>(verticalAlign, boundsMode, 0.0f, horizontalPositioning, baselinePolicy, overflowPolicy);
     res.text->setBaseFormat(parseBaseFormat(text.defaultStyle));
 
     parseStyles(&res);
@@ -116,6 +117,23 @@ BaselinePolicy TextParser::parseBaselinePolicy() const
 
         case octopus::Text::BaselinePolicy::OFFSET_BEARING:
             return BaselinePolicy::OFFSET_BEARING;
+    }
+}
+
+OverflowPolicy TextParser::parseOverflowPolicy() const
+{
+    switch(text.overflowPolicy) {
+        case octopus::Text::OverflowPolicy::NO_OVERFLOW:
+            return OverflowPolicy::NO_OVERFLOW;
+
+        case octopus::Text::OverflowPolicy::CLIP_LINE:
+            return OverflowPolicy::CLIP_LINE;
+
+        case octopus::Text::OverflowPolicy::EXTEND_LINE:
+            return OverflowPolicy::EXTEND_LINE;
+
+        case octopus::Text::OverflowPolicy::EXTEND_ALL:
+            return OverflowPolicy::EXTEND_ALL;
     }
 }
 
