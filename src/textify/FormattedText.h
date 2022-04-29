@@ -26,7 +26,8 @@ public:
                   BoundsMode boundsMode,
                   float baseline,
                   HorizontalPositionPolicy horizontalPositioning,
-                  BaselinePolicy baselinePolicy);
+                  BaselinePolicy baselinePolicy,
+                  OverflowPolicy overflowPolicy);
 
     FormattedText(FormattedText&&) = default;
     FormattedText& operator=(FormattedText&&) = default;
@@ -60,6 +61,7 @@ public:
     float baseline() const;
     HorizontalPositionPolicy horizontalPositionPolicy() const;
     BaselinePolicy baselinePolicy() const;
+    OverflowPolicy overflowPolicy() const;
     inline const std::string& content() const { return content_; }
     inline const std::vector<FormatModifier> & formatModifiers() const { return formatModifiers_; }
 
@@ -77,8 +79,6 @@ public:
     const std::string& debug_getDefautlPostScriptName() const;
     void debug_setDefautlPostScriptName(const std::string& name);
 private:
-    FormattedText() {} //! used exclusively by TextParser
-
     FormattedText(const FormattedText& other) = default;
 
     compat::qchar replace(compat::qchar cp);
@@ -94,6 +94,7 @@ private:
     float baseline_;
     HorizontalPositionPolicy horizontalPositioning_;
     BaselinePolicy baselinePolicy_;
+    OverflowPolicy overflowPolicy_;
 
     /**
      * Original text value encoded as UTF-8 string

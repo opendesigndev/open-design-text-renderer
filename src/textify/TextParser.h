@@ -47,6 +47,7 @@ private:
     HorizontalAlign parseHorizontalAlign() const;
     BoundsMode parseBoundsMode() const;
     BaselinePolicy parseBaselinePolicy() const;
+    OverflowPolicy parseOverflowPolicy() const;
     compat::Matrix3f parseTransformation() const;
     Decoration parseDecoration(const octopus::TextStyle& style) const;
     GlyphFormat::Ligatures parseLigatures(const octopus::TextStyle& style) const;

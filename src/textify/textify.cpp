@@ -298,6 +298,7 @@ TextShapeResult shapeTextInner(Context& ctx,
     auto y = 0.0f;
     auto positioning = VerticalPositioning::TOP_BOUND;
     auto baselineSet = text.baselinePolicy() == BaselinePolicy::SET;
+    auto overflowPolicy = text.overflowPolicy();
 
     // TODO: move to a standalone function
     auto drawShapes = [&]() {
@@ -307,7 +308,7 @@ TextShapeResult shapeTextInner(Context& ctx,
                 paragraphShape->draw(ctx, 0, static_cast<int>(std::floor(maxWidth)), y, positioning, 1.0f, last, baselineSet, false);
 
             const auto lastLinePolicy =
-                (ctx.config.cutLastLine && (paragraphs.size() > 1 || drawResult.journal.size() > 1))
+                (overflowPolicy == OverflowPolicy::CLIP_LINE && drawResult.journal.size() > 1)
                     ? LastLinePolicy::CUT
                     : LastLinePolicy::FORCE;
             drawResult.journal.setLastLinePolicy(lastLinePolicy);
@@ -452,13 +453,15 @@ TextDrawResult drawTextInner(
     auto caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
     const auto& shapes = paragraphShapes;
     auto hasBaselineTransform = text.baselinePolicy() == BaselinePolicy::SET;
+    auto overflowPolicy = text.overflowPolicy();
 
     // TODO: move to a function
     for (const auto& paragraphShape : shapes) {
         auto last = paragraphShape == shapes.back();
         auto drawResult = paragraphShape->draw(ctx, 0, textBounds.w, caretVerticalPos, positioning, scale, last, hasBaselineTransform, alphaMask);
 
-        const auto lastLinePolicy = (ctx.config.cutLastLine && (shapes.size() > 1 || drawResult.journal.size() > 1))
+        const auto lastLinePolicy =
+            (overflowPolicy == OverflowPolicy::CLIP_LINE && drawResult.journal.size() > 1)
                                         ? LastLinePolicy::CUT
                                         : LastLinePolicy::FORCE;
         drawResult.journal.setLastLinePolicy(lastLinePolicy);
@@ -476,10 +479,14 @@ TextDrawResult drawTextInner(
     auto baselineOffset = resolveBaselineOffset(text, paragraphResults.front());
     auto verticalOffset = resolveVerticalAlignment(text, textBounds, textBottom, baselineOffset * scale);
 
-    auto unlimitedVerticalStretch = ctx.config.infiniteVerticalStretch || text.boundsMode() == BoundsMode::AUTO_HEIGHT || text.verticalAlign() != VerticalAlign::TOP;
+    auto unlimitedVerticalStretch
+        = overflowPolicy == OverflowPolicy::EXTEND_ALL || text.boundsMode() == BoundsMode::AUTO_HEIGHT || text.verticalAlign() != VerticalAlign::TOP;
 
     auto verticalStretchLimit = unlimitedVerticalStretch ? 0 : textBounds.h;
-    auto stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
+    auto stretchedGlyphsBounds = compat::Rectangle{};
+    if (text.boundsMode() != BoundsMode::FIXED || overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
+        stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
+    }
     auto stretchedTextBounds = stretchBounds(textBounds, stretchedGlyphsBounds);
 
     auto bitmapBounds = outerRect(stretchedTextBounds);
