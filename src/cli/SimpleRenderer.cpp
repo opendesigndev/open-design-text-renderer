@@ -128,16 +128,17 @@ bool SimpleRenderer::renderTextLayer(const octopus::Layer& layer, Canvas& canvas
         return false;
     }
 
-    // auto viewArea = std::optional<textify::Rectangle>{};
 
-    auto viewArea = textify::Rectangle{56, 76, 163, 117};
+    auto viewArea = std::optional<textify::Rectangle>{};
+
+    // to test view area
+    // auto viewArea = textify::Rectangle{56, 76, 163, 117};
     // auto viewArea = textify::Rectangle{109, 138, 163, 117};
     // auto viewArea = textify::Rectangle{60, 79, 163, 117};
 
     if (viewArea_.has_value()) {
         // auto viewRectLayer = utils::transform(utils::toFRectangle(viewArea_.value()), convertMatrix(layer.transform));
         // viewArea = unsafe::cast<textify::Rectangle>(utils::outerRect(viewRectLayer));
-
         // viewArea = unsafe::cast<textify::Rectangle>(viewArea_.value());
     }
 

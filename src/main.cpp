@@ -205,7 +205,7 @@ bool runOctopusRenderer(const std::string& filename) {
         fmt::print("# layers: {}\n", octopus.content.get()->layers.value().size());
     }
 
-    auto renderer = textify::cli::SimpleRenderer{octopus, 2.0f};
+    auto renderer = textify::cli::SimpleRenderer{octopus, 1.0f};
     renderer.renderToFile("preview.png");
 
     return true;
