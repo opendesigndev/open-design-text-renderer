@@ -70,6 +70,7 @@ VerticalAlign TextParser::parseVerticalAlign() const
         case octopus::Text::VerticalAlign::BOTTOM:
             return VerticalAlign::BOTTOM;
     }
+    return { };
 }
 
 HorizontalAlign TextParser::parseHorizontalAlign() const
@@ -87,6 +88,7 @@ HorizontalAlign TextParser::parseHorizontalAlign() const
         case octopus::Text::HorizontalAlign::JUSTIFY:
             return HorizontalAlign::JUSTIFY;
     }
+    return { };
 }
 
 BoundsMode TextParser::parseBoundsMode() const
@@ -101,6 +103,7 @@ BoundsMode TextParser::parseBoundsMode() const
         case octopus::TextFrame::Mode::FIXED:
             return BoundsMode::FIXED;
     }
+    return { };
 }
 
 BaselinePolicy TextParser::parseBaselinePolicy() const
@@ -118,6 +121,7 @@ BaselinePolicy TextParser::parseBaselinePolicy() const
         case octopus::Text::BaselinePolicy::OFFSET_BEARING:
             return BaselinePolicy::OFFSET_BEARING;
     }
+    return { };
 }
 
 OverflowPolicy TextParser::parseOverflowPolicy() const
@@ -135,6 +139,7 @@ OverflowPolicy TextParser::parseOverflowPolicy() const
         case octopus::Text::OverflowPolicy::EXTEND_ALL:
             return OverflowPolicy::EXTEND_ALL;
     }
+    return { };
 }
 
 constexpr float deg2rad(float deg) {

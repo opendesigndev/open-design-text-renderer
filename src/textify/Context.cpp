@@ -27,7 +27,7 @@ int Context::removeInactiveShapes()
         std::remove_if(std::begin(shapes), std::end(shapes), [](const auto& shape) { return !shape->active; }),
         std::end(shapes)
     );
-    return before - shapes.size();
+    return int(before - shapes.size());
 }
 
 }
