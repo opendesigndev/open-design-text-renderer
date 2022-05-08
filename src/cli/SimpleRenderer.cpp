@@ -167,9 +167,9 @@ bool SimpleRenderer::renderText(const octopus::Text& text, Canvas& canvas, const
         const auto& r = viewArea.value();
         log->info("drawing text after reading cutout: {}, {} | {} x {}", r.l, r.t, r.w, r.h);
     }
-    auto drawOptions = textify::DrawOptions{
-        .scale = scale_,
-        .viewArea = viewArea
+    textify::DrawOptions drawOptions = {
+        scale_,
+        viewArea
     };
 
     auto [width, height] = textify::getDrawBufferDimensions(textifyCtx_, textShape, drawOptions);
@@ -180,7 +180,7 @@ bool SimpleRenderer::renderText(const octopus::Text& text, Canvas& canvas, const
 
     auto drawResult = textify::drawText(textifyCtx_, textShape, bitmap.pixels(), width, height, drawOptions);
     if (drawResult.error) {
-        log->error("failed to shape text content: {}...", text.value.substr(0, std::min(text.value.size(), 16ul)));
+        log->error("failed to shape text content: {}...", text.value.substr(0, std::min(text.value.size(), (size_t) 16)));
         return false;
     }
 

@@ -11,8 +11,8 @@
 #include <cstddef>
 
 namespace octopus {
-    class Octopus;
-    class Layer;
+    struct Octopus;
+    struct Layer;
 }
 
 namespace textify {
