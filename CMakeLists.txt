@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.13)
-project(textify2)
+cmake_minimum_required(VERSION 3.16)
+project(textify)
 
 get_directory_property(PARENT_DIR PARENT_DIRECTORY)
 if (PARENT_DIR)
@@ -57,16 +57,10 @@ if (NOT TEXTIFY_HAVE_LIBOCTOPUS)
     set(LIBOCTOPUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/liboctopus)
 endif()
 
-# TODO: the test for MSCV should be removed once a vcpkg is set up
-if (NOT MSVC)
-    find_package(PNG REQUIRED)
-    find_package(Freetype REQUIRED)
-    find_package(Harfbuzz REQUIRED)
-    find_package(ICU COMPONENTS uc data)
-endif()
-
-message("ICU library: ${ICU_LIBRARY}")
-message("Harfbuzz library: ${HARFBUZZ_LIBRARIES}")
+find_package(PNG REQUIRED)
+find_package(Freetype REQUIRED)
+find_package(HarfBuzz REQUIRED)
+find_package(ICU COMPONENTS uc data)
 
 set(TEXTIFY_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -239,11 +233,8 @@ foreach(TARGET IN ITEMS textify textify-cli)
     target_include_directories(${TARGET} PUBLIC  ${TEXTIFY_INCLUDE_DIR}
                                          PRIVATE ${TEXTIFY_SOURCE_DIR}
                                                  ${TEXTIFY_SOURCE_DIR}/vendor
-                                                 ${LIBOCTOPUS_INCLUDE}
-                                                 ${FREETYPE_INCLUDE_DIRS}
-                                                 ${HARFBUZZ_INCLUDE_DIRS}
                                                  ${ICU_INCLUDE_DIR})
 
-    target_link_libraries(${TARGET} PRIVATE liboctopus ${FREETYPE_LIBRARIES} ${ZLIB_LIBRARY} ${PNG_LIBRARIES} ${HARFBUZZ_LIBRARIES} ${ICU_LIBRARY} ${FREETYPE_LIBRARIES})
+    target_link_libraries(${TARGET} PRIVATE PNG::PNG freetype harfbuzz harfbuzz::harfbuzz ${ICU_LIBRARY} liboctopus)
 
 endforeach()
