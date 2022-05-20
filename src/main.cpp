@@ -115,7 +115,7 @@ bool minimalExample() {
         .value = "First line\nSecond line",
         .defaultStyle = style1,
         .styles = std::vector<octopus::StyleRange>{octopus::StyleRange{style2, {{0, 10}}}},
-        .textTransform =
+        .transform =
         {
             0.7771459817886353,
             -0.6293203830718994,

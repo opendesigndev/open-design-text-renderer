@@ -148,7 +148,7 @@ constexpr float deg2rad(float deg) {
 
 compat::Matrix3f TextParser::parseTransformation() const
 {
-    auto t = text.textTransform;
+    auto t = text.transform;
     auto transformation = compat::Matrix3f::identity;
 
     transformation[0][0] = t[0];
