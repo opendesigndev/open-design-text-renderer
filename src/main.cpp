@@ -83,53 +83,48 @@ struct File
 };
 
 bool minimalExample() {
-    auto ctxOptions = textify::ContextOptions{
-        .errorFunc = [] (const std::string& msg) {
-            fmt::print(fg(fmt::color::white) | bg(fmt::color::crimson) | fmt::emphasis::bold, "[ERROR] {}", msg);
-            fmt::print("\n");
-        },
-        .warnFunc = [] (const std::string& msg) { fmt::print("[WARN] {}\n", msg); },
-        .infoFunc = [] (const std::string& msg) { fmt::print("[INFO] {}\n", msg); },
+    textify::ContextOptions ctxOptions;
+    ctxOptions.errorFunc = [](const std::string &msg) {
+        fmt::print(fg(fmt::color::white) | bg(fmt::color::crimson) | fmt::emphasis::bold, "[ERROR] {}", msg);
+        fmt::print("\n");
     };
+    ctxOptions.warnFunc = [](const std::string &msg) { fmt::print("[WARN] {}\n", msg); };
+    ctxOptions.infoFunc = [](const std::string &msg) { fmt::print("[INFO] {}\n", msg); };
 
     auto ctx = TextifyContext(ctxOptions);
     if (!ctx) {
         return false;
     }
 
-    auto fill = octopus::Fill {
-        .type = octopus::Fill::Type::COLOR,
-        .color = octopus::Color{0.9f, 0.1f, 0.1, 1.0f}
-    };
+    octopus::Fill fill;
+    fill.type = octopus::Fill::Type::COLOR;
+    fill.color = octopus::Color { 0.9f, 0.1f, 0.1, 1.0f };
 
     octopus::TextStyle style1;
     style1.fontSize = 36;
-    style1.font = { .postScriptName = "IBMPlexSans-Regular" };
+    style1.font = octopus::Font();
+    style1.font->postScriptName = "IBMPlexSans-Regular";
     style1.fills = {fill};
 
     octopus::TextStyle style2;
     style2.fontSize = 36;
-    style2.font = { .postScriptName = "IBMPlexSans-Regular" };
+    style2.font = octopus::Font();
+    style2.font->postScriptName = "IBMPlexSans-Regular";
 
-    octopus::Text text1 = {
-        .value = "First line\nSecond line",
-        .defaultStyle = style1,
-        .styles = std::vector<octopus::StyleRange>{octopus::StyleRange{style2, {{0, 10}}}},
-        .transform =
-        {
-            0.7771459817886353,
-            -0.6293203830718994,
-            0.6293203830718994,
-            0.7771459817886353,
-            187.2850799560547,
-            314.066650390625
-        },
-        .frame = octopus::TextFrame{
-            .mode = octopus::TextFrame::Mode::AUTO_WIDTH,
-            .size = octopus::Dimensions{ 125, 31 }
-        },
-        .baselinePolicy = octopus::Text::BaselinePolicy::SET
-    };
+    octopus::Text text1;
+    text1.value = "First line\nSecond line";
+    text1.defaultStyle = style1;
+    text1.styles = std::vector<octopus::StyleRange> { octopus::StyleRange{style2, {{0, 10}}} };
+    text1.transform[0] = 0.7771459817886353;
+    text1.transform[1] = -0.6293203830718994;
+    text1.transform[2] = 0.6293203830718994;
+    text1.transform[3] = 0.7771459817886353;
+    text1.transform[4] = 187.2850799560547;
+    text1.transform[5] = 314.066650390625;
+    text1.frame = octopus::TextFrame();
+    text1.frame->mode = octopus::TextFrame::Mode::AUTO_WIDTH;
+    text1.frame->size = octopus::Dimensions { 125, 31 };
+    text1.baselinePolicy = octopus::Text::BaselinePolicy::SET;
 
     const auto& text = text1;
 
@@ -166,10 +161,9 @@ bool minimalExample() {
     // height *= scale;
 
     auto viewArea = textify::Rectangle{141, 151, 80, 117};
-    auto drawOptions = textify::DrawOptions{
-        .scale = scale,
-        // .viewArea = viewArea
-    };
+    textify::DrawOptions drawOptions;
+    drawOptions.scale = scale;
+    //drawOptions.viewArea = viewArea;
 
     auto [width, height] = textify::getDrawBufferDimensions(ctx, textShape, drawOptions);
 
