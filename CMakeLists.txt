@@ -57,6 +57,7 @@ if (NOT TEXTIFY_HAVE_LIBOCTOPUS)
     set(LIBOCTOPUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/liboctopus)
 endif()
 
+find_package(Threads REQUIRED)
 find_package(PNG REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(HarfBuzz REQUIRED)
@@ -219,22 +220,18 @@ set (TEXTIFY_HEADERS ${TEXTIFY_PUBLIC_HEADERS} ${TEXTIFY_PRIVATE_HEADERS})
 # adds static library target
 add_library(textify ${TEXTIFY_SOURCES} ${TEXTIFY_HEADERS})
 
+set_property(TARGET textify PROPERTY CXX_STANDARD 17)
+target_compile_definitions(textify PRIVATE ${TEXTIFY_DEFINITIONS})
+
+target_include_directories(textify PUBLIC  ${TEXTIFY_INCLUDE_DIR}
+                                   PRIVATE ${TEXTIFY_SOURCE_DIR}
+                                           ${TEXTIFY_SOURCE_DIR}/vendor
+                                           ${ICU_INCLUDE_DIR})
+
+target_link_libraries(textify PRIVATE Threads::Threads PNG::PNG freetype harfbuzz harfbuzz::harfbuzz ${ICU_LIBRARY} liboctopus)
+
 # adds runnable target
-add_executable(textify-cli ${TEXTIFY_SOURCES} ${TEXTIFY_HEADERS} "${TEXTIFY_SOURCE_DIR}/main.cpp")
+add_executable(textify-cli "${TEXTIFY_SOURCE_DIR}/main.cpp")
 
-# adds tests target
-# add_executable(textify2tests ${TEXTIFY_SOURCES} ${TEXTIFY_HEADERS} "${TEXTIFY_SOURCE_DIR}/textify-tests.cpp")
-
-foreach(TARGET IN ITEMS textify textify-cli)
-    set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 17)
-
-    target_compile_definitions(${TARGET} PRIVATE ${TEXTIFY_DEFINITIONS})
-
-    target_include_directories(${TARGET} PUBLIC  ${TEXTIFY_INCLUDE_DIR}
-                                         PRIVATE ${TEXTIFY_SOURCE_DIR}
-                                                 ${TEXTIFY_SOURCE_DIR}/vendor
-                                                 ${ICU_INCLUDE_DIR})
-
-    target_link_libraries(${TARGET} PRIVATE PNG::PNG freetype harfbuzz harfbuzz::harfbuzz ${ICU_LIBRARY} liboctopus)
-
-endforeach()
+target_include_directories(textify-cli PRIVATE ${TEXTIFY_SOURCE_DIR}/vendor ${TEXTIFY_SOURCE_DIR})
+target_link_libraries(textify-cli PRIVATE liboctopus textify)
