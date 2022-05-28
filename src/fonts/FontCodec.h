@@ -23,7 +23,7 @@ const unsigned int SIGNATURE = 'DCVA';
 
 class Codec {
 public:
-    typedef Result<BufferType, bool> Result;
+    typedef ::Result<BufferType, bool> Result;
 
     virtual ~Codec() = default;
     virtual Result encode(const BufferType & input) = 0;
