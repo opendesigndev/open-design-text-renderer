@@ -192,8 +192,8 @@ bool runOctopusRenderer(const std::string& filename) {
 
     octopus::Octopus octopus;
     auto err = octopus::Parser::parse(octopus, raw.data());
-    if (err != octopus::Parser::Error::OK) {
-        fmt::print("error: {}\n", (int)err);
+    if (err != octopus::Parser::OK) {
+        fmt::print("error: {}\n", (int)err.type);
         return false;
     } else {
         fmt::print("# layers: {}\n", octopus.content.get()->layers.value().size());
