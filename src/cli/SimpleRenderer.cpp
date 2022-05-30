@@ -76,8 +76,8 @@ SimpleRenderer::~SimpleRenderer()
 
 bool SimpleRenderer::renderToFile(const std::string& filename)
 {
-    auto w = static_cast<int>(std::ceil(octopus_.dimensions.width));
-    auto h = static_cast<int>(std::ceil(octopus_.dimensions.height));
+    auto w = octopus_.dimensions.has_value() ? static_cast<int>(std::ceil(octopus_.dimensions->width)) : 256;
+    auto h = octopus_.dimensions.has_value() ? static_cast<int>(std::ceil(octopus_.dimensions->height)) : 256;
 
     auto canvas = Canvas{scale(w), scale(h)};
 
