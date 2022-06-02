@@ -130,18 +130,18 @@ template <typename T>
 Bitmap<T>& Bitmap<T>::operator=(const Bitmap<T>& orig) {
     if (this != &orig) {
         #ifndef __EMSCRIPTEN__
-        if (ownsData_) {
-            pixels_ = reinterpret_cast<T*>(realloc(pixels_, sizeof(T)*orig.width_*orig.height_));
-        } else {
-            pixels_ = reinterpret_cast<T*>(malloc(sizeof(T)*orig.width_*orig.height_));
-        }
-        ownsData_ = true;
+            if (ownsData_) {
+                pixels_ = reinterpret_cast<T*>(realloc(pixels_, sizeof(T)*orig.width_*orig.height_));
+            } else {
+                pixels_ = reinterpret_cast<T*>(malloc(sizeof(T)*orig.width_*orig.height_));
+            }
+            ownsData_ = true;
         #else
             T* newPixels = nullptr;
             if (ownsData_) {
-                newPixels = realloc(pixels_, sizeof(T)*orig.width_*orig.height_)
+                newPixels = reinterpret_cast<T*>(realloc(pixels_, sizeof(T)*orig.width_*orig.height_));
             } else {
-                newPixels = reinterpret_cast<T*>(malloc(sizeof(T)*orig.width*orig.height))
+                newPixels = reinterpret_cast<T*>(malloc(sizeof(T)*orig.width*orig.height));
             }
             if (newPixels) {
                 ownsData_ = true;

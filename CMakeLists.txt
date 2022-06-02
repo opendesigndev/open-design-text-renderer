@@ -15,6 +15,7 @@ endif()
 # TODO: default OFF
 option(TEXTIFY_DEBUG "Debug Mode" ON)
 option(TEXTIFY_USE_ENCRYPTED_FONTS "Support Avocode fonts encoded via LZ4/Monocypher" ON)
+option(TEXTIFY_BUILD_CLI "Build Textify CLI utility" ${STANDALONE})
 
 # TEXTIFY_HAVE_LIBOCTOPUS: if ON LIBOCTOPUS_INCLUDE variable and 'liboctopus' target are expected to be loaded into the current scope
 # option(TEXTIFY_HAVE_LIBOCTOPUS "Liboctopus provided externally" $<BOOL:$<NOT,${STANDALONE}>>)
@@ -50,7 +51,7 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/third_party/platform/${PLATFORM})
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 if (NOT TEXTIFY_HAVE_LIBOCTOPUS)
     add_subdirectory(third_party/liboctopus)
@@ -82,10 +83,6 @@ set(TEXTIFY_PRIVATE_HEADERS
     ${TEXTIFY_SOURCE_DIR}/common/hash_utils.hpp
     ${TEXTIFY_SOURCE_DIR}/common/lexical_cast.hpp
     ${TEXTIFY_SOURCE_DIR}/common/sorted_vector.hpp
-
-    ${TEXTIFY_SOURCE_DIR}/cli/Canvas.h
-    ${TEXTIFY_SOURCE_DIR}/cli/octopus-utils.h
-    ${TEXTIFY_SOURCE_DIR}/cli/SimpleRenderer.h
 
     # rendering shim layer
     ${TEXTIFY_SOURCE_DIR}/compat/affine-transform.h
@@ -156,10 +153,6 @@ set(TEXTIFY_SOURCES
 
     ${TEXTIFY_SOURCE_DIR}/common/buffer_view.cpp
 
-    ${TEXTIFY_SOURCE_DIR}/cli/Canvas.cpp
-    ${TEXTIFY_SOURCE_DIR}/cli/octopus-utils.cpp
-    ${TEXTIFY_SOURCE_DIR}/cli/SimpleRenderer.cpp
-
     ${TEXTIFY_SOURCE_DIR}/compat/affine-transform.cpp
     ${TEXTIFY_SOURCE_DIR}/compat/arithmetics.cpp
     ${TEXTIFY_SOURCE_DIR}/compat/basic-types.cpp
@@ -204,6 +197,18 @@ set(TEXTIFY_SOURCES
     ${TEXTIFY_SOURCE_DIR}/vendor/fmt/format.cc
 )
 
+set(TEXTIFY_CLI_HEADERS
+    ${TEXTIFY_SOURCE_DIR}/main.cpp
+    ${TEXTIFY_SOURCE_DIR}/cli/Canvas.h
+    ${TEXTIFY_SOURCE_DIR}/cli/octopus-utils.h
+    ${TEXTIFY_SOURCE_DIR}/cli/SimpleRenderer.h
+)
+set(TEXTIFY_CLI_SOURCES
+    ${TEXTIFY_SOURCE_DIR}/cli/Canvas.cpp
+    ${TEXTIFY_SOURCE_DIR}/cli/octopus-utils.cpp
+    ${TEXTIFY_SOURCE_DIR}/cli/SimpleRenderer.cpp
+)
+
 set(TEXTIFY_DEFINITIONS "")
 
 if(TEXTIFY_USE_ENCRYPTED_FONTS)
@@ -233,7 +238,8 @@ target_include_directories(textify PUBLIC  ${TEXTIFY_INCLUDE_DIR}
 target_link_libraries(textify PRIVATE Threads::Threads PNG::PNG freetype harfbuzz harfbuzz::harfbuzz ${ICU_LIBRARY} liboctopus)
 
 # adds runnable target
-add_executable(textify-cli "${TEXTIFY_SOURCE_DIR}/main.cpp")
-
-target_include_directories(textify-cli PRIVATE ${TEXTIFY_SOURCE_DIR}/vendor ${TEXTIFY_SOURCE_DIR})
-target_link_libraries(textify-cli PRIVATE liboctopus textify)
+if(TEXTIFY_BUILD_CLI AND NOT EMSCRIPTEN)
+    add_executable(textify-cli ${TEXTIFY_CLI_SOURCES} ${TEXTIFY_CLI_HEADERS})
+    target_include_directories(textify-cli PRIVATE ${TEXTIFY_SOURCE_DIR}/vendor ${TEXTIFY_SOURCE_DIR})
+    target_link_libraries(textify-cli PRIVATE liboctopus textify)
+endif()
