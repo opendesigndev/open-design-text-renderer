@@ -62,7 +62,7 @@ find_package(Threads REQUIRED)
 find_package(PNG REQUIRED)
 find_package(Freetype REQUIRED)
 if(NOT TARGET harfbuzz::harfbuzz)
-    find_package(HarfBuzz REQUIRED)
+    find_package(harfbuzz REQUIRED)
 endif()
 find_package(ICU COMPONENTS uc data)
 
