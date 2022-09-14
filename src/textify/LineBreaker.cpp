@@ -39,15 +39,16 @@ LineBreaker::LineStarts LineBreaker::analyzeBreaks(const utils::Log& log, const 
     auto locale = icu::Locale::getDefault(); // TODO Recognize locale from text
     UErrorCode error = U_ZERO_ERROR;
     auto bi = icu::BreakIterator::createLineInstance(locale, error);
+    auto utext = ustring::fromUTF32(reinterpret_cast<const UChar32*>(text.data()), static_cast<int32_t>(text.size()));
+    opportunities.assign(utext.length() + 1, false); // The last possible line start is just beyond the last character
+
     if (U_FAILURE(error)) {
         log.error("Cannot instantiate ICU line break iterator: {}.", u_errorName(error));
         delete bi;
-        return {};
+        return opportunities;
     }
 
-    auto utext = ustring::fromUTF32(reinterpret_cast<const UChar32*>(text.data()), static_cast<int32_t>(text.size()));
     bi->setText(utext);
-    opportunities.assign(utext.length() + 1, false); // The last possible line start is just beyond the last character
     do {
         opportunities.at(bi->current()) = true;
     } while (bi->next() != icu::BreakIterator::DONE);
