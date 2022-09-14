@@ -85,8 +85,21 @@ bool addFontFile(Context* ctx, const std::string& postScriptName, const std::str
 
 bool addFontBytes(ContextHandle ctx, const std::string& postScriptName, const std::string& inFontFaceName, const std::uint8_t* data, size_t length, bool override)
 {
-    // TODO:
-    return false;
+    auto facesToUpdate = FacesNames{}; // TODO override?
+    if (ctx->fontManager->faceExists(postScriptName)) {
+        facesToUpdate.push_back(postScriptName);
+    }
+
+    // TODO get rid of const_cast
+    auto result = ctx->fontManager->loadFaceAs(postScriptName, postScriptName, inFontFaceName, BufferView(const_cast<std::uint8_t *>(data), length));
+
+    for (const auto& shape : ctx->shapes) {
+        for (const auto& face : facesToUpdate) {
+            shape->onFontFaceChanged(face);
+        }
+    }
+
+    return result;
 }
 
 std::vector<std::string> listMissingFonts(Context* ctx, const octopus::Text& text)
