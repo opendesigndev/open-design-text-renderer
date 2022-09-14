@@ -85,7 +85,6 @@ public:
 
     void setRequiresDefaultEmojiFont();
 
-private:
     /**
      * Loads font from a given buffer
      *
@@ -98,6 +97,7 @@ private:
      */
     bool loadFaceAs(const std::string& key, const std::string& faceKey, const std::string& faceName, BufferView data);
 
+private:
     bool storeFile(const std::string& storageKey, const std::string& filename, bool replace);
 
     const utils::Log& log_;
