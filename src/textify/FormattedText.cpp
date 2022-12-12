@@ -1,9 +1,12 @@
 #include "FormattedText.h"
-#include "textify/text-format.h"
 
 #include <algorithm>
 #include <cmath>
 #include <locale>
+
+#include "textify/text-format.h"
+#include "fonts/FontManager.h"
+#include "unicode/EmojiTable.h"
 
 
 namespace textify {
@@ -309,6 +312,14 @@ std::unordered_set<std::string> FormattedText::collectUsedFaceNames() const
     for (const auto& mod : formatModifiers_) {
         if (mod.FACE) {
             faces.insert(mod.face);
+        }
+    }
+
+    const unicode::EmojiTable &emojiTable = unicode::EmojiTable::instance();
+    for (compat::qchar ch : text_) {
+        if (emojiTable.lookup(ch)) {
+            faces.insert(FontManager::DEFAULT_EMOJI_FONT);
+            break;
         }
     }
 
