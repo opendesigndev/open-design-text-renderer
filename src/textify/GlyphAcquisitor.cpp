@@ -65,28 +65,30 @@ void GlyphAcquisitor::setup(const Parameters& params, FT_Face ftFace)
 
 GlyphPtr GlyphAcquisitor::acquire(FT_UInt codepoint, const Vector2f& offset, const ScaleParams& scale, bool render) const
 {
-    auto slotResult = acquireSlot(codepoint, offset, scale.vectorScale);
-    if(!slotResult) {
+    const Result<FT_GlyphSlot, bool> slotResult = acquireSlot(codepoint, offset, scale.vectorScale);
+    if (!slotResult) {
         return nullptr;
     }
-    auto glyphSlot = slotResult.value();
-    /*if (!glyphSlot->glyph_index) {
-        // return nullptr;
-    }*/
 
-    auto glyph = createGlyph(glyphSlot);
+    const FT_GlyphSlot glyphSlot = slotResult.value();
+    GlyphPtr glyph = createGlyph(glyphSlot);
 
-    bool bitmapGlyph = glyphSlot->format == FT_GLYPH_FORMAT_BITMAP; // format will change after FT_Render_Glyph
+    const bool bitmapGlyph = glyphSlot->format == FT_GLYPH_FORMAT_BITMAP; // format will change after FT_Render_Glyph
 
     if (params_.scalable && render) {
         FreetypeHandle::error = FT_Render_Glyph(glyphSlot, FT_RENDER_MODE_LIGHT);
-        FreetypeHandle::checkOk(__func__);
+        const bool isRendered = FreetypeHandle::checkOk(__func__);
+        if (!isRendered) {
+            return nullptr;
+        }
     }
 
-   auto bmpScaleFactor = scale.bitmapScale;
+    RenderScale bmpScaleFactor = scale.bitmapScale;
 
     if (render) {
-        glyph->putBitmap(glyphSlot->bitmap);
+        if (!glyph->putBitmap(glyphSlot->bitmap)) {
+            return nullptr;
+        }
 
         if (bitmapGlyph && params_.scalable)
             bmpScaleFactor *= scale.vectorScale;
@@ -94,12 +96,11 @@ GlyphPtr GlyphAcquisitor::acquire(FT_UInt codepoint, const Vector2f& offset, con
             glyph->scaleBitmap(bmpScaleFactor);
     }
 
-    auto k = bmpScaleFactor;
+    const RenderScale k = bmpScaleFactor;
     glyph->bitmapBearing.x = int(glyphSlot->bitmap_left * k);
     glyph->bitmapBearing.y = int(glyphSlot->bitmap_top * k);
     glyph->lsb_delta = FreetypeHandle::from26_6fixed(FT_F26Dot6(glyphSlot->lsb_delta * k));
     glyph->rsb_delta = FreetypeHandle::from26_6fixed(FT_F26Dot6(glyphSlot->rsb_delta * k));
-
     glyph->metricsBearingX = FreetypeHandle::from26_6fixed(FT_F26Dot6(glyphSlot->metrics.horiBearingX));
     glyph->metricsBearingY = FreetypeHandle::from26_6fixed(FT_F26Dot6(glyphSlot->metrics.horiBearingY));
 
@@ -117,8 +118,8 @@ Result<FT_GlyphSlot,bool> GlyphAcquisitor::acquireSlot(FT_UInt codepoint, const 
     FT_Set_Transform(ftFace_, &matrix, &delta);
 
     FreetypeHandle::error = FT_Load_Glyph(ftFace_, codepoint, params_.loadflags);
-    auto ok = FreetypeHandle::checkOk(__func__);
-    if (!ok) {
+    const bool isLoaded = FreetypeHandle::checkOk(__func__);
+    if (!isLoaded) {
         return false;
     }
 

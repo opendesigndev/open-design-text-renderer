@@ -87,6 +87,7 @@ bool FreetypeHandle::checkOk(const char* func)
         return true;
     }
 
+    // FT Error codes: https://freetype.org/freetype2/docs/reference/ft2-error_code_values.html
     // Log::instance.logf(Log::TEXTIFY, Log::ERROR, "Freetype error in function %s: (%d) %s.", func, error, getErrorMessage(error));
     error = FT_Err_Ok;
     return false;

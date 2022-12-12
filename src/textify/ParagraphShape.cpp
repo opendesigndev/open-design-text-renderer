@@ -232,8 +232,8 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                     }
                 }
 
-                auto faceID = unscaledGlyphShape.format.faceId;
-                auto faceItem = fontManager_.facesTable().getFaceItem(faceID);
+                const FaceId &faceID = unscaledGlyphShape.format.faceId;
+                const FaceTable::Item* faceItem = fontManager_.facesTable().getFaceItem(faceID);
                 if (!faceItem) {
                     log_.warn("Line drawing error: Missing font face \"{}\"", faceID);
                     continue;
@@ -368,6 +368,11 @@ std::size_t ParagraphShape::linesCount() const
 const GlyphShape& ParagraphShape::glyph(std::size_t index) const
 {
     return glyphs_[index];
+}
+
+const std::vector<GlyphShape> &ParagraphShape::glyphs() const
+{
+    return glyphs_;
 }
 
 ParagraphShape::ReportedFaces ParagraphShape::reportedFaces() const
