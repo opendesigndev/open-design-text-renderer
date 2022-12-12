@@ -102,6 +102,15 @@ TextDrawResult drawTextInner(
                     int width,
                     int height
                     );
-}
 
-}
+/// Draw individual ParagraphShapes.
+ParagraphShape::DrawResults draw(const ParagraphShapes &shapes,
+                                 Context &ctx,
+                                 const FormattedText &text,
+                                 int textWidth,
+                                 RenderScale scale,
+                                 bool isAlphaMask,
+                                 float &caretVerticalPos);
+
+} // namespace priv
+} // namespace textify

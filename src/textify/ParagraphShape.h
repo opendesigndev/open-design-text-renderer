@@ -302,6 +302,7 @@ private:
     const FontManager& fontManager_;
     bool loadBearing_;
 };
+using ParagraphShapePtr = std::unique_ptr<ParagraphShape>;
 
 } // namespace priv
 } // namespace textify

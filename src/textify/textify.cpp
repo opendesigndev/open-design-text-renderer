@@ -69,8 +69,7 @@ compat::FRectangle toFRectangle(const compat::Rectangle& r) {
  *
  * @return bounds object
  */
-compat::Rectangle
-stretchedBounds(const std::vector<ParagraphShape::DrawResult>& paragraphResults, int verticalOffset, int limit)
+compat::Rectangle stretchedBounds(const std::vector<ParagraphShape::DrawResult>& paragraphResults, int verticalOffset, int limit)
 {
     compat::Rectangle stretchedBounds = {};
 
@@ -442,36 +441,19 @@ TextDrawResult drawTextInner(
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
     RenderScale origScale = scale;
 
-    auto textBounds = scaleRect(unscaledTextBounds, scale);
+    compat::FRectangle textBounds = scaleRect(unscaledTextBounds, scale);
     if (!textBounds) {
         return TextDrawError::INVALID_SCALE;
     }
 
-    std::vector<ParagraphShape::DrawResult> paragraphResults;
+    float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
 
-    auto positioning = VerticalPositioning::BASELINE;
-    auto caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
-    const auto& shapes = paragraphShapes;
-    auto hasBaselineTransform = text.baselinePolicy() == BaselinePolicy::SET;
-    auto overflowPolicy = text.overflowPolicy();
-
-    // TODO: move to a function
-    for (const auto& paragraphShape : shapes) {
-        auto last = paragraphShape == shapes.back();
-        auto drawResult = paragraphShape->draw(ctx, 0, textBounds.w, caretVerticalPos, positioning, scale, last, hasBaselineTransform, alphaMask);
-
-        const auto lastLinePolicy =
-            (overflowPolicy == OverflowPolicy::CLIP_LINE && drawResult.journal.size() > 1)
-                                        ? LastLinePolicy::CUT
-                                        : LastLinePolicy::FORCE;
-        drawResult.journal.setLastLinePolicy(lastLinePolicy);
-
-        paragraphResults.emplace_back(std::move(drawResult));
-    }
-
+    const ParagraphShape::DrawResults paragraphResults = draw(paragraphShapes, ctx, text, textBounds.w, scale, alphaMask, caretVerticalPos);
     if (paragraphResults.empty()) {
         return TextDrawError::PARAGRAPHS_TYPESETING_ERROR;
     }
+
+    const OverflowPolicy overflowPolicy = text.overflowPolicy();
 
     // account for descenders of last paragraph's last line
     auto textBottom = caretVerticalPos - paragraphResults.back().lastlineDescender;
@@ -526,5 +508,34 @@ TextDrawResult drawTextInner(
     return TextDrawOutput{bitmapBounds};
 }
 
+ParagraphShape::DrawResults draw(const ParagraphShapes &shapes,
+                                 Context &ctx,
+                                 const FormattedText &text,
+                                 int textWidth,
+                                 RenderScale scale,
+                                 bool isAlphaMask,
+                                 float &caretVerticalPos) {
+    ParagraphShape::DrawResults drawResults;
+
+    VerticalPositioning positioning = VerticalPositioning::BASELINE;
+    const bool hasBaselineTransform = text.baselinePolicy() == BaselinePolicy::SET;
+    const OverflowPolicy overflowPolicy = text.overflowPolicy();
+
+    for (const ParagraphShapePtr& paragraphShape : shapes) {
+        const bool isLast = (paragraphShape == shapes.back());
+        ParagraphShape::DrawResult drawResult = paragraphShape->draw(ctx, 0, textWidth, caretVerticalPos, positioning, scale, isLast, hasBaselineTransform, isAlphaMask);
+
+        const LastLinePolicy lastLinePolicy =
+            (overflowPolicy == OverflowPolicy::CLIP_LINE && drawResult.journal.size() > 1)
+            ? LastLinePolicy::CUT
+            : LastLinePolicy::FORCE;
+        drawResult.journal.setLastLinePolicy(lastLinePolicy);
+
+        drawResults.emplace_back(std::move(drawResult));
+    }
+
+    return drawResults;
 }
-}
+
+} // namespace priv
+} // namespace textify
