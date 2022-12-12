@@ -51,6 +51,7 @@ struct GlyphShape
 
     Scalable scaledGlyphShape(float scale) const;
 };
+using GlyphShapes = std::vector<GlyphShape>;
 
 } // namespace priv
 } // namespace textify

@@ -7,14 +7,15 @@
 #include <optional>
 #include <vector>
 
+// Forward declaration
 namespace textify {
-
 namespace utils {
 class Log;
 }
+}
 
+namespace textify {
 namespace priv {
-
 
 struct LineSpan
 {
@@ -42,8 +43,8 @@ struct LineSpan
     TextDirection baseDir;
     Justifiable justifiable;
 };
+using LineSpans = std::vector<LineSpan>;
 
-typedef std::vector<LineSpan> LineSpans;
 
 class LineBreaker
 {

@@ -31,6 +31,7 @@ struct VisualRun
     TextDirection dir;
     float width;
 };
+using VisualRuns = std::vector<VisualRun>;
 
 inline static bool isWhitespace(compat::qchar c)
 {

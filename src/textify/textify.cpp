@@ -15,7 +15,6 @@
 #include "compat/basic-types.h"
 #include "compat/Bitmap.hpp"
 
-#include "utils/fmt.h"
 #include "utils/utils.h"
 
 #include <octopus/text.h>
@@ -280,7 +279,7 @@ TextShapeResult shapeTextInner(Context& ctx,
     ParagraphShapes shapes;
     for (const FormattedParagraph& paragraph : paragraphs) {
         const bool loadBearing = text.baselinePolicy() == BaselinePolicy::OFFSET_BEARING;
-        ParagraphShapePtr paragraphShape = std::make_unique<ParagraphShape>(log, ctx.getFontManager(), loadBearing);
+        ParagraphShapePtr paragraphShape = std::make_unique<ParagraphShape>(log, ctx.getFontManager().facesTable(), loadBearing);
         const ParagraphShape::ShapeResult shapeResult = paragraphShape->shape(paragraph, maxWidth);
 
         if (shapeResult.success) {

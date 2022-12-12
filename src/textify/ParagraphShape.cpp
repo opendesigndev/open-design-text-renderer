@@ -80,25 +80,26 @@ void ParagraphShape::ReportedFaces::merge(const ReportedFaces& other)
 }
 
 
-ParagraphShape::ParagraphShape(const utils::Log& log, const FontManager& fontManager, bool loadBearing)
-    : log_(log), fontManager_(fontManager), loadBearing_(loadBearing)
-{ }
+ParagraphShape::ParagraphShape(const utils::Log& log, const FaceTable &faceTable, bool loadGlyphsBearings) :
+    log_(log),
+    faceTable_(faceTable),
+    loadGlyphsBearings_(loadGlyphsBearings)
+{
+}
 
 ParagraphShape::ShapeResult ParagraphShape::shape(const FormattedParagraph& paragraph, float width)
 {
     if (paragraph.text_.size() != paragraph.format_.size()) {
-        log_.warn("Paragraph shaping error: Text format incorrectly expanded.");
+        log_.warn("[Textify / ParagraphShape::shape] Paragraph shaping error: Text format incorrectly expanded.");
         return false;
     }
 
-    visualRuns_ = paragraph.visualRuns_;
-    baseDirection_ = paragraph.baseDirection_;
     // Prepare Unicode line break opportunities
-    lineStarts_ = LineBreaker::analyzeBreaks(log_,  paragraph.text_);
+    const LineBreaker::LineStarts lineStartsOpt = LineBreaker::analyzeBreaks(log_,  paragraph.text_);
 
     ShapeResult result(false);
-    auto textLen = static_cast<int>(paragraph.text_.size());
-    auto pos = 0;
+    const int textLen = static_cast<int>(paragraph.text_.size());
+    int pos = 0;
 
     // Divide paragraph into sequences with uniform glyph format
     while (pos < textLen) {
@@ -112,20 +113,20 @@ ParagraphShape::ShapeResult ParagraphShape::shape(const FormattedParagraph& para
             ++pos, ++seq.len;
         }
 
-        shapeSequence(seq, paragraph, fontManager_.facesTable(), result);
+        shapeSequence(seq, paragraph, faceTable_, lineStartsOpt, result);
     }
 
-    LineBreaker breaker{log_, glyphs_, visualRuns_, baseDirection_};
-    breaker.breakLines(int(width));
-    const auto& lineSpans = breaker.getLines();
+    LineBreaker breaker {log_, shapingPhaseOutput_.glyphs_, paragraph.visualRuns_, paragraph.baseDirection_};
+    breaker.breakLines(static_cast<int>(std::floor(width)));
+    const LineSpans &lineSpans = breaker.getLines();
     if (lineSpans.empty()) {
-        log_.warn("Paragraph breaking error: No lines present.");
+        log_.warn("[Textify / ParagraphShape::shape] Paragraph breaking error: No lines present.");
         return result;
     }
 
-    lineSpans_ = breaker.moveLines();
+    shapingPhaseOutput_.lineSpans_ = breaker.moveLines();
 
-    result.success = !glyphs_.empty();
+    result.success = !shapingPhaseOutput_.glyphs_.empty();
     return result;
 }
 
@@ -141,44 +142,44 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 {
     DrawResult result;
 
-    if (glyphs_.empty()) {
-        log_.warn("No glyphs in ParagraphShape.");
+    if (shapingPhaseOutput_.glyphs_.empty()) {
+        log_.warn("[Textify / ParagraphShape::draw] No glyphs in ParagraphShape.");
         return result;
     }
 
-    const float align = evaluateAlign(glyphs_[0].format.align, glyphs_[0].direction);
-    auto bearingX = glyphs_[0].bearingX * scale;
+    const float align = evaluateAlign(shapingPhaseOutput_.glyphs_[0].format.align, shapingPhaseOutput_.glyphs_[0].direction);
+    const spacing bearingX = shapingPhaseOutput_.glyphs_[0].bearingX * scale;
 
     Vector2f caret{0.0f, y};
-    for (auto& lineSpan : lineSpans_) {
+    for (const LineSpan &lineSpan : shapingPhaseOutput_.lineSpans_) {
         result.journal.startLine(caret.y);
 
         startCaret(lineSpan, caret.y, positioning, scale);
 
         // Resolve justification
-        JustifyParams justifyParams = {
+        const JustifyParams justifyParams {
                 (width > 0.0 ? width : lineSpan.lineWidth) / scale,
                 ctx.config.justifyAmbiguous,
                 ctx.config.limitJustifySpaceWidth
             };
 
-        auto justification = justify(lineSpan, justifyParams);
+        const JustifyResult justification = justify(lineSpan, justifyParams);
         if (!justification.success) {
             positioning = VerticalPositioning::PREV_BASELINE;
             continue;
         }
 
-        auto spaceCoef = justification.spaceCoef;
-        auto nonSpaceCoef = justification.nonSpaceCoef;
-        auto lineWidth = justification.lineWidth * scale;
+        const float spaceCoef = justification.spaceCoef;
+        const float nonSpaceCoef = justification.nonSpaceCoef;
+        const float lineWidth = justification.lineWidth * scale;
 
-        auto leftLimit = left + align * (width - lineWidth);
-        auto rightLimit = left + width - (1.0f - align) * (width - lineWidth);
+        const int leftLimit = left + align * (width - lineWidth);
+        const int rightLimit = left + width - (1.0f - align) * (width - lineWidth);
 
-        bool firstLine = &lineSpan == &lineSpans_.front();
+        const bool isFirstLine = &lineSpan == &shapingPhaseOutput_.lineSpans_.front();
 
         // first line of the paragraph
-        if (firstLine) {
+        if (isFirstLine) {
             result.firstAscender = maxAscender(lineSpan, scale);
             result.firstDescender = maxDescender(lineSpan, scale);
             result.firstLineHeight = maxLineHeight(lineSpan, scale);
@@ -187,20 +188,20 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
             result.leftFirst = leftLimit;
         }
         // last line of the paragraph
-        if (&lineSpan == &lineSpans_.back()) {
+        if (&lineSpan == &shapingPhaseOutput_.lineSpans_.back()) {
             result.lastlineDescender = maxDescender(lineSpan, scale);
         }
 
-        bool lineRtl = lineSpan.baseDir == TextDirection::RIGHT_TO_LEFT;
+        const bool lineRtl = lineSpan.baseDir == TextDirection::RIGHT_TO_LEFT;
         caret.x = (lineRtl ? rightLimit : leftLimit)/* * scale*/;
 
-        if (firstLine) {
-            caret.x += glyphs_[0].format.paragraphIndent * scale;
+        if (isFirstLine) {
+            caret.x += shapingPhaseOutput_.glyphs_[0].format.paragraphIndent * scale;
         }
 
         // Draw the line
         for (const auto& visualRun : lineSpan.visualRuns) {
-            bool runRtl = visualRun.dir == TextDirection::RIGHT_TO_LEFT && ctx.config.enableRtl;
+            const bool runRtl = visualRun.dir == TextDirection::RIGHT_TO_LEFT && ctx.config.enableRtl;
             auto direction = runRtl ? -1 : 1;
             auto runWidth = visualRun.width * scale;
 
@@ -211,8 +212,8 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 caret.x += -1 * direction * runWidth;
 
             for (int j = static_cast<int>(visualRun.start); j < static_cast<int>(visualRun.end); ++j) {
-                auto unscaledGlyphShape = glyphs_[j];
-                auto scaledGlyphShape = glyphs_[j].scaledGlyphShape(scale);
+                auto unscaledGlyphShape = shapingPhaseOutput_.glyphs_[j];
+                auto scaledGlyphShape = shapingPhaseOutput_.glyphs_[j].scaledGlyphShape(scale);
                 bool fixedHorizontalAdvance = false;
 
                 if (unscaledGlyphShape.character == 0x2028) { // Blank line
@@ -222,9 +223,9 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
                 auto tabStop = isTabStop(unscaledGlyphShape.character);
 
-                if (j == visualRun.start && !firstLine && firstRun && !tabStop) {
+                if (j == visualRun.start && !isFirstLine && firstRun && !tabStop) {
                     auto x = caret.x;
-                    auto nextlineOffset = newlineOffset(glyphs_[j].format.tabStops);
+                    auto nextlineOffset = newlineOffset(shapingPhaseOutput_.glyphs_[j].format.tabStops);
                     if (nextlineOffset.has_value()) {
                         caret.x = nextlineOffset.value() * scale;
                     }
@@ -239,30 +240,28 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 }
 
                 const FaceId &faceID = unscaledGlyphShape.format.faceId;
-                const FaceTable::Item* faceItem = fontManager_.facesTable().getFaceItem(faceID);
+                const FaceTable::Item* faceItem = faceTable_.getFaceItem(faceID);
                 if (!faceItem) {
-                    log_.warn("Line drawing error: Missing font face \"{}\"", faceID);
+                    log_.warn("[Textify / ParagraphShape::draw] Line drawing error: Missing font face \"{}\"", faceID);
                     continue;
                 }
 
-                auto face = faceItem->face;
+                FacePtr face = faceItem->face;
 
-                auto glyphScale = 1.0f;
-                auto desiredSize = face->isScalable() ? unscaledGlyphShape.format.size : scaledGlyphShape.size;
+                float glyphScale = 1.0f;
+                font_size desiredSize = face->isScalable() ? unscaledGlyphShape.format.size : scaledGlyphShape.size;
 
                 auto setSizeRes = face->setSize(desiredSize);
                 if (setSizeRes && !face->isScalable()) {
                     glyphScale = scaledGlyphShape.ascender / (float)setSizeRes.value();
                 }
 
-                auto offset = Vector2f{
+                const Vector2f offset {
                     static_cast<float>(caret.x - floor(caret.x)),
                     static_cast<float>(caret.y - floor(caret.y)),
                 };
 
-                auto glyph =
-                    face->acquireGlyph(unscaledGlyphShape.codepoint, offset, {scale,glyphScale}, true,
-                                       ctx.config.internalDisableHinting);
+                GlyphPtr glyph = face->acquireGlyph(unscaledGlyphShape.codepoint, offset, {scale,glyphScale}, true, ctx.config.internalDisableHinting);
                 if (!glyph) {
                     continue;
                 }
@@ -337,47 +336,47 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
         // updates the leftmost coords within paragraph
         result.leftmost = std::min(result.leftmost, !lineRtl ? leftLimit : lineSpan.lineWidth - leftLimit);
     }
-    y = caret.y + ((last ? 0 : 1) * (glyphs_[0].format.paragraphSpacing * scale));
+    y = caret.y + ((last ? 0 : 1) * (shapingPhaseOutput_.glyphs_[0].format.paragraphSpacing * scale));
 
     return result;
 }
 
 HorizontalAlign ParagraphShape::firstLineHorizontalAlignment() const
 {
-    if (glyphs_.empty()) {
+    if (shapingPhaseOutput_.glyphs_.empty()) {
         return HorizontalAlign::LEFT;
     }
 
-    return glyphs_[0].format.align;
+    return shapingPhaseOutput_.glyphs_[0].format.align;
 }
 
 bool ParagraphShape::hasExplicitLineHeight() const
 {
-    if (glyphs_.empty()) {
+    if (shapingPhaseOutput_.glyphs_.empty()) {
         return false;
     }
 
-    return glyphs_[0].format.lineHeight != 0;
+    return shapingPhaseOutput_.glyphs_[0].format.lineHeight != 0;
 }
 
 const LineSpans& ParagraphShape::lineSpans() const
 {
-    return lineSpans_;
+    return shapingPhaseOutput_.lineSpans_;
 }
 
 std::size_t ParagraphShape::linesCount() const
 {
-    return lineSpans_.size();
+    return shapingPhaseOutput_.lineSpans_.size();
 }
 
 const GlyphShape &ParagraphShape::glyph(std::size_t index) const
 {
-    return glyphs_[index];
+    return shapingPhaseOutput_.glyphs_[index];
 }
 
 const std::vector<GlyphShape> &ParagraphShape::glyphs() const
 {
-    return glyphs_;
+    return shapingPhaseOutput_.glyphs_;
 }
 
 void ParagraphShape::startCaret(const LineSpan& lineSpan, float& y, VerticalPositioning& positioning, float scale) const
@@ -412,7 +411,6 @@ spacing ParagraphShape::evalLineHeight(const uint32_t codepoint, const Immediate
     spacing lh = fmt.lineHeight;
 
     if (lh == 0) {
-
         // implicit line height
         lh = lineHeightFromFace(face);
 
@@ -421,8 +419,8 @@ spacing ParagraphShape::evalLineHeight(const uint32_t codepoint, const Immediate
             // setting it to span of ascender and descender is on of the options
             // we can do with it to achieve extecpted results
 
-            spacing ascender;
-            spacing descender;
+            spacing ascender = 0.0f;
+            spacing descender = 0.0f;
 
             if (face->isScalable()) {
                 ascender = face->scaleFontUnits(face->getFtFace()->ascender, true);
@@ -462,33 +460,33 @@ spacing ParagraphShape::evalLineHeight(const uint32_t codepoint, const Immediate
     return lh;
 }
 
-ParagraphShape::JustifyResult ParagraphShape::justify(const LineSpan& lineSpan, JustifyParams params) const
+ParagraphShape::JustifyResult ParagraphShape::justify(const LineSpan& lineSpan, const JustifyParams &params) const
 {
     float spaceCoef = 1.0f;
     float nonSpaceCoef = 1.0f;
     auto startIdx = static_cast<std::size_t>(lineSpan.start);
 
-    if (startIdx >= glyphs_.size()) {
-        log_.warn("Line drawing error: Line length equals zero.");
+    if (startIdx >= shapingPhaseOutput_.glyphs_.size()) {
+        log_.warn("[Textify / ParagraphShape::justify] Line drawing error: Line length equals zero.");
         return {0.0f, 0.0f, 0.0f, false};
     }
 
-    bool shouldJustify = glyphs_[startIdx].format.align == HorizontalAlign::JUSTIFY;
-    shouldJustify =
-        shouldJustify && (lineSpan.justifiable == LineSpan::Justifiable::POSITIVE ||
-                          (lineSpan.justifiable == LineSpan::Justifiable::DOCUMENT && params.justifyAmbiguous));
+    const bool shouldJustify = shapingPhaseOutput_.glyphs_[startIdx].format.align == HorizontalAlign::JUSTIFY &&
+         (lineSpan.justifiable == LineSpan::Justifiable::POSITIVE ||
+         (lineSpan.justifiable == LineSpan::Justifiable::DOCUMENT && params.justifyAmbiguous));
+
     if (shouldJustify) {
         int spaces = 0;
         int nonSpaces = 0;
         spacing spaceWidth = 0;
         spacing nonSpaceWidth = 0;
         for (int j = static_cast<int>(lineSpan.start); j < static_cast<int>(lineSpan.end); ++j) {
-            if (isWhitespace(glyphs_[j].character)) {
+            if (isWhitespace(shapingPhaseOutput_.glyphs_[j].character)) {
                 spaces++;
-                spaceWidth += glyphs_[j].horizontalAdvance + glyphs_[j].format.letterSpacing;
+                spaceWidth += shapingPhaseOutput_.glyphs_[j].horizontalAdvance + shapingPhaseOutput_.glyphs_[j].format.letterSpacing;
             } else {
                 nonSpaces++;
-                nonSpaceWidth += glyphs_[j].horizontalAdvance + glyphs_[j].format.letterSpacing;
+                nonSpaceWidth += shapingPhaseOutput_.glyphs_[j].horizontalAdvance + shapingPhaseOutput_.glyphs_[j].format.letterSpacing;
             }
         }
 
@@ -508,13 +506,13 @@ ParagraphShape::JustifyResult ParagraphShape::justify(const LineSpan& lineSpan, 
 float ParagraphShape::kern(const FacePtr face, const int idx, float scale) const
 {
     float kernValue = 0.0;
-    auto fontHasKerning = FT_HAS_KERNING(face->getFtFace());
-    auto glyphHasKerning = glyphs_[idx].format.kerning;
+    const bool fontHasKerning = FT_HAS_KERNING(face->getFtFace());
+    const bool glyphHasKerning = shapingPhaseOutput_.glyphs_[idx].format.kerning;
 
     if (fontHasKerning && glyphHasKerning) {
         FT_Vector kerning;
-        auto prev = glyphs_[idx - 1].codepoint;
-        auto curr = glyphs_[idx].codepoint;
+        const uint32_t prev = shapingPhaseOutput_.glyphs_[idx - 1].codepoint;
+        const uint32_t curr = shapingPhaseOutput_.glyphs_[idx].codepoint;
         FreetypeHandle::error = FT_Get_Kerning(face->getFtFace(), prev, curr, FT_KERNING_DEFAULT, &kerning);
         FreetypeHandle::checkOk(__func__);
         kernValue = scale * FreetypeHandle::from26_6fixed(kerning.x); // grid-fitted kerning distances, see FT_Kerning_Mode
@@ -528,7 +526,7 @@ spacing ParagraphShape::maxDescender(const LineSpan& lineSpan, float scale) cons
     spacing descender = 0;
 
     for (auto i = lineSpan.start; i < lineSpan.end; ++i) {
-        descender = std::min(glyphs_[i].descender * scale, descender);
+        descender = std::min(shapingPhaseOutput_.glyphs_[i].descender * scale, descender);
     }
 
     return descender;
@@ -539,7 +537,7 @@ spacing ParagraphShape::maxAscender(const LineSpan& lineSpan, float scale) const
     spacing ascender = 0;
 
     for (auto i = lineSpan.start; i < lineSpan.end; ++i) {
-        ascender = std::max(glyphs_[i].ascender * scale, ascender);
+        ascender = std::max(shapingPhaseOutput_.glyphs_[i].ascender * scale, ascender);
     }
 
     return ascender;
@@ -550,7 +548,7 @@ spacing ParagraphShape::maxLineHeight(const LineSpan& lineSpan, float scale) con
     spacing height = 0;
 
     for (auto i = lineSpan.start; i < lineSpan.end; ++i) {
-        height = std::max(glyphs_[i].lineHeight * scale, height);
+        height = std::max(shapingPhaseOutput_.glyphs_[i].lineHeight * scale, height);
     }
 
     return height;
@@ -561,7 +559,7 @@ spacing ParagraphShape::maxLineDefaultHeight(const LineSpan& lineSpan, float sca
     spacing defaultLineHeight = 0;
 
     for (auto i = lineSpan.start; i < lineSpan.end; ++i) {
-        defaultLineHeight = std::max(glyphs_[i].defaultLineHeight * scale, defaultLineHeight);
+        defaultLineHeight = std::max(shapingPhaseOutput_.glyphs_[i].defaultLineHeight * scale, defaultLineHeight);
     }
 
     return defaultLineHeight;
@@ -572,7 +570,7 @@ spacing ParagraphShape::maxBearing(const LineSpan& lineSpan, float scale) const
     spacing bearing = 0;
 
     for (auto i = lineSpan.start; i < lineSpan.end; ++i) {
-        bearing = std::max(glyphs_[i].bearingY * scale, bearing);
+        bearing = std::max(shapingPhaseOutput_.glyphs_[i].bearingY * scale, bearing);
     }
 
     return bearing;
@@ -583,8 +581,7 @@ std::vector<hb_feature_t> ParagraphShape::setupFeatures(const ImmediateFormat& f
     typedef std::pair<const char*, std::uint32_t> featureItem;
 
     auto liga = format.ligatures == GlyphFormat::Ligatures::STANDARD || format.ligatures == GlyphFormat::Ligatures::ALL;
-    auto alt =
-        format.ligatures == GlyphFormat::Ligatures::ALTERNATIVE || format.ligatures == GlyphFormat::Ligatures::ALL;
+    auto alt = format.ligatures == GlyphFormat::Ligatures::ALTERNATIVE || format.ligatures == GlyphFormat::Ligatures::ALL;
 
     // those **typically** correspond to OpenType features
     auto tags = std::vector<featureItem>{
@@ -618,7 +615,7 @@ bool ParagraphShape::validateUserFeatures(const FacePtr face, const TypeFeatures
     for (const auto& userFeature : features) {
         const auto& tag = userFeature.tag;
         if (!face->hasOpenTypeFeature(userFeature.tag)) {
-            log_.warn("missing OpenType feature: {}", tag);
+            log_.warn("[Textify / ParagraphShape::validateUserFeatures] Missing OpenType feature: {}", tag);
             ok = false;
         }
     }
@@ -628,6 +625,7 @@ bool ParagraphShape::validateUserFeatures(const FacePtr face, const TypeFeatures
 void ParagraphShape::shapeSequence(const Sequence& seq,
                                    const FormattedParagraph& paragraph,
                                    const FaceTable& faces,
+                                   const LineBreaker::LineStarts &lineStartsOpt,
                                    ShapeResult& result)
 {
     auto faceItem = faces.getFaceItem(seq.format.faceId);
@@ -635,7 +633,7 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
         bool inserted = false;
         std::tie(std::ignore, inserted) = reportedFaces_.insert({seq.format.faceId, ReportedFontReason::NO_DATA});
         if (inserted) {
-            log_.warn("Paragraph shaping error: Reported face item '{}'", seq.format.faceId);
+            log_.warn("[Textify / ParagraphShape::shapeSequence] Paragraph shaping error: Reported face item '{}'", seq.format.faceId);
         }
         return;
     }
@@ -643,7 +641,7 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
     auto face = faceItem->face;
     if (!face->getFtFace()) {
         reportedFaces_.insert({seq.format.faceId, ReportedFontReason::LOAD_FAILED});
-        log_.warn("Paragraph shaping error: Missing font face '{}'", seq.format.faceId);
+        log_.warn("[Textify / ParagraphShape::shapeSequence] Paragraph shaping error: Missing font face '{}'", seq.format.faceId);
         return;
     } else {
         result.insertFontItem(seq.format.faceId, faceItem->fallback);
@@ -670,7 +668,7 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
 
     hb_shape(face->getHbFont(), hbBuffer, hbFeatures.data(), static_cast<unsigned int>(hbFeatures.size()));
 
-    auto missingGlyph = false;
+    bool isGlyphMissing = false;
 
     GlyphShape glyph;
     auto hbLen = hb_buffer_get_length(hbBuffer);
@@ -683,19 +681,21 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
 
         // If HB does not evaluate emoji modifiers and ZWJ sequences correctly,
         // force skip those pseudo-glyphs. Known to happen with Apple Color Emoji.
-        if (isSkipGlyph(paragraph.text_[i]))
+        if (isSkipGlyph(paragraph.text_[i])) {
+            log_.info("[Textify / ParagraphShape::shapeSequence] Skipping unrecognized glyph '{}'", paragraph.text_[i]);
             continue;
+        }
 
         glyph.format = fmt;
         glyph.codepoint = hbInfo[k].codepoint;
+        // TODO: Matus: Why is this color duplicated in the ImmediateFormat and in the glyph color?
         glyph.color = fmt.color;
 
-        if (lineStarts_)
-            glyph.lineStart = std::optional<bool>(lineStarts_->at(p));
+        if (lineStartsOpt)
+            glyph.lineStart = std::optional<bool>(lineStartsOpt->at(p));
 
         if (hbPos[k].x_advance != 0) {
-            glyph.horizontalAdvance =
-                FreetypeHandle::from26_6fixed(hbPos[k].x_advance); // HB has already scaled FT values
+            glyph.horizontalAdvance = FreetypeHandle::from26_6fixed(hbPos[k].x_advance); // HB has already scaled FT values
         } else {
             glyph.horizontalAdvance = FreetypeHandle::from16_16fixed(face->getGlyphAdvance(glyph.codepoint));
         }
@@ -717,30 +717,27 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
         }
 
         if (glyph.codepoint == 0 && !LineBreaker::isSoftBreak(glyph.character)) {
-            missingGlyph = true;
+            isGlyphMissing = true;
         }
 
         if (!face->isScalable()) {
             glyph.applyResizeFactor(resizeFactor);
         }
 
-        auto a = FreetypeHandle::from26_6fixed(face->getFtFace()->size->metrics.ascender);
-        auto d = FreetypeHandle::from26_6fixed(face->getFtFace()->size->metrics.descender);
-
-        if (loadBearing_) {
-            auto loadedGlyph = face->acquireGlyph(glyph.codepoint, {}, {1.0f,1.0f}, false, true);
+        if (loadGlyphsBearings_) {
+            const GlyphPtr loadedGlyph = face->acquireGlyph(glyph.codepoint, {}, {1.0f,1.0f}, false, true);
             glyph.bearingX = loadedGlyph->metricsBearingX;
             glyph.bearingY = loadedGlyph->metricsBearingY;
         } else {
             glyph.bearingX = glyph.bearingY = 0.0f;
         }
 
-        glyphs_.push_back(glyph);
+        shapingPhaseOutput_.glyphs_.push_back(glyph);
     }
 
     hb_buffer_destroy(hbBuffer);
 
-    if (missingGlyph) {
+    if (isGlyphMissing) {
         reportedFaces_.insert({seq.format.faceId, ReportedFontReason::MISSING_GLYPH});
     }
 }

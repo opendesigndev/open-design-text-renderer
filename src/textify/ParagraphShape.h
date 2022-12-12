@@ -1,32 +1,21 @@
 #pragma once
 
-#include "base.h"
 #include "Context.h"
 #include "FormattedParagraph.h"
 #include "LineBreaker.h"
-#include "reported-fonts-utils.h"
-#include "text-format.h"
 #include "TypesetJournal.h"
+#include "reported-fonts-utils.h"
 
 #include "fonts/FaceTable.h"
 
-// #include "reported-fonts-utils.h"
-
-// #include "common/types.h"
-
-#include <set>
-#include <unordered_map>
 #include <unordered_set>
 
 
 namespace textify {
-
 namespace utils {
 class Log;
 }
-
-class FontManager;
-};
+}
 
 namespace textify {
 namespace priv {
@@ -122,7 +111,7 @@ public:
         void merge(const ReportedFaces& other);
     };
 
-    ParagraphShape(const utils::Log& log, const FontManager& fontManager, bool loadBearing);
+    ParagraphShape(const utils::Log& log, const FaceTable &faceTable, bool loadGlyphsBearings);
 
     ParagraphShape(const ParagraphShape&) = delete;
     ParagraphShape& operator=(const ParagraphShape&) = delete;
@@ -165,7 +154,6 @@ public:
     bool hasExplicitLineHeight() const;
 
     const LineSpans& lineSpans() const;
-
     std::size_t linesCount() const;
 
     /// Read-only access to the specified glyph.
@@ -203,7 +191,7 @@ private:
      * \returns     Coefficient with which to multiply space width, coefficient with which to multiply non space width
      * and line width
      */
-    JustifyResult justify(const LineSpan& lineSpan, JustifyParams params) const;
+    JustifyResult justify(const LineSpan& lineSpan, const JustifyParams &params) const;
 
     /** Evaluates kerning
      *
@@ -272,6 +260,7 @@ private:
 
     bool validateUserFeatures(const FacePtr face, const TypeFeatures& features) const;
 
+    /// A consequent sequence of Glyph Shapes with the same format.
     struct Sequence
     {
         int start, len;
@@ -288,23 +277,22 @@ private:
     void shapeSequence(const Sequence& seq,
                        const FormattedParagraph& paragraph,
                        const FaceTable& faces,
+                       const LineBreaker::LineStarts &lineStartsOpt,
                        ShapeResult& result);
 
 private:
-    std::vector<GlyphShape> glyphs_;
-    std::vector<VisualRun> visualRuns_;
-    TextDirection baseDirection_;
+    /// Output of the shaping phase and an input to the drawing phase.
+    struct ShapingPhaseOutput {
+        GlyphShapes glyphs_;
+        LineSpans lineSpans_;
+    } shapingPhaseOutput_;
 
-    //! Report Reported faces once and store the information
+    // TODO: Matus: Whom are these font faces reported to? It seems like nobody reads this.
     ReportedFaces reportedFaces_;
 
-    LineBreaker::LineStarts lineStarts_;
-
-    LineSpans lineSpans_;
-
-    const utils::Log& log_;
-    const FontManager& fontManager_;
-    bool loadBearing_;
+    const utils::Log &log_;
+    const FaceTable &faceTable_;
+    const bool loadGlyphsBearings_;
 };
 using ParagraphShapePtr = std::unique_ptr<ParagraphShape>;
 
