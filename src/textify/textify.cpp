@@ -292,31 +292,10 @@ TextShapeResult shapeTextInner(Context& ctx,
         return TextShapeError::SHAPE_ERROR;
     }
 
-    std::vector<ParagraphShape::DrawResult> paragraphResults;
+    float y = 0.0f;
+    VerticalPositioning positioning = VerticalPositioning::TOP_BOUND;
 
-    auto y = 0.0f;
-    auto positioning = VerticalPositioning::TOP_BOUND;
-    auto baselineSet = text.baselinePolicy() == BaselinePolicy::SET;
-    auto overflowPolicy = text.overflowPolicy();
-
-    // TODO: move to a standalone function
-    auto drawShapes = [&]() {
-        for (const auto& paragraphShape : shapes) {
-            auto last = paragraphShape == shapes.back();
-            auto drawResult =
-                paragraphShape->draw(ctx, 0, static_cast<int>(std::floor(maxWidth)), y, positioning, 1.0f, last, baselineSet, false);
-
-            const auto lastLinePolicy =
-                (overflowPolicy == OverflowPolicy::CLIP_LINE && drawResult.journal.size() > 1)
-                    ? LastLinePolicy::CUT
-                    : LastLinePolicy::FORCE;
-            drawResult.journal.setLastLinePolicy(lastLinePolicy);
-
-            paragraphResults.emplace_back(std::move(drawResult));
-        }
-    };
-
-    drawShapes();
+    ParagraphShape::DrawResults paragraphResults = draw(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
 
     // Rerun glyph bitmaps if previous justification was nonsense (zero width for auto-width bounds)
     if (text.boundsMode() == BoundsMode::AUTO_WIDTH) {
@@ -330,9 +309,7 @@ TextShapeResult shapeTextInner(Context& ctx,
             maxWidth = std::max(maxWidth, paragraphResult.maxLineWidth);
         }
 
-        paragraphResults.clear();
-
-        drawShapes();
+        paragraphResults = draw(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
     }
 
     if (paragraphResults.empty()) {
@@ -347,20 +324,16 @@ TextShapeResult shapeTextInner(Context& ctx,
 
     auto firstLineActualHeight = p0.firstAscender + p0.firstDescender;
 
-    auto w = 0.0f;
-    auto h = std::max(std::ceil(y), std::round(ctx.config.preferRealLineHeightOverExplicit ? firstLineActualHeight : p0.firstLineHeight));
+    float w = 0.0f;
+    float h = std::max(std::ceil(y), std::round(ctx.config.preferRealLineHeightOverExplicit ? firstLineActualHeight : p0.firstLineHeight));
 
     for (const auto& paragraphResult : paragraphResults) {
         w = std::max(w, std::floor(paragraphResult.maxLineWidth));
     }
 
-    auto l = 0.0f;
-    auto t = 0.0f;
-
-    if (baselineSet) {
-        l -= std::floor(p0.leftFirst);
-        t -= std::round(p0.firstAscender);
-    }
+    const bool isBaselineSet = text.baselinePolicy() == BaselinePolicy::SET;
+    const float l = isBaselineSet ? -std::floor(p0.leftFirst) : 0.0f;
+    const float t = isBaselineSet ? -std::round(p0.firstAscender) : 0.0f;
 
     preserveFixedDimensions(text.boundsMode(), frameSize, w, h);
 
@@ -446,9 +419,10 @@ TextDrawResult drawTextInner(
         return TextDrawError::INVALID_SCALE;
     }
 
+    VerticalPositioning positioning = VerticalPositioning::BASELINE;
     float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
 
-    const ParagraphShape::DrawResults paragraphResults = draw(paragraphShapes, ctx, text, textBounds.w, scale, alphaMask, caretVerticalPos);
+    const ParagraphShape::DrawResults paragraphResults = draw(paragraphShapes, ctx, text, textBounds.w, scale, alphaMask, positioning, caretVerticalPos);
     if (paragraphResults.empty()) {
         return TextDrawError::PARAGRAPHS_TYPESETING_ERROR;
     }
@@ -514,10 +488,10 @@ ParagraphShape::DrawResults draw(const ParagraphShapes &shapes,
                                  int textWidth,
                                  RenderScale scale,
                                  bool isAlphaMask,
+                                 VerticalPositioning &positioning,
                                  float &caretVerticalPos) {
     ParagraphShape::DrawResults drawResults;
 
-    VerticalPositioning positioning = VerticalPositioning::BASELINE;
     const bool hasBaselineTransform = text.baselinePolicy() == BaselinePolicy::SET;
     const OverflowPolicy overflowPolicy = text.overflowPolicy();
 

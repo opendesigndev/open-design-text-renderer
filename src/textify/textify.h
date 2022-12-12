@@ -110,6 +110,7 @@ ParagraphShape::DrawResults draw(const ParagraphShapes &shapes,
                                  int textWidth,
                                  RenderScale scale,
                                  bool isAlphaMask,
+                                 VerticalPositioning &positioning,
                                  float &caretVerticalPos);
 
 } // namespace priv
