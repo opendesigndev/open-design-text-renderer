@@ -107,7 +107,6 @@ public:
 
     struct ShapeResult
     {
-
         /* implicit */ ShapeResult(bool success);
 
         void insertFontItem(const std::string& faceID, bool fallback);
@@ -115,6 +114,12 @@ public:
         FlagsTable fallbacks;
 
         bool success;
+    };
+
+    class ReportedFaces : public std::unordered_set<ReportedFontItem>
+    {
+    public:
+        void merge(const ReportedFaces& other);
     };
 
     ParagraphShape(const utils::Log& log, const FontManager& fontManager, bool loadBearing);
@@ -141,9 +146,15 @@ public:
      * @param[in] scale            Scaling factor
      * @param[last] last           Drawing last paragraph
      */
-    DrawResult
-    draw(const Context& ctx, int left, int width, float& y, VerticalPositioning& positioning, float scale,
-         bool last, bool counterBaselineTranslation, bool alphaMask) const;
+    DrawResult draw(const Context& ctx,
+                    int left,
+                    int width,
+                    float& y,
+                    VerticalPositioning& positioning,
+                    float scale,
+                    bool last,
+                    bool counterBaselineTranslation,
+                    bool alphaMask) const;
 
     HorizontalAlign firstLineHorizontalAlignment() const;
 
@@ -158,17 +169,9 @@ public:
     std::size_t linesCount() const;
 
     /// Read-only access to the specified glyph.
-    const GlyphShape& glyph(std::size_t index) const;
+    const GlyphShape &glyph(std::size_t index) const;
     /// Read-only access to glyphs.
     const std::vector<GlyphShape> &glyphs() const;
-
-    class ReportedFaces : public std::unordered_set<ReportedFontItem>
-    {
-    public:
-        void merge(const ReportedFaces& other);
-    };
-
-    ReportedFaces reportedFaces() const;
 
 private:
     /// Get caret position at the start of a line
@@ -287,6 +290,7 @@ private:
                        const FaceTable& faces,
                        ShapeResult& result);
 
+private:
     std::vector<GlyphShape> glyphs_;
     std::vector<VisualRun> visualRuns_;
     TextDirection baseDirection_;

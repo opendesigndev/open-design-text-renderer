@@ -51,6 +51,7 @@ private:
     std::vector<VisualRun> visualRuns_;
     TextDirection baseDirection_;
 };
+using FormattedParagraphs = std::vector<FormattedParagraph>;
 
 }
 } // namespace textify

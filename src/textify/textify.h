@@ -10,21 +10,22 @@
 
 #include <memory>
 
+// Forward declarations
 namespace octopus {
     struct Text;
 }
+namespace textify {
+    struct Context;
+}
 
 namespace textify {
-
-struct Context;
-
 namespace priv {
 
 class FormattedText;
 class ParagraphShape;
 
 using UsedFaces = std::unordered_set<std::string>;
-using ParagraphShapes = std::vector<std::unique_ptr<ParagraphShape>>;
+using ParagraphShapes = std::vector<ParagraphShapePtr>;
 using FormattedTextPtr = std::unique_ptr<FormattedText>;
 
 using MayBeFrameSize = std::optional<compat::Vector2f>;
@@ -71,6 +72,7 @@ enum class TextDrawError
 
 using TextDrawResult = Result<TextDrawOutput, TextDrawError>;
 
+/// List all font face names that have not been loaded to the context's FontManager.
 FacesNames listMissingFonts(Context* ctx, const octopus::Text& text);
 
 TextShapeResult shapeText(Context* ctx, const octopus::Text& text);
@@ -83,7 +85,14 @@ TextShapeResult shapeTextInner(Context& ctx,
                 const compat::Matrix3f& textTransform
                 );
 
-TextDrawResult drawText(Context* ctx, const TextShapeData& shapedData, void* pixels, int width, int height, float scale, bool dry, const compat::Rectangle& viewArea);
+TextDrawResult drawText(Context* ctx,
+                        const TextShapeData& shapedData,
+                        void* pixels,
+                        int width,
+                        int height,
+                        float scale,
+                        bool dry,
+                        const compat::Rectangle& viewArea);
 
 TextDrawResult drawTextInner(
                     Context& ctx,
@@ -100,18 +109,17 @@ TextDrawResult drawTextInner(
                     const ParagraphShapes& paragraphShapes,
                     Pixel32* pixels,
                     int width,
-                    int height
-                    );
+                    int height);
 
 /// Draw individual ParagraphShapes.
-ParagraphShape::DrawResults draw(const ParagraphShapes &shapes,
-                                 Context &ctx,
-                                 const FormattedText &text,
-                                 int textWidth,
-                                 RenderScale scale,
-                                 bool isAlphaMask,
-                                 VerticalPositioning &positioning,
-                                 float &caretVerticalPos);
+ParagraphShape::DrawResults drawParagraphInner(const ParagraphShapes &shapes,
+                                               Context &ctx,
+                                               const FormattedText &text,
+                                               int textWidth,
+                                               RenderScale scale,
+                                               bool isAlphaMask,
+                                               VerticalPositioning &positioning,
+                                               float &caretVerticalPos);
 
 } // namespace priv
 } // namespace textify

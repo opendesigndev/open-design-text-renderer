@@ -17,6 +17,7 @@ namespace priv {
 
 using namespace compat;
 
+namespace {
 inline static bool checkOverwrite(const BitmapRGBA& bitmap, const int pos)
 {
     return pos < bitmap.width() * bitmap.height() && pos > 0 && bitmap.pixels()[pos] == 0 &&
@@ -66,6 +67,10 @@ static spacing lineHeightFromFace(const FacePtr face)
         return FreetypeHandle::from26_6fixed(face->getFtFace()->size->metrics.height);
     }
 }
+}
+
+
+ParagraphShape::ShapeResult::ShapeResult(bool success) : success(success) {}
 
 void ParagraphShape::ReportedFaces::merge(const ReportedFaces& other)
 {
@@ -73,6 +78,7 @@ void ParagraphShape::ReportedFaces::merge(const ReportedFaces& other)
         insert(otherItem);
     }
 }
+
 
 ParagraphShape::ParagraphShape(const utils::Log& log, const FontManager& fontManager, bool loadBearing)
     : log_(log), fontManager_(fontManager), loadBearing_(loadBearing)
@@ -140,7 +146,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
         return result;
     }
 
-    auto align = evaluateAlign(glyphs_[0].format.align, glyphs_[0].direction);
+    const float align = evaluateAlign(glyphs_[0].format.align, glyphs_[0].direction);
     auto bearingX = glyphs_[0].bearingX * scale;
 
     Vector2f caret{0.0f, y};
@@ -204,7 +210,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
             if (runRtl != lineRtl)
                 caret.x += -1 * direction * runWidth;
 
-            for (int j = visualRun.start; j < visualRun.end; ++j) {
+            for (int j = static_cast<int>(visualRun.start); j < static_cast<int>(visualRun.end); ++j) {
                 auto unscaledGlyphShape = glyphs_[j];
                 auto scaledGlyphShape = glyphs_[j].scaledGlyphShape(scale);
                 bool fixedHorizontalAdvance = false;
@@ -338,7 +344,6 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
 HorizontalAlign ParagraphShape::firstLineHorizontalAlignment() const
 {
-
     if (glyphs_.empty()) {
         return HorizontalAlign::LEFT;
     }
@@ -365,7 +370,7 @@ std::size_t ParagraphShape::linesCount() const
     return lineSpans_.size();
 }
 
-const GlyphShape& ParagraphShape::glyph(std::size_t index) const
+const GlyphShape &ParagraphShape::glyph(std::size_t index) const
 {
     return glyphs_[index];
 }
@@ -373,11 +378,6 @@ const GlyphShape& ParagraphShape::glyph(std::size_t index) const
 const std::vector<GlyphShape> &ParagraphShape::glyphs() const
 {
     return glyphs_;
-}
-
-ParagraphShape::ReportedFaces ParagraphShape::reportedFaces() const
-{
-    return reportedFaces_;
 }
 
 void ParagraphShape::startCaret(const LineSpan& lineSpan, float& y, VerticalPositioning& positioning, float scale) const
@@ -473,7 +473,7 @@ ParagraphShape::JustifyResult ParagraphShape::justify(const LineSpan& lineSpan, 
         return {0.0f, 0.0f, 0.0f, false};
     }
 
-    auto shouldJustify = glyphs_[startIdx].format.align == HorizontalAlign::JUSTIFY;
+    bool shouldJustify = glyphs_[startIdx].format.align == HorizontalAlign::JUSTIFY;
     shouldJustify =
         shouldJustify && (lineSpan.justifiable == LineSpan::Justifiable::POSITIVE ||
                           (lineSpan.justifiable == LineSpan::Justifiable::DOCUMENT && params.justifyAmbiguous));
@@ -482,7 +482,7 @@ ParagraphShape::JustifyResult ParagraphShape::justify(const LineSpan& lineSpan, 
         int nonSpaces = 0;
         spacing spaceWidth = 0;
         spacing nonSpaceWidth = 0;
-        for (int j = lineSpan.start; j < lineSpan.end; ++j) {
+        for (int j = static_cast<int>(lineSpan.start); j < static_cast<int>(lineSpan.end); ++j) {
             if (isWhitespace(glyphs_[j].character)) {
                 spaces++;
                 spaceWidth += glyphs_[j].horizontalAdvance + glyphs_[j].format.letterSpacing;
@@ -503,7 +503,7 @@ ParagraphShape::JustifyResult ParagraphShape::justify(const LineSpan& lineSpan, 
     }
 
     return {spaceCoef, nonSpaceCoef, lineSpan.lineWidth, true};
-} // namespace textify
+}
 
 float ParagraphShape::kern(const FacePtr face, const int idx, float scale) const
 {
@@ -624,8 +624,6 @@ bool ParagraphShape::validateUserFeatures(const FacePtr face, const TypeFeatures
     }
     return ok;
 }
-
-ParagraphShape::ShapeResult::ShapeResult(bool success) : success(success) {}
 
 void ParagraphShape::shapeSequence(const Sequence& seq,
                                    const FormattedParagraph& paragraph,
@@ -752,5 +750,5 @@ void ParagraphShape::ShapeResult::insertFontItem(const std::string& faceID, bool
     fallbacks.insert({faceID, fallback});
 }
 
-}
+} // namespace priv
 } // namespace textify

@@ -224,14 +224,15 @@ float roundCaretPosition(float pos, bool floorBaseline)
     return std::round(pos);
 }
 
-}
+} // namespace
+
 
 FacesNames listMissingFonts(Context* ctx, const octopus::Text& text)
 {
-    const auto& fontManager = ctx->getFontManager();
+    const FontManager &fontManager = ctx->getFontManager();
 
-    auto parsedText = TextParser(text).parseText();
-    auto usedNames = parsedText.text->collectUsedFaceNames();
+    const TextParser::ParseResult parsedText = TextParser(text).parseText();
+    const std::unordered_set<std::string> usedNames = parsedText.text->collectUsedFaceNames();
 
     FacesNames missing;
     for (auto&& name : usedNames) {
@@ -264,24 +265,23 @@ TextShapeResult shapeTextInner(Context& ctx,
                                const std::optional<compat::Vector2f>& frameSize,
                                const compat::Matrix3f& textTransform)
 {
-    const auto& log = ctx.getLogger();
-    const auto& text = *formattedText.get();
+    const utils::Log &log = ctx.getLogger();
+    const FormattedText &text = *formattedText.get();
 
     // Split the text into paragraphs
-    auto paragraphs = splitText(log, text, ctx.getFontManager());
-
+    const FormattedParagraphs paragraphs = splitText(log, text, ctx.getFontManager());
     if (paragraphs.empty()) {
         return TextShapeError::NO_PARAGRAPHS;
     }
 
-    auto maxWidth = text.boundsMode() == BoundsMode::AUTO_WIDTH ? 0.0f : frameSize.value_or(compat::Vector2f{0,0}).x;
+    float maxWidth = text.boundsMode() == BoundsMode::AUTO_WIDTH ? 0.0f : frameSize.value_or(compat::Vector2f{0,0}).x;
 
     // Shape the paragraphs
-    std::vector<std::unique_ptr<ParagraphShape>> shapes;
-    for (const auto& paragraph : paragraphs) {
-        auto loadBearing = text.baselinePolicy() == BaselinePolicy::OFFSET_BEARING;
-        auto paragraphShape = std::make_unique<ParagraphShape>(log, ctx.getFontManager(), loadBearing);
-        auto shapeResult = paragraphShape->shape(paragraph, maxWidth);
+    ParagraphShapes shapes;
+    for (const FormattedParagraph& paragraph : paragraphs) {
+        const bool loadBearing = text.baselinePolicy() == BaselinePolicy::OFFSET_BEARING;
+        ParagraphShapePtr paragraphShape = std::make_unique<ParagraphShape>(log, ctx.getFontManager(), loadBearing);
+        const ParagraphShape::ShapeResult shapeResult = paragraphShape->shape(paragraph, maxWidth);
 
         if (shapeResult.success) {
             shapes.emplace_back(std::move(paragraphShape));
@@ -295,7 +295,7 @@ TextShapeResult shapeTextInner(Context& ctx,
     float y = 0.0f;
     VerticalPositioning positioning = VerticalPositioning::TOP_BOUND;
 
-    ParagraphShape::DrawResults paragraphResults = draw(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
+    ParagraphShape::DrawResults paragraphResults = drawParagraphInner(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
 
     // Rerun glyph bitmaps if previous justification was nonsense (zero width for auto-width bounds)
     if (text.boundsMode() == BoundsMode::AUTO_WIDTH) {
@@ -309,20 +309,20 @@ TextShapeResult shapeTextInner(Context& ctx,
             maxWidth = std::max(maxWidth, paragraphResult.maxLineWidth);
         }
 
-        paragraphResults = draw(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
+        paragraphResults = drawParagraphInner(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
     }
 
     if (paragraphResults.empty()) {
         return TextShapeError::TYPESET_ERROR;
     }
 
-    const auto& p0 = paragraphResults[0];
+    const ParagraphShape::DrawResult &p0 = paragraphResults[0];
 
     if (ctx.config.lastLineDescenderOffset) {
         y = std::round(y - paragraphResults.back().lastlineDescender);
     }
 
-    auto firstLineActualHeight = p0.firstAscender + p0.firstDescender;
+    const float firstLineActualHeight = p0.firstAscender + p0.firstDescender;
 
     float w = 0.0f;
     float h = std::max(std::ceil(y), std::round(ctx.config.preferRealLineHeightOverExplicit ? firstLineActualHeight : p0.firstLineHeight));
@@ -337,10 +337,10 @@ TextShapeResult shapeTextInner(Context& ctx,
 
     preserveFixedDimensions(text.boundsMode(), frameSize, w, h);
 
-    auto textBoundsNoTransform = compat::FRectangle{l, t, w, h};
-    auto textBoundsTransform = transform(textBoundsNoTransform, textTransform);
+    const compat::FRectangle textBoundsNoTransform { l, t, w, h };
+    const compat::FRectangle textBoundsTransform = transform(textBoundsNoTransform, textTransform);
 
-    auto baseline = resolveBaselinePosition(text, p0);
+    const float baseline = resolveBaselinePosition(text, p0);
 
     return std::make_unique<TextShapeData>(
         std::move(formattedText),
@@ -354,20 +354,20 @@ TextShapeResult shapeTextInner(Context& ctx,
 }
 
 TextDrawResult drawText(Context* ctx,
-                    const TextShapeData& shapedData,
-                    void* pixels, int width, int height,
-                    float scale,
-                    bool dry,
-                    const compat::Rectangle& viewArea)
+                        const TextShapeData& shapedData,
+                        void* pixels,
+                        int width,
+                        int height,
+                        float scale,
+                        bool dry,
+                        const compat::Rectangle& viewArea)
 {
-    auto textTransform = shapedData.textTransform;
+    const compat::Matrix3f inverseTransform = inverse(shapedData.textTransform);
 
-    auto T_inv = inverse(textTransform);
-
-    auto viewAreaTextSpace = utils::transform(toFRectangle(viewArea), T_inv);
+    compat::FRectangle viewAreaTextSpace = utils::transform(toFRectangle(viewArea), inverseTransform);
     viewAreaTextSpace = scaleRect(viewAreaTextSpace, scale);
 
-    auto drawResult = drawTextInner(
+    TextDrawResult drawResult = drawTextInner(
             *ctx,
             dry,
             *shapedData.formattedText.get(),
@@ -378,7 +378,7 @@ TextDrawResult drawText(Context* ctx,
             static_cast<Pixel32*>(pixels), width, height);
 
     if (drawResult) {
-        auto value = drawResult.moveValue();
+        TextDrawOutput value = drawResult.moveValue();
         value.transform = shapedData.textTransform;
         value.transform[2][0] *= scale;
         value.transform[2][1] *= scale;
@@ -403,10 +403,8 @@ TextDrawResult drawTextInner(
                     const ParagraphShapes& paragraphShapes,
                     compat::Pixel32* pixels,
                     int width,
-                    int height
-                    )
+                    int height)
 {
-
     if (text.getLength() == 0) {
         return TextDrawOutput{{}};
     }
@@ -422,7 +420,7 @@ TextDrawResult drawTextInner(
     VerticalPositioning positioning = VerticalPositioning::BASELINE;
     float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
 
-    const ParagraphShape::DrawResults paragraphResults = draw(paragraphShapes, ctx, text, textBounds.w, scale, alphaMask, positioning, caretVerticalPos);
+    const ParagraphShape::DrawResults paragraphResults = drawParagraphInner(paragraphShapes, ctx, text, textBounds.w, scale, alphaMask, positioning, caretVerticalPos);
     if (paragraphResults.empty()) {
         return TextDrawError::PARAGRAPHS_TYPESETING_ERROR;
     }
@@ -482,14 +480,14 @@ TextDrawResult drawTextInner(
     return TextDrawOutput{bitmapBounds};
 }
 
-ParagraphShape::DrawResults draw(const ParagraphShapes &shapes,
-                                 Context &ctx,
-                                 const FormattedText &text,
-                                 int textWidth,
-                                 RenderScale scale,
-                                 bool isAlphaMask,
-                                 VerticalPositioning &positioning,
-                                 float &caretVerticalPos) {
+ParagraphShape::DrawResults drawParagraphInner(const ParagraphShapes &shapes,
+                                               Context &ctx,
+                                               const FormattedText &text,
+                                               int textWidth,
+                                               RenderScale scale,
+                                               bool isAlphaMask,
+                                               VerticalPositioning &positioning,
+                                               float &caretVerticalPos) {
     ParagraphShape::DrawResults drawResults;
 
     const bool hasBaselineTransform = text.baselinePolicy() == BaselinePolicy::SET;
