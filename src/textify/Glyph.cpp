@@ -75,13 +75,18 @@ static void convertGrayscaleBitmap(Pixel8 *dst, const FT_Bitmap &bitmap) {
     }
 }
 
-void GrayGlyph::putBitmap(const FT_Bitmap &bitmap) {
-    if ((bitmap_ = createBitmap<Pixel8>(bitmap.width, bitmap.rows)))
+bool GrayGlyph::putBitmap(const FT_Bitmap &bitmap) {
+    if ((bitmap_ = createBitmap<Pixel8>(bitmap.width, bitmap.rows))) {
         convertGrayscaleBitmap(bitmap_->pixels(), bitmap);
+        return true;
+    }
+    return false;
 }
 
-void ColorGlyph::putBitmap(const FT_Bitmap &bitmap) {
+bool ColorGlyph::putBitmap(const FT_Bitmap &bitmap) {
     switch (bitmap.pixel_mode) {
+        case FT_PIXEL_MODE_NONE:
+            return false;
         case FT_PIXEL_MODE_MONO:
         case FT_PIXEL_MODE_GRAY:
         case FT_PIXEL_MODE_GRAY2:
@@ -154,6 +159,7 @@ void ColorGlyph::putBitmap(const FT_Bitmap &bitmap) {
             // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Unexpected glyph pixel format");
             ;
     }
+    return true;
 }
 
 void GrayGlyph::blit(Pixel32* dst, const IDims2& dDims, const Vector2i& offset) const

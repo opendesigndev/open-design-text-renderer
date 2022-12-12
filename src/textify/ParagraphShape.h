@@ -103,6 +103,7 @@ public:
          */
         float leftFirst = 0.0f;
     };
+    using DrawResults = std::vector<DrawResult>;
 
     struct ShapeResult
     {
@@ -156,7 +157,10 @@ public:
 
     std::size_t linesCount() const;
 
+    /// Read-only access to the specified glyph.
     const GlyphShape& glyph(std::size_t index) const;
+    /// Read-only access to glyphs.
+    const std::vector<GlyphShape> &glyphs() const;
 
     class ReportedFaces : public std::unordered_set<ReportedFontItem>
     {
