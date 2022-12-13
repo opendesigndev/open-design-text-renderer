@@ -14,7 +14,7 @@ namespace priv {
 struct GlyphShape
 {
     ImmediateFormat format;
-    uint32_t codepoint; //!< Face dependent
+    uint32_t codepoint;         //!< Face dependent
     compat::qchar character;    //!< Unicode
     Pixel32 color;      // TODO why is this here and also in format?
     TextDirection direction;

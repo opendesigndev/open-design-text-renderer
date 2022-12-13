@@ -80,14 +80,13 @@ void ParagraphShape::ReportedFaces::merge(const ReportedFaces& other)
 }
 
 
-ParagraphShape::ParagraphShape(const utils::Log& log, const FaceTable &faceTable, bool loadGlyphsBearings) :
+ParagraphShape::ParagraphShape(const utils::Log& log, const FaceTable &faceTable) :
     log_(log),
-    faceTable_(faceTable),
-    loadGlyphsBearings_(loadGlyphsBearings)
+    faceTable_(faceTable)
 {
 }
 
-ParagraphShape::ShapeResult ParagraphShape::shape(const FormattedParagraph& paragraph, float width)
+ParagraphShape::ShapeResult ParagraphShape::shape(const FormattedParagraph& paragraph, float width, bool loadGlyphsBearings)
 {
     if (paragraph.text_.size() != paragraph.format_.size()) {
         log_.warn("[Textify / ParagraphShape::shape] Paragraph shaping error: Text format incorrectly expanded.");
@@ -113,7 +112,7 @@ ParagraphShape::ShapeResult ParagraphShape::shape(const FormattedParagraph& para
             ++pos, ++seq.len;
         }
 
-        shapeSequence(seq, paragraph, faceTable_, lineStartsOpt, result);
+        shapeSequence(seq, paragraph, faceTable_, lineStartsOpt, loadGlyphsBearings, result);
     }
 
     LineBreaker breaker {log_, shapingPhaseOutput_.glyphs_, paragraph.visualRuns_, paragraph.baseDirection_};
@@ -626,6 +625,7 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
                                    const FormattedParagraph& paragraph,
                                    const FaceTable& faces,
                                    const LineBreaker::LineStarts &lineStartsOpt,
+                                   bool loadGlyphsBearings,
                                    ShapeResult& result)
 {
     auto faceItem = faces.getFaceItem(seq.format.faceId);
@@ -724,7 +724,7 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
             glyph.applyResizeFactor(resizeFactor);
         }
 
-        if (loadGlyphsBearings_) {
+        if (loadGlyphsBearings) {
             const GlyphPtr loadedGlyph = face->acquireGlyph(glyph.codepoint, {}, {1.0f,1.0f}, false, true);
             glyph.bearingX = loadedGlyph->metricsBearingX;
             glyph.bearingY = loadedGlyph->metricsBearingY;

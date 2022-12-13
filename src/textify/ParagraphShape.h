@@ -111,7 +111,7 @@ public:
         void merge(const ReportedFaces& other);
     };
 
-    ParagraphShape(const utils::Log& log, const FaceTable &faceTable, bool loadGlyphsBearings);
+    ParagraphShape(const utils::Log& log, const FaceTable &faceTable);
 
     ParagraphShape(const ParagraphShape&) = delete;
     ParagraphShape& operator=(const ParagraphShape&) = delete;
@@ -122,7 +122,7 @@ public:
      * @param paragraph Formatted paragraph to be transformed
      * @param width     Text width used for line breaking.
      */
-    ShapeResult shape(const FormattedParagraph& paragraph, float width);
+    ShapeResult shape(const FormattedParagraph& paragraph, float width, bool loadGlyphsBearings);
 
     /**
      * Transform the shape into glyphs (images).
@@ -278,6 +278,7 @@ private:
                        const FormattedParagraph& paragraph,
                        const FaceTable& faces,
                        const LineBreaker::LineStarts &lineStartsOpt,
+                       bool loadGlyphsBearings,
                        ShapeResult& result);
 
 private:
@@ -292,7 +293,6 @@ private:
 
     const utils::Log &log_;
     const FaceTable &faceTable_;
-    const bool loadGlyphsBearings_;
 };
 using ParagraphShapePtr = std::unique_ptr<ParagraphShape>;
 

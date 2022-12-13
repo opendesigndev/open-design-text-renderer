@@ -112,14 +112,14 @@ TextDrawResult drawTextInner(
                     int height);
 
 /// Draw individual ParagraphShapes.
-ParagraphShape::DrawResults drawParagraphInner(const ParagraphShapes &shapes,
-                                               Context &ctx,
-                                               const FormattedText &text,
-                                               int textWidth,
-                                               RenderScale scale,
-                                               bool isAlphaMask,
-                                               VerticalPositioning &positioning,
-                                               float &caretVerticalPos);
+ParagraphShape::DrawResults drawParagraphsInner(const ParagraphShapes &shapes,
+                                                Context &ctx,
+                                                const FormattedText &text,
+                                                int textWidth,
+                                                RenderScale scale,
+                                                bool isAlphaMask,
+                                                VerticalPositioning &positioning,
+                                                float &caretVerticalPos);
 
 } // namespace priv
 } // namespace textify

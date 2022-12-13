@@ -275,12 +275,12 @@ TextShapeResult shapeTextInner(Context& ctx,
 
     float maxWidth = text.boundsMode() == BoundsMode::AUTO_WIDTH ? 0.0f : frameSize.value_or(compat::Vector2f{0,0}).x;
 
+    const bool loadGlyphsBearings = text.baselinePolicy() == BaselinePolicy::OFFSET_BEARING;
     // Shape the paragraphs
     ParagraphShapes shapes;
     for (const FormattedParagraph& paragraph : paragraphs) {
-        const bool loadBearing = text.baselinePolicy() == BaselinePolicy::OFFSET_BEARING;
-        ParagraphShapePtr paragraphShape = std::make_unique<ParagraphShape>(log, ctx.getFontManager().facesTable(), loadBearing);
-        const ParagraphShape::ShapeResult shapeResult = paragraphShape->shape(paragraph, maxWidth);
+        ParagraphShapePtr paragraphShape = std::make_unique<ParagraphShape>(log, ctx.getFontManager().facesTable());
+        const ParagraphShape::ShapeResult shapeResult = paragraphShape->shape(paragraph, maxWidth, loadGlyphsBearings);
 
         if (shapeResult.success) {
             shapes.emplace_back(std::move(paragraphShape));
@@ -294,7 +294,7 @@ TextShapeResult shapeTextInner(Context& ctx,
     float y = 0.0f;
     VerticalPositioning positioning = VerticalPositioning::TOP_BOUND;
 
-    ParagraphShape::DrawResults paragraphResults = drawParagraphInner(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
+    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
 
     // Rerun glyph bitmaps if previous justification was nonsense (zero width for auto-width bounds)
     if (text.boundsMode() == BoundsMode::AUTO_WIDTH) {
@@ -308,7 +308,7 @@ TextShapeResult shapeTextInner(Context& ctx,
             maxWidth = std::max(maxWidth, paragraphResult.maxLineWidth);
         }
 
-        paragraphResults = drawParagraphInner(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
+        paragraphResults = drawParagraphsInner(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
     }
 
     if (paragraphResults.empty()) {
@@ -419,7 +419,7 @@ TextDrawResult drawTextInner(
     VerticalPositioning positioning = VerticalPositioning::BASELINE;
     float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
 
-    const ParagraphShape::DrawResults paragraphResults = drawParagraphInner(paragraphShapes, ctx, text, textBounds.w, scale, alphaMask, positioning, caretVerticalPos);
+    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(paragraphShapes, ctx, text, textBounds.w, scale, alphaMask, positioning, caretVerticalPos);
     if (paragraphResults.empty()) {
         return TextDrawError::PARAGRAPHS_TYPESETING_ERROR;
     }
@@ -479,14 +479,14 @@ TextDrawResult drawTextInner(
     return TextDrawOutput{bitmapBounds};
 }
 
-ParagraphShape::DrawResults drawParagraphInner(const ParagraphShapes &shapes,
-                                               Context &ctx,
-                                               const FormattedText &text,
-                                               int textWidth,
-                                               RenderScale scale,
-                                               bool isAlphaMask,
-                                               VerticalPositioning &positioning,
-                                               float &caretVerticalPos) {
+ParagraphShape::DrawResults drawParagraphsInner(const ParagraphShapes &shapes,
+                                                Context &ctx,
+                                                const FormattedText &text,
+                                                int textWidth,
+                                                RenderScale scale,
+                                                bool isAlphaMask,
+                                                VerticalPositioning &positioning,
+                                                float &caretVerticalPos) {
     ParagraphShape::DrawResults drawResults;
 
     const bool hasBaselineTransform = text.baselinePolicy() == BaselinePolicy::SET;
