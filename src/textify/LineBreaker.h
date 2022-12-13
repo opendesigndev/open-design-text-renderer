@@ -27,15 +27,15 @@ struct LineSpan
                   //!< ending with a soft break (0x2028).
     };
 
-    //! Glyph indices in left-closed interval [start, end)
-    long start, end;
-
     LineSpan() = default;
     LineSpan(long start,
              long end,
              float lineWidth,
              TextDirection dir = TextDirection::LEFT_TO_RIGHT,
              Justifiable justifiable = Justifiable::POSITIVE);
+
+    //! Glyph indices in left-closed interval [start, end)
+    long start, end;
 
     //! BiDi visual runs.
     std::vector<VisualRun> visualRuns;

@@ -25,7 +25,6 @@ class FormattedText;
 class ParagraphShape;
 
 using UsedFaces = std::unordered_set<std::string>;
-using ParagraphShapes = std::vector<ParagraphShapePtr>;
 using FormattedTextPtr = std::unique_ptr<FormattedText>;
 
 using MayBeFrameSize = std::optional<compat::Vector2f>;

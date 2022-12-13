@@ -199,7 +199,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
         }
 
         // Draw the line
-        for (const auto& visualRun : lineSpan.visualRuns) {
+        for (const VisualRun &visualRun : lineSpan.visualRuns) {
             const bool runRtl = visualRun.dir == TextDirection::RIGHT_TO_LEFT && ctx.config.enableRtl;
             auto direction = runRtl ? -1 : 1;
             auto runWidth = visualRun.width * scale;
@@ -299,14 +299,14 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
                 glyph->setDestination({static_cast<int>(floor(coord.x)), static_cast<int>(floor(coord.y))},
                                       counterBaselineTranslation ? 0 : maxAscender(lineSpan, scale));
-                glyph->setColor(alphaMask ? ~Pixel32() : unscaledGlyphShape.color);
+                glyph->setColor(alphaMask ? ~Pixel32() : unscaledGlyphShape.format.color);
 
                 if (unscaledGlyphShape.format.decoration != Decoration::NONE) {
                     result.journal.addDecoration(
                         {{static_cast<int>(floor(coord.x)), static_cast<int>(floor(caret.y))},
                          {static_cast<int>(round(coord.x)) + glyph->bitmapWidth(), static_cast<int>(floor(caret.y))},
                          unscaledGlyphShape.format.decoration,
-                         unscaledGlyphShape.color,
+                         unscaledGlyphShape.format.color,
                          face}, scale);
                 }
 
@@ -327,7 +327,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
             // for fixed width use the provided value
             result.maxLineWidth = static_cast<float>(width);
         } else {
-            // TODO what if RTL??
+            // TODO: what if RTL??
             auto currentLineWidth = std::ceil(std::max(caret.x - leftLimit, lineWidth));
             result.maxLineWidth = std::max(result.maxLineWidth, currentLineWidth);
         }
@@ -358,16 +358,6 @@ bool ParagraphShape::hasExplicitLineHeight() const
     return shapingPhaseOutput_.glyphs_[0].format.lineHeight != 0;
 }
 
-const LineSpans& ParagraphShape::lineSpans() const
-{
-    return shapingPhaseOutput_.lineSpans_;
-}
-
-std::size_t ParagraphShape::linesCount() const
-{
-    return shapingPhaseOutput_.lineSpans_.size();
-}
-
 const GlyphShape &ParagraphShape::glyph(std::size_t index) const
 {
     return shapingPhaseOutput_.glyphs_[index];
@@ -383,7 +373,6 @@ void ParagraphShape::startCaret(const LineSpan& lineSpan, float& y, VerticalPosi
     float yShift = 0;
     switch (positioning) {
         case VerticalPositioning::BASELINE:
-
             break;
         case VerticalPositioning::PREV_BASELINE:
             yShift = std::round(maxLineHeight(lineSpan, scale));
@@ -688,8 +677,6 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
 
         glyph.format = fmt;
         glyph.codepoint = hbInfo[k].codepoint;
-        // TODO: Matus: Why is this color duplicated in the ImmediateFormat and in the glyph color?
-        glyph.color = fmt.color;
 
         if (lineStartsOpt)
             glyph.lineStart = std::optional<bool>(lineStartsOpt->at(p));

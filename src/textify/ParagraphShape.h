@@ -153,9 +153,6 @@ public:
      **/
     bool hasExplicitLineHeight() const;
 
-    const LineSpans& lineSpans() const;
-    std::size_t linesCount() const;
-
     /// Read-only access to the specified glyph.
     const GlyphShape &glyph(std::size_t index) const;
     /// Read-only access to glyphs.
@@ -282,7 +279,7 @@ private:
                        ShapeResult& result);
 
 private:
-    /// Output of the shaping phase and an input to the drawing phase.
+    /// Output of the shaping phase and input to the drawing phase.
     struct ShapingPhaseOutput {
         GlyphShapes glyphs_;
         LineSpans lineSpans_;
@@ -295,6 +292,7 @@ private:
     const FaceTable &faceTable_;
 };
 using ParagraphShapePtr = std::unique_ptr<ParagraphShape>;
+using ParagraphShapes = std::vector<ParagraphShapePtr>;
 
 } // namespace priv
 } // namespace textify

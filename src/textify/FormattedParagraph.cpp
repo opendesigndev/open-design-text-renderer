@@ -124,14 +124,14 @@ bool FormattedParagraph::analyzeBidi()
         int32_t start, length;
         // returns the directionality of the run, UBIDI_LTR==0 or UBIDI_RTL==1, never UBIDI_MIXED, never UBIDI_NEUTRAL
         // (see docs)
-        auto dir = static_cast<TextDirection>(ubidi_getVisualRun(ubidi, i, &start, &length));
+        const TextDirection dir = static_cast<TextDirection>(ubidi_getVisualRun(ubidi, i, &start, &length));
         visualRuns_.push_back({start, start + length, dir});
     }
 
-    for (const auto& run : visualRuns_) {
+    for (const VisualRun &run : visualRuns_) {
         // i iterates over UTF-16 code units, j iterates over UTF-32 code points
-        const auto start = utext.getChar32Start(run.start);
-        for (auto i = start, j = start; i < run.end; i = utext.getChar32Limit(++i), ++j) {
+        const int32_t start = utext.getChar32Start(static_cast<int32_t>(run.start));
+        for (int32_t i = start, j = start; i < run.end; i = utext.getChar32Limit(++i), ++j) {
             format_[j].direction = run.dir;
         }
     }

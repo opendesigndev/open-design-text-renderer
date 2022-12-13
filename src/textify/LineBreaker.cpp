@@ -28,7 +28,7 @@ LineBreaker::LineBreaker(const utils::Log& log,
 
 bool LineBreaker::isSoftBreak(compat::qchar c)
 {
-    //          Line separator End of text (deprecated)
+    // Line separator End of text (deprecated)
     return c == 0x2028 || c == 0x0003;
 }
 
@@ -79,13 +79,13 @@ void LineBreaker::breakLines(int maxLineWidth)
 
     if (!glyphs_[0].lineStart.has_value()) {
         log_.warn("Line breaking opportunities not present.");
-        for (auto i = 0ul; i < glyphs_.size(); ++i)
+        for (unsigned long i = 0ul; i < glyphs_.size(); ++i)
             advanceContext(i, ctx);
         insertLine(0, static_cast<long>(glyphs_.size()), ctx.wordWidth + ctx.spaceWidth, LineSpan::Justifiable::POSITIVE);
         return;
     }
 
-    for (auto i = 0ul; i < glyphs_.size(); ++i) {
+    for (unsigned long i = 0ul; i < glyphs_.size(); ++i) {
         if (isSoftBreak(glyphs_[i].character)) {
             if (ctx.lineStart == i) { // Blank line containing only a soft break
                 insertLine(ctx.lineStart, i + 1, 0, LineSpan::Justifiable::NEGATIVE);
@@ -97,14 +97,14 @@ void LineBreaker::breakLines(int maxLineWidth)
                     insertLine(i, i + 1, 0, LineSpan::Justifiable::NEGATIVE);
                 }
             }
-            ctx.lineStart = i + 1;
+            ctx.lineStart = static_cast<int>(i + 1);
             continue;
         }
 
         if (i > 0 && glyphs_[i].lineStart.value()) {
             ctx.lineWidth += ctx.wordWidth + ctx.spaceWidth;
             ctx.wordWidth = ctx.spaceWidth = 0;
-            ctx.lineEnd = i;
+            ctx.lineEnd = static_cast<int>(i);
         }
 
         advanceContext(i, ctx);
@@ -127,7 +127,7 @@ void LineBreaker::breakLines(int maxLineWidth)
 
 void LineBreaker::advanceContext(long i, Context& ctx)
 {
-    auto advance = glyphs_[i].horizontalAdvance + glyphs_[i].format.letterSpacing;
+    const spacing advance = glyphs_[i].horizontalAdvance + glyphs_[i].format.letterSpacing;
 
     if (isWhitespace(glyphs_[i].character)) {
         if (isTabStop(glyphs_[i].character)) {
@@ -164,8 +164,8 @@ void LineBreaker::advanceContext(long i, Context& ctx)
 
 void LineBreaker::removeTrailingSpaces()
 {
-    for (auto& lineSpan : lineSpans_) {
-        for (auto i = lineSpan.end - 1; i >= lineSpan.start; --i) {
+    for (LineSpan &lineSpan : lineSpans_) {
+        for (long i = lineSpan.end - 1; i >= lineSpan.start; --i) {
             if (isWhitespace(glyphs_[i].character)) {
                 lineSpan.lineWidth -= glyphs_[i].horizontalAdvance + glyphs_[i].format.letterSpacing;
             } else {
@@ -178,9 +178,9 @@ void LineBreaker::removeTrailingSpaces()
 
 bool LineBreaker::performBidi()
 {
-    auto sumWidths = [&](int32_t start, int32_t end) {
+    const auto sumWidths = [&](long start, long end) {
         Context ctx;
-        for (auto j = start; j < end; ++j) {
+        for (long j = start; j < end; ++j) {
             advanceContext(j, ctx);
         }
 
