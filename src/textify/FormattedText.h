@@ -78,6 +78,7 @@ public:
     int debug_getDefautlFontSize() const;
     const std::string& debug_getDefautlPostScriptName() const;
     void debug_setDefautlPostScriptName(const std::string& name);
+
 private:
     FormattedText(const FormattedText& other) = default;
 

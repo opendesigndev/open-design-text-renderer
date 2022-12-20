@@ -105,16 +105,12 @@ TextDrawResult drawText(Context &ctx,
                         const compat::Rectangle &viewArea);
 
 TextDrawResult drawTextInner(Context &ctx,
-                             bool dry,
-
+                             bool dry, // Only compute the boundaries, the actual drawing does not take place.
                              const FormattedText& text,
                              const compat::FRectangle& unscaledTextBounds,
                              float baseline,
-
                              RenderScale scale,
                              const compat::FRectangle& viewArea,
-                             bool alphaMask,
-
                              const ParagraphShapes& paragraphShapes,
                              Pixel32* pixels,
                              int width,
@@ -127,7 +123,6 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
                                                 OverflowPolicy overflowPolicy,
                                                 int textWidth,
                                                 RenderScale scale,
-                                                bool isAlphaMask,
                                                 VerticalPositioning &positioning,
                                                 float &caretVerticalPos);
 

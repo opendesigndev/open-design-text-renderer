@@ -15,8 +15,10 @@ struct TextShape
 
     /* implicit */ TextShape(DataPtr&& data);
 
+    /// The data.
     std::unique_ptr<priv::TextShapeData> data;
     bool active = true;
+    /// Gets labeled as "dirty" on font face change. Shaping needs to be called again.
     bool dirty = false;
 
     void deactivate();
