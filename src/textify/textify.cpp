@@ -456,27 +456,29 @@ TextDrawResult drawTextInner(Context &ctx,
         return TextDrawError::DRAW_BOUNDS_ERROR;
     }
 
-    compat::Vector2i offset = {0, 0};
-
-    compat::Rectangle viewAreaBounds = compat::INFINITE_BOUNDS;
-
     if (ctx.config.enableViewAreaCutout) {
         bitmapBounds = outerRect(viewArea & stretchedTextBounds);
-        viewAreaBounds = outerRect(viewArea);
-
-        auto offsetBounds = outerRect(stretchedTextBounds) - bitmapBounds;
-        offset = compat::Vector2i{offsetBounds.l, offsetBounds.t};
     }
 
     if (dry) {
         return TextDrawOutput{bitmapBounds};
     }
 
+    compat::Vector2i offset = {0, 0};
+    compat::Rectangle viewAreaBounds = compat::INFINITE_BOUNDS;
+
+    if (ctx.config.enableViewAreaCutout) {
+        const compat::Rectangle offsetBounds = outerRect(stretchedTextBounds) - bitmapBounds;
+
+        viewAreaBounds = outerRect(viewArea);
+        offset = compat::Vector2i{offsetBounds.l, offsetBounds.t};
+    }
+
     // vertical align offset
     offset.y += int(verticalOffset - stretchedGlyphsBounds.t);
 
     for (const auto& paragraphResult : paragraphResults) {
-        auto journalDrawResult = paragraphResult.journal.draw(output, bitmapBounds, stretchedTextBounds.h, viewAreaBounds, offset);
+        const TypesetJournal::DrawResult journalDrawResult = paragraphResult.journal.draw(output, bitmapBounds, stretchedTextBounds.h, viewAreaBounds, offset);
 
         if (journalDrawResult) {
             // totalGlyphsDrawn += (decltype(totalGlyphsDrawn)) journalDrawResult.value().numGlyphsRendered;

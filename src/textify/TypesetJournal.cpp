@@ -64,7 +64,7 @@ void TypesetJournal::extendLastDecoration(int newRange, Decoration type)
 
 TypesetJournal::DrawResult TypesetJournal::draw(BitmapRGBA& bitmap, const Rectangle& bounds, int textHeight, const Rectangle& viewArea, const Vector2i& offset) const
 {
-    auto drawResult = drawGlyphs(bitmap, bounds, textHeight, viewArea, offset);
+    DrawResult drawResult = drawGlyphs(bitmap, bounds, textHeight, viewArea, offset);
 
     drawDecorations(bitmap, offset);
 
