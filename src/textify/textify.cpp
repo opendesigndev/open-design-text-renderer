@@ -27,23 +27,6 @@
 namespace textify {
 namespace priv {
 
-TextShapeData::TextShapeData(FormattedTextPtr text,
-                             MayBeFrameSize frameSize,
-                             const compat::Matrix3f& textTransform,
-                             ParagraphShapes&& shapes,
-                             const compat::FRectangle& boundsNoTransform,
-                             const compat::FRectangle& boundsTransformed,
-                             float baseline)
-    : formattedText(std::move(text)),
-      frameSize(frameSize),
-      textTransform(textTransform),
-      usedFaces(formattedText->collectUsedFaceNames()),
-      paragraphShapes(std::move(shapes)),
-      textBoundsNoTransform(boundsNoTransform),
-      textBoundsTransformed(boundsTransformed),
-      baseline(baseline)
-{ }
-
 namespace {
 
 compat::Rectangle outerRect(const compat::FRectangle& rect) {
@@ -81,7 +64,7 @@ compat::Rectangle stretchedBounds(const std::vector<ParagraphShape::DrawResult>&
 
 compat::FRectangle stretchBounds(const compat::FRectangle& baseBounds, const compat::Rectangle& stretchRect)
 {
-    auto bounds = baseBounds;
+    compat::FRectangle bounds = baseBounds;
     bounds.t += std::min(stretchRect.t, 0);
     // bounds.l += std::min(stretchRect.l, 0);
     bounds.l = baseBounds.l;
@@ -158,7 +141,7 @@ spacing resolveBaselineOffset(const FormattedText& text, const ParagraphShape::D
     auto wantBecauseBaselinePolicy = text.baselinePolicy() == BaselinePolicy::CENTER && text.verticalAlign() != VerticalAlign::CENTER;
 
     if (wantBecauseBaselinePolicy) {
-        auto lineHeight = p0.firstLineDefaultHeight;
+        spacing lineHeight = p0.firstLineDefaultHeight;
 
         if (p0.firstLineHeight) {
             // for explicit line height use the value directly
@@ -216,53 +199,65 @@ float resolveVerticalAlignment(const FormattedText& text, const compat::FRectang
 
 float roundCaretPosition(float pos, bool floorBaseline)
 {
-    if (floorBaseline) {
-        return std::floor(pos);
-    }
-
-    return std::round(pos);
+    return floorBaseline ? std::floor(pos) : std::round(pos);
 }
 
 } // namespace
 
 
-FacesNames listMissingFonts(Context* ctx, const octopus::Text& text)
-{
-    const FontManager &fontManager = ctx->getFontManager();
+TextShapeData::TextShapeData(FormattedTextPtr text,
+                             FrameSizeOpt frameSize,
+                             const compat::Matrix3f& textTransform,
+                             ParagraphShapes&& shapes,
+                             const compat::FRectangle& boundsNoTransform,
+                             const compat::FRectangle& boundsTransformed,
+                             float baseline)
+    : formattedText(std::move(text)),
+      frameSize(frameSize),
+      textTransform(textTransform),
+      usedFaces(formattedText->collectUsedFaceNames()),
+      paragraphShapes(std::move(shapes)),
+      textBoundsNoTransform(boundsNoTransform),
+      textBoundsTransformed(boundsTransformed),
+      baseline(baseline)
+{ }
 
+
+FacesNames listMissingFonts(Context &ctx, const octopus::Text& text)
+{
     const TextParser::ParseResult parsedText = TextParser(text).parseText();
     const std::unordered_set<std::string> usedNames = parsedText.text->collectUsedFaceNames();
 
     FacesNames missing;
     for (auto&& name : usedNames) {
-        if (!ctx->fontManager->faceExists(name)) {
+        if (!ctx.fontManager->faceExists(name)) {
             missing.emplace_back(std::move(name));
         }
     }
     return missing;
 }
 
-TextShapeResult shapeText(Context* ctx, const octopus::Text& text)
+TextShapeResult shapeText(Context &ctx, const octopus::Text& text)
 {
     auto parsedText = TextParser(text).parseText();
 
-    MayBeFrameSize frameSize;
+    FrameSizeOpt frameSize;
     if (text.frame.has_value()) {
         auto [w, h] = text.frame.value().size.value_or(octopus::Dimensions{0.0,0.0});
         frameSize = compat::Vector2f{static_cast<float>(w), static_cast<float>(h)};
     }
-    return shapeTextInner(*ctx, std::move(parsedText.text), frameSize, parsedText.transformation);
+    return shapeTextInner(ctx, std::move(parsedText.text), frameSize, parsedText.transformation);
 }
 
-TextShapeResult reshapeText(Context* ctx, TextShapeDataPtr&& textShapeData)
+TextShapeResult reshapeText(Context &ctx, TextShapeDataPtr&& textShapeData)
 {
-    return shapeTextInner(*ctx, std::move(textShapeData->formattedText), textShapeData->frameSize, textShapeData->textTransform);
+    return shapeTextInner(ctx, std::move(textShapeData->formattedText), textShapeData->frameSize, textShapeData->textTransform);
 }
 
-TextShapeResult shapeTextInner(Context& ctx,
-                               std::unique_ptr<FormattedText> formattedText,
-                               const std::optional<compat::Vector2f>& frameSize,
-                               const compat::Matrix3f& textTransform)
+TextShapeResult shapeTextInner(Context &ctx,
+                               FormattedTextPtr formattedText,
+                               const FrameSizeOpt &frameSize,
+                               const compat::Matrix3f &textTransform)
 {
     const utils::Log &log = ctx.getLogger();
     const FormattedText &text = *formattedText.get();
@@ -352,7 +347,7 @@ TextShapeResult shapeTextInner(Context& ctx,
     );
 }
 
-TextDrawResult drawText(Context* ctx,
+TextDrawResult drawText(Context &ctx,
                         const TextShapeData& shapeData,
                         void* pixels,
                         int width,
@@ -372,7 +367,7 @@ TextDrawResult drawText(Context* ctx,
                     viewArea);
 }
 
-TextDrawResult drawText(Context *ctx,
+TextDrawResult drawText(Context &ctx,
                         const ParagraphShapes &paragraphShapes,
                         const compat::Matrix3f &textTransform,
                         const FormattedText &text,
@@ -390,7 +385,7 @@ TextDrawResult drawText(Context *ctx,
     viewAreaTextSpace = scaleRect(viewAreaTextSpace, scale);
 
     TextDrawResult drawResult = drawTextInner(
-            *ctx,
+            ctx,
             dry,
             text,
             unscaledTextBounds,
@@ -410,7 +405,7 @@ TextDrawResult drawText(Context *ctx,
     }
 }
 
-TextDrawResult drawTextInner(Context& ctx,
+TextDrawResult drawTextInner(Context &ctx,
                              bool dry,
 
                              const FormattedText& text,

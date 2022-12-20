@@ -32,10 +32,10 @@ compat::Rectangle convertRect(const textify::Rectangle& r) {
     return compat::Rectangle{r.l, r.t, r.w, r.h};
 }
 
-bool sanitizeShape(Context* ctx, TextShapeHandle textShape)
+bool sanitizeShape(ContextHandle ctx, TextShapeHandle textShape)
 {
     if (textShape->dirty) {
-        auto textShapeResult = priv::reshapeText(ctx, std::move(textShape->data));
+        priv::TextShapeResult textShapeResult = priv::reshapeText(*ctx, std::move(textShape->data));
 
         if (!textShapeResult) {
             return false;
@@ -48,7 +48,7 @@ bool sanitizeShape(Context* ctx, TextShapeHandle textShape)
 
 }
 
-Context* createContext(const ContextOptions& options)
+ContextHandle createContext(const ContextOptions& options)
 {
     auto logger = std::make_unique<utils::Log>(options.errorFunc, options.warnFunc, options.infoFunc);
     auto fontManager = std::make_unique<FontManager>(*logger.get());
@@ -62,11 +62,17 @@ Context* createContext(const ContextOptions& options)
 
 void destroyContext(ContextHandle ctx)
 {
-    delete ctx;
+    if (ctx) {
+        delete ctx;
+    }
 }
 
-bool addFontFile(Context* ctx, const std::string& postScriptName, const std::string& inFontFaceName, const std::string& filename, bool override)
+bool addFontFile(ContextHandle ctx, const std::string& postScriptName, const std::string& inFontFaceName, const std::string& filename, bool override)
 {
+    if (ctx == nullptr) {
+        return false;
+    }
+
     auto facesToUpdate = override ? ctx->fontManager->listFacesInStorage(filename) : FacesNames{};
     if (ctx->fontManager->faceExists(postScriptName)) {
         facesToUpdate.push_back(postScriptName);
@@ -85,6 +91,10 @@ bool addFontFile(Context* ctx, const std::string& postScriptName, const std::str
 
 bool addFontBytes(ContextHandle ctx, const std::string& postScriptName, const std::string& inFontFaceName, const std::uint8_t* data, size_t length, bool override)
 {
+    if (ctx == nullptr) {
+        return false;
+    }
+
     auto facesToUpdate = FacesNames{}; // TODO override?
     if (ctx->fontManager->faceExists(postScriptName)) {
         facesToUpdate.push_back(postScriptName);
@@ -102,25 +112,37 @@ bool addFontBytes(ContextHandle ctx, const std::string& postScriptName, const st
     return result;
 }
 
-std::vector<std::string> listMissingFonts(Context* ctx, const octopus::Text& text)
+std::vector<std::string> listMissingFonts(ContextHandle ctx, const octopus::Text& text)
 {
-    return priv::listMissingFonts(ctx, text);
+    if (ctx == nullptr) {
+        return {};
+    }
+    return priv::listMissingFonts(*ctx, text);
 }
 
-TextShapeHandle shapeText(Context* ctx, const octopus::Text& text)
+TextShapeHandle shapeText(ContextHandle ctx, const octopus::Text& text)
 {
-    auto textShapeResult = priv::shapeText(ctx, text);
+    if (ctx == nullptr) {
+        return nullptr;
+    }
+
+    priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
     if (!textShapeResult) {
         ctx->getLogger().error("shaping of a text failed with error: {}", (int)textShapeResult.error());
         return nullptr;
     }
 
     ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue()));
+
     return ctx->shapes.back().get();
 }
 
 void destroyTextShapes(ContextHandle ctx, TextShapeHandle* textShapes, size_t count)
 {
+    if (ctx == nullptr) {
+        return;
+    }
+
     for (auto textShape = textShapes; textShape != textShapes + count; ++textShape) {
         (*textShape)->deactivate();
     }
@@ -128,9 +150,13 @@ void destroyTextShapes(ContextHandle ctx, TextShapeHandle* textShapes, size_t co
     ctx->removeInactiveShapes();
 }
 
-bool reshapeText(Context* ctx, TextShapeHandle textShape, const octopus::Text& text)
+bool reshapeText(ContextHandle ctx, TextShapeHandle textShape, const octopus::Text& text)
 {
-    auto textShapeResult = priv::shapeText(ctx, text);
+    if (ctx == nullptr) {
+        return false;
+    }
+
+    priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
     if (!textShapeResult) {
         ctx->getLogger().error("reshaping of a text failed with error: {}", (int)textShapeResult.error());
         return false;
@@ -140,8 +166,12 @@ bool reshapeText(Context* ctx, TextShapeHandle textShape, const octopus::Text& t
     return true;
 }
 
-FRectangle getBounds(Context* ctx, TextShapeHandle textShape)
+FRectangle getBounds(ContextHandle ctx, TextShapeHandle textShape)
 {
+    if (ctx == nullptr) {
+        return {};
+    }
+
     if (textShape && sanitizeShape(ctx, textShape)) {
         return utils::castFRectangle(textShape->getData().textBoundsTransformed);
     }
@@ -150,14 +180,22 @@ FRectangle getBounds(Context* ctx, TextShapeHandle textShape)
 
 bool intersect(ContextHandle ctx, TextShapeHandle textShape, float x, float y, float radius)
 {
+    if (ctx == nullptr) {
+        return false;
+    }
+
     return textShape && textShape->getData().textBoundsTransformed.contains(x, y);
 }
 
 Dimensions getDrawBufferDimensions(ContextHandle ctx, TextShapeHandle textShape, const DrawOptions& drawOptions)
 {
+    if (ctx == nullptr) {
+        return {};
+    }
+
     if (textShape && sanitizeShape(ctx, textShape)) {
         const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
-        const priv::TextDrawResult result = priv::drawText(ctx, textShape->getData(), nullptr, 0, 0, drawOptions.scale, true, viewArea);
+        const priv::TextDrawResult result = priv::drawText(*ctx, textShape->getData(), nullptr, 0, 0, drawOptions.scale, true, viewArea);
         if (result) {
             const int w = result.value().drawBounds.w;
             const int h = result.value().drawBounds.h;
@@ -170,9 +208,13 @@ Dimensions getDrawBufferDimensions(ContextHandle ctx, TextShapeHandle textShape,
 
 DrawTextResult drawText(ContextHandle ctx, TextShapeHandle textShape, void* pixels, int width, int height, const DrawOptions& drawOptions)
 {
+    if (ctx == nullptr) {
+        return {{}, {}, true};
+    }
+
     if (textShape && sanitizeShape(ctx, textShape)) {
         auto viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
-        auto result = priv::drawText(ctx, textShape->getData(), pixels, width, height, drawOptions.scale, false, viewArea);
+        auto result = priv::drawText(*ctx, textShape->getData(), pixels, width, height, drawOptions.scale, false, viewArea);
         if (result) {
             const auto& drawOutput = result.value();
 

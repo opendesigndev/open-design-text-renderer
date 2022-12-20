@@ -101,6 +101,7 @@ private:
      **/
     std::string content_;
 };
+using FormattedTextPtr = std::unique_ptr<FormattedText>;
 
 }
 }

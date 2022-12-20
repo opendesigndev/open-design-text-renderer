@@ -21,18 +21,13 @@ namespace textify {
 namespace textify {
 namespace priv {
 
-class FormattedText;
-class ParagraphShape;
-
 using UsedFaces = std::unordered_set<std::string>;
-using FormattedTextPtr = std::unique_ptr<FormattedText>;
-
-using MayBeFrameSize = std::optional<compat::Vector2f>;
+using FrameSizeOpt = std::optional<compat::Vector2f>;
 
 struct TextShapeData
 {
     TextShapeData(FormattedTextPtr text,
-                  MayBeFrameSize frameSize,
+                  FrameSizeOpt frameSize,
                   const compat::Matrix3f& textTransform,
                   ParagraphShapes&& shapes,
                   const compat::FRectangle& boundsNoTransform,
@@ -41,7 +36,7 @@ struct TextShapeData
 
     // input properties
     FormattedTextPtr formattedText;
-    MayBeFrameSize frameSize;
+    FrameSizeOpt frameSize;
     compat::Matrix3f textTransform;
     UsedFaces usedFaces;
 
@@ -72,18 +67,21 @@ enum class TextDrawError
 using TextDrawResult = Result<TextDrawOutput, TextDrawError>;
 
 /// List all font face names that have not been loaded to the context's FontManager.
-FacesNames listMissingFonts(Context* ctx, const octopus::Text& text);
+FacesNames listMissingFonts(Context &ctx,
+                            const octopus::Text& text);
 
-TextShapeResult shapeText(Context* ctx, const octopus::Text& text);
+TextShapeResult shapeText(Context &ctx,
+                          const octopus::Text& text);
 
-TextShapeResult reshapeText(Context* ctx, TextShapeDataPtr&& textShapeData);
+TextShapeResult reshapeText(Context &ctx,
+                            TextShapeDataPtr&& textShapeData);
 
-TextShapeResult shapeTextInner(Context& ctx,
+TextShapeResult shapeTextInner(Context &ctx,
                 FormattedTextPtr text,
-                const std::optional<compat::Vector2f>& frameSize,
-                const compat::Matrix3f& textTransform);
+                const FrameSizeOpt &frameSize,
+                const compat::Matrix3f &textTransform);
 
-TextDrawResult drawText(Context* ctx,
+TextDrawResult drawText(Context &ctx,
                         const TextShapeData& shapeData,
                         void* pixels,
                         int width,
@@ -93,7 +91,7 @@ TextDrawResult drawText(Context* ctx,
                         const compat::Rectangle& viewArea);
 
 // TODO: Matus: Cleanup this function - make sure all the arguments are optimal etc.
-TextDrawResult drawText(Context *ctx,
+TextDrawResult drawText(Context &ctx,
                         const ParagraphShapes &paragraphShapes,
                         const compat::Matrix3f &textTransform,
                         const FormattedText &text,
@@ -106,7 +104,7 @@ TextDrawResult drawText(Context *ctx,
                         bool dry,
                         const compat::Rectangle &viewArea);
 
-TextDrawResult drawTextInner(Context& ctx,
+TextDrawResult drawTextInner(Context &ctx,
                              bool dry,
 
                              const FormattedText& text,

@@ -18,13 +18,6 @@ namespace priv {
 using namespace compat;
 
 namespace {
-inline static bool checkOverwrite(const BitmapRGBA& bitmap, const int pos)
-{
-    return pos < bitmap.width() * bitmap.height() && pos > 0 && bitmap.pixels()[pos] == 0 &&
-           (pos + 1) % bitmap.width() != 0 && bitmap.pixels()[pos + 1] == 0 && (pos - 1) % bitmap.width() != 0 &&
-           bitmap.pixels()[pos + 1] == 0;
-}
-
 static bool isSkipGlyph(qchar c)
 {
     const std::vector<qchar> skipped = {
