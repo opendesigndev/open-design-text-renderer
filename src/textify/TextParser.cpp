@@ -19,7 +19,7 @@ TypeFeatures convertFeatures(const std::vector<octopus::OpenTypeFeature>& featur
 {
     TypeFeatures outFeatures;
 
-    for(const auto& feature : features) {
+    for(const octopus::OpenTypeFeature& feature : features) {
         outFeatures.emplace_back(TypeFeature{feature.tag, feature.value});
     }
 

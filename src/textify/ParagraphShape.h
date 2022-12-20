@@ -116,13 +116,19 @@ public:
     ParagraphShape(const ParagraphShape&) = delete;
     ParagraphShape& operator=(const ParagraphShape&) = delete;
 
+    // TODO: Matus: Skip the shaping phase and initialize with Glyphs and Lines.
+    void initialize(const GlyphShapes &glyphs,
+                    const LineSpans &lineSpans);
+
     /**
      * Transform @a paragraph into text shapes -- ie join characters into ligatures etc.
      *
      * @param paragraph Formatted paragraph to be transformed
      * @param width     Text width used for line breaking.
      */
-    ShapeResult shape(const FormattedParagraph& paragraph, float width, bool loadGlyphsBearings);
+    ShapeResult shape(const FormattedParagraph& paragraph,
+                      float width,
+                      bool loadGlyphsBearings);
 
     /**
      * Transform the shape into glyphs (images).
@@ -157,6 +163,8 @@ public:
     const GlyphShape &glyph(std::size_t index) const;
     /// Read-only access to glyphs.
     const std::vector<GlyphShape> &glyphs() const;
+    /// Read-only access to line spans.
+    const LineSpans& lineSpans() const;
 
 private:
     /// Get caret position at the start of a line

@@ -147,22 +147,22 @@ enum class OverflowPolicy
 };
 
 
+/// Textify representation of octopus OpenType features.
 struct TypeFeature
 {
     std::string tag;
     std::int32_t value;
 };
+typedef std::vector<TypeFeature> TypeFeatures;
 
 bool operator==(const TypeFeature& a, const TypeFeature& b);
-
-typedef std::vector<TypeFeature> TypeFeatures;
 
 typedef sorted_vector<spacing> TabStops;
 
 /// Format properties that affect the bare render of an individual glyph
 struct GlyphFormat
 {
-    /// The values correspond to the values in Octopus
+    /// Textify representation of octopus Ligatures enum
     enum class Ligatures
     {
         NONE = 0,
@@ -180,8 +180,13 @@ struct GlyphFormat
 
     bool operator==(const GlyphFormat& b) const
     {
-        return faceId == b.faceId && size == b.size && ligatures == b.ligatures &&
-               direction == b.direction && features == b.features && tabStops == b.tabStops;
+        return
+            faceId == b.faceId &&
+            size == b.size &&
+            ligatures == b.ligatures &&
+            direction == b.direction &&
+            features == b.features &&
+            tabStops == b.tabStops;
     }
 };
 

@@ -86,6 +86,12 @@ ParagraphShape::ParagraphShape(const utils::Log& log, const FaceTable &faceTable
 {
 }
 
+void ParagraphShape::initialize(const GlyphShapes &glyphs,
+                                const LineSpans &lineSpans) {
+    shapingPhaseOutput_.glyphs_ = glyphs;
+    shapingPhaseOutput_.lineSpans_ = lineSpans;
+}
+
 ParagraphShape::ShapeResult ParagraphShape::shape(const FormattedParagraph& paragraph, float width, bool loadGlyphsBearings)
 {
     if (paragraph.text_.size() != paragraph.format_.size()) {
@@ -201,8 +207,8 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
         // Draw the line
         for (const VisualRun &visualRun : lineSpan.visualRuns) {
             const bool runRtl = visualRun.dir == TextDirection::RIGHT_TO_LEFT && ctx.config.enableRtl;
-            auto direction = runRtl ? -1 : 1;
-            auto runWidth = visualRun.width * scale;
+            const float direction = runRtl ? -1.0f : 1.0f;
+            const float runWidth = visualRun.width * scale;
 
             bool firstRun = &visualRun == &lineSpan.visualRuns.front();
 
@@ -211,8 +217,8 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 caret.x += -1 * direction * runWidth;
 
             for (int j = static_cast<int>(visualRun.start); j < static_cast<int>(visualRun.end); ++j) {
-                auto unscaledGlyphShape = shapingPhaseOutput_.glyphs_[j];
-                auto scaledGlyphShape = shapingPhaseOutput_.glyphs_[j].scaledGlyphShape(scale);
+                const GlyphShape &unscaledGlyphShape = shapingPhaseOutput_.glyphs_[j];
+                const GlyphShape::Scalable &scaledGlyphShape = shapingPhaseOutput_.glyphs_[j].scaledGlyphShape(scale);
                 bool fixedHorizontalAdvance = false;
 
                 if (unscaledGlyphShape.character == 0x2028) { // Blank line
@@ -220,7 +226,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                     continue;
                 }
 
-                auto tabStop = isTabStop(unscaledGlyphShape.character);
+                const bool tabStop = isTabStop(unscaledGlyphShape.character);
 
                 if (j == visualRun.start && !isFirstLine && firstRun && !tabStop) {
                     auto x = caret.x;
@@ -248,9 +254,9 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 FacePtr face = faceItem->face;
 
                 float glyphScale = 1.0f;
-                font_size desiredSize = face->isScalable() ? unscaledGlyphShape.format.size : scaledGlyphShape.size;
+                const font_size desiredSize = face->isScalable() ? unscaledGlyphShape.format.size : scaledGlyphShape.size;
 
-                auto setSizeRes = face->setSize(desiredSize);
+                const Result<font_size,bool> setSizeRes = face->setSize(desiredSize);
                 if (setSizeRes && !face->isScalable()) {
                     glyphScale = scaledGlyphShape.ascender / (float)setSizeRes.value();
                 }
@@ -294,7 +300,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
                 caret.x += direction * (isWhitespace(unscaledGlyphShape.character) ? spaceCoef : nonSpaceCoef) *
                            (hAdvance + scaledGlyphShape.letterSpacing);
-                auto fracOffset = glyph->rsb_delta - glyph->lsb_delta;
+                const float fracOffset = glyph->rsb_delta - glyph->lsb_delta;
                 caret.x += fracOffset * scale;
 
                 glyph->setDestination({static_cast<int>(floor(coord.x)), static_cast<int>(floor(coord.y))},
@@ -366,6 +372,11 @@ const GlyphShape &ParagraphShape::glyph(std::size_t index) const
 const std::vector<GlyphShape> &ParagraphShape::glyphs() const
 {
     return shapingPhaseOutput_.glyphs_;
+}
+
+const LineSpans& ParagraphShape::lineSpans() const
+{
+    return shapingPhaseOutput_.lineSpans_;
 }
 
 void ParagraphShape::startCaret(const LineSpan& lineSpan, float& y, VerticalPositioning& positioning, float scale) const
@@ -452,7 +463,7 @@ ParagraphShape::JustifyResult ParagraphShape::justify(const LineSpan& lineSpan, 
 {
     float spaceCoef = 1.0f;
     float nonSpaceCoef = 1.0f;
-    auto startIdx = static_cast<std::size_t>(lineSpan.start);
+    const size_t startIdx = static_cast<std::size_t>(lineSpan.start);
 
     if (startIdx >= shapingPhaseOutput_.glyphs_.size()) {
         log_.warn("[Textify / ParagraphShape::justify] Line drawing error: Line length equals zero.");
@@ -617,7 +628,7 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
                                    bool loadGlyphsBearings,
                                    ShapeResult& result)
 {
-    auto faceItem = faces.getFaceItem(seq.format.faceId);
+    const FaceTable::Item* faceItem = faces.getFaceItem(seq.format.faceId);
     if (!faceItem) {
         bool inserted = false;
         std::tie(std::ignore, inserted) = reportedFaces_.insert({seq.format.faceId, ReportedFontReason::NO_DATA});
@@ -627,7 +638,7 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
         return;
     }
 
-    auto face = faceItem->face;
+    const FacePtr face = faceItem->face;
     if (!face->getFtFace()) {
         reportedFaces_.insert({seq.format.faceId, ReportedFontReason::LOAD_FAILED});
         log_.warn("[Textify / ParagraphShape::shapeSequence] Paragraph shaping error: Missing font face '{}'", seq.format.faceId);
@@ -642,7 +653,7 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
 
     auto desiredSize = seq.format.size;
     auto actualSizeResult = face->setSize(desiredSize);
-    auto resizeFactor = 1.0f;
+    float resizeFactor = 1.0f;
     if (actualSizeResult && actualSizeResult.value() != desiredSize) {
         resizeFactor = (float)desiredSize / (float)actualSizeResult.value();
     }

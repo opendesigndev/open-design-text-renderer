@@ -195,7 +195,7 @@ spacing resolveBaselinePosition(const FormattedText& text, const ParagraphShape:
 
 float resolveVerticalAlignment(const FormattedText& text, const compat::FRectangle& textBounds, float textBottom, spacing baselineOffset)
 {
-    auto verticalOffset = 0.0f;
+    float verticalOffset = 0.0f;
     if (text.boundsMode() == BoundsMode::FIXED) {
         // vertical alignment is only allowed for fixed bounds
         switch (text.verticalAlign()) {
@@ -294,7 +294,7 @@ TextShapeResult shapeTextInner(Context& ctx,
     float y = 0.0f;
     VerticalPositioning positioning = VerticalPositioning::TOP_BOUND;
 
-    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
+    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, shapes, text.baselinePolicy(), text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
 
     // Rerun glyph bitmaps if previous justification was nonsense (zero width for auto-width bounds)
     if (text.boundsMode() == BoundsMode::AUTO_WIDTH) {
@@ -308,7 +308,7 @@ TextShapeResult shapeTextInner(Context& ctx,
             maxWidth = std::max(maxWidth, paragraphResult.maxLineWidth);
         }
 
-        paragraphResults = drawParagraphsInner(shapes, ctx, text, static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
+        paragraphResults = drawParagraphsInner(ctx, shapes, text.baselinePolicy(), text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, false, positioning, y);
     }
 
     if (paragraphResults.empty()) {
@@ -353,15 +353,38 @@ TextShapeResult shapeTextInner(Context& ctx,
 }
 
 TextDrawResult drawText(Context* ctx,
-                        const TextShapeData& shapedData,
+                        const TextShapeData& shapeData,
                         void* pixels,
                         int width,
                         int height,
                         float scale,
                         bool dry,
-                        const compat::Rectangle& viewArea)
-{
-    const compat::Matrix3f inverseTransform = inverse(shapedData.textTransform);
+                        const compat::Rectangle& viewArea) {
+    return drawText(ctx,
+                    shapeData.paragraphShapes,
+                    shapeData.textTransform,
+                    *shapeData.formattedText,
+                    shapeData.textBoundsNoTransform,
+                    shapeData.baseline,
+                    pixels, width, height,
+                    scale,
+                    dry,
+                    viewArea);
+}
+
+TextDrawResult drawText(Context *ctx,
+                        const ParagraphShapes &paragraphShapes,
+                        const compat::Matrix3f &textTransform,
+                        const FormattedText &text,
+                        const compat::FRectangle &unscaledTextBounds,
+                        float baseline,
+                        void *pixels,
+                        int width,
+                        int height,
+                        float scale,
+                        bool dry,
+                        const compat::Rectangle &viewArea) {
+    const compat::Matrix3f inverseTransform = inverse(textTransform);
 
     compat::FRectangle viewAreaTextSpace = utils::transform(toFRectangle(viewArea), inverseTransform);
     viewAreaTextSpace = scaleRect(viewAreaTextSpace, scale);
@@ -369,16 +392,16 @@ TextDrawResult drawText(Context* ctx,
     TextDrawResult drawResult = drawTextInner(
             *ctx,
             dry,
-            *shapedData.formattedText.get(),
-            shapedData.textBoundsNoTransform,
-            shapedData.baseline,
+            text,
+            unscaledTextBounds,
+            baseline,
             scale, viewAreaTextSpace, false,
-            shapedData.paragraphShapes,
+            paragraphShapes,
             static_cast<Pixel32*>(pixels), width, height);
 
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
-        value.transform = shapedData.textTransform;
+        value.transform = textTransform;
         value.transform[2][0] *= scale;
         value.transform[2][1] *= scale;
         return value;
@@ -387,23 +410,21 @@ TextDrawResult drawText(Context* ctx,
     }
 }
 
-TextDrawResult drawTextInner(
-                    Context& ctx,
-                    bool dry,
+TextDrawResult drawTextInner(Context& ctx,
+                             bool dry,
 
-                    const FormattedText& text,
-                    const compat::FRectangle& unscaledTextBounds,
-                    float baseline,
+                             const FormattedText& text,
+                             const compat::FRectangle& unscaledTextBounds,
+                             float baseline,
 
-                    RenderScale scale,
-                    const compat::FRectangle& viewArea,
-                    bool alphaMask,
+                             RenderScale scale,
+                             const compat::FRectangle& viewArea,
+                             bool alphaMask,
 
-                    const ParagraphShapes& paragraphShapes,
-                    compat::Pixel32* pixels,
-                    int width,
-                    int height)
-{
+                             const ParagraphShapes& paragraphShapes,
+                             compat::Pixel32* pixels,
+                             int width,
+                             int height) {
     if (text.getLength() == 0) {
         return TextDrawOutput{{}};
     }
@@ -419,30 +440,30 @@ TextDrawResult drawTextInner(
     VerticalPositioning positioning = VerticalPositioning::BASELINE;
     float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
 
-    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(paragraphShapes, ctx, text, textBounds.w, scale, alphaMask, positioning, caretVerticalPos);
+    const OverflowPolicy overflowPolicy = text.overflowPolicy();
+
+    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, text.baselinePolicy(), overflowPolicy, textBounds.w, scale, alphaMask, positioning, caretVerticalPos);
     if (paragraphResults.empty()) {
         return TextDrawError::PARAGRAPHS_TYPESETING_ERROR;
     }
 
-    const OverflowPolicy overflowPolicy = text.overflowPolicy();
-
     // account for descenders of last paragraph's last line
-    auto textBottom = caretVerticalPos - paragraphResults.back().lastlineDescender;
+    const spacing textBottom = caretVerticalPos - paragraphResults.back().lastlineDescender;
 
-    auto baselineOffset = resolveBaselineOffset(text, paragraphResults.front());
-    auto verticalOffset = resolveVerticalAlignment(text, textBounds, textBottom, baselineOffset * scale);
+    const spacing baselineOffset = resolveBaselineOffset(text, paragraphResults.front());
+    const float verticalOffset = resolveVerticalAlignment(text, textBounds, textBottom, baselineOffset * scale);
 
     auto unlimitedVerticalStretch
         = overflowPolicy == OverflowPolicy::EXTEND_ALL || text.boundsMode() == BoundsMode::AUTO_HEIGHT || text.verticalAlign() != VerticalAlign::TOP;
 
-    auto verticalStretchLimit = unlimitedVerticalStretch ? 0 : textBounds.h;
-    auto stretchedGlyphsBounds = compat::Rectangle{};
+    const float verticalStretchLimit = unlimitedVerticalStretch ? 0.0f : textBounds.h;
+    compat::Rectangle stretchedGlyphsBounds;
     if (text.boundsMode() != BoundsMode::FIXED || overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
         stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
     }
-    auto stretchedTextBounds = stretchBounds(textBounds, stretchedGlyphsBounds);
+    compat::FRectangle stretchedTextBounds = stretchBounds(textBounds, stretchedGlyphsBounds);
 
-    auto bitmapBounds = outerRect(stretchedTextBounds);
+    compat::Rectangle bitmapBounds = outerRect(stretchedTextBounds);
 
     if (!bitmapBounds) {
         return TextDrawError::DRAW_BOUNDS_ERROR;
@@ -479,9 +500,10 @@ TextDrawResult drawTextInner(
     return TextDrawOutput{bitmapBounds};
 }
 
-ParagraphShape::DrawResults drawParagraphsInner(const ParagraphShapes &shapes,
-                                                Context &ctx,
-                                                const FormattedText &text,
+ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
+                                                const ParagraphShapes &shapes,
+                                                BaselinePolicy baselinePolicy,
+                                                OverflowPolicy overflowPolicy,
                                                 int textWidth,
                                                 RenderScale scale,
                                                 bool isAlphaMask,
@@ -489,8 +511,7 @@ ParagraphShape::DrawResults drawParagraphsInner(const ParagraphShapes &shapes,
                                                 float &caretVerticalPos) {
     ParagraphShape::DrawResults drawResults;
 
-    const bool hasBaselineTransform = text.baselinePolicy() == BaselinePolicy::SET;
-    const OverflowPolicy overflowPolicy = text.overflowPolicy();
+    const bool hasBaselineTransform = baselinePolicy == BaselinePolicy::SET;
 
     for (const ParagraphShapePtr& paragraphShape : shapes) {
         const bool isLast = (paragraphShape == shapes.back());

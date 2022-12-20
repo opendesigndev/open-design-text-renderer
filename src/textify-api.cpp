@@ -156,11 +156,11 @@ bool intersect(ContextHandle ctx, TextShapeHandle textShape, float x, float y, f
 Dimensions getDrawBufferDimensions(ContextHandle ctx, TextShapeHandle textShape, const DrawOptions& drawOptions)
 {
     if (textShape && sanitizeShape(ctx, textShape)) {
-        auto viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
-        auto result = priv::drawText(ctx, textShape->getData(), nullptr, 0, 0, drawOptions.scale, true, viewArea);
+        const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
+        const priv::TextDrawResult result = priv::drawText(ctx, textShape->getData(), nullptr, 0, 0, drawOptions.scale, true, viewArea);
         if (result) {
-            int w = result.value().drawBounds.w;
-            int h = result.value().drawBounds.h;
+            const int w = result.value().drawBounds.w;
+            const int h = result.value().drawBounds.h;
 
             return {w, h};
         }

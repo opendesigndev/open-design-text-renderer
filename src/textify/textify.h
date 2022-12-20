@@ -81,11 +81,10 @@ TextShapeResult reshapeText(Context* ctx, TextShapeDataPtr&& textShapeData);
 TextShapeResult shapeTextInner(Context& ctx,
                 FormattedTextPtr text,
                 const std::optional<compat::Vector2f>& frameSize,
-                const compat::Matrix3f& textTransform
-                );
+                const compat::Matrix3f& textTransform);
 
 TextDrawResult drawText(Context* ctx,
-                        const TextShapeData& shapedData,
+                        const TextShapeData& shapeData,
                         void* pixels,
                         int width,
                         int height,
@@ -93,27 +92,41 @@ TextDrawResult drawText(Context* ctx,
                         bool dry,
                         const compat::Rectangle& viewArea);
 
-TextDrawResult drawTextInner(
-                    Context& ctx,
-                    bool dry,
+// TODO: Matus: Cleanup this function - make sure all the arguments are optimal etc.
+TextDrawResult drawText(Context *ctx,
+                        const ParagraphShapes &paragraphShapes,
+                        const compat::Matrix3f &textTransform,
+                        const FormattedText &text,
+                        const compat::FRectangle &unscaledTextBounds,
+                        float baseline,
+                        void *pixels,
+                        int width,
+                        int height,
+                        float scale,
+                        bool dry,
+                        const compat::Rectangle &viewArea);
 
-                    const FormattedText& text,
-                    const compat::FRectangle& unscaledTextBounds,
-                    float baseline,
+TextDrawResult drawTextInner(Context& ctx,
+                             bool dry,
 
-                    RenderScale scale,
-                    const compat::FRectangle& viewArea,
-                    bool alphaMask,
+                             const FormattedText& text,
+                             const compat::FRectangle& unscaledTextBounds,
+                             float baseline,
 
-                    const ParagraphShapes& paragraphShapes,
-                    Pixel32* pixels,
-                    int width,
-                    int height);
+                             RenderScale scale,
+                             const compat::FRectangle& viewArea,
+                             bool alphaMask,
+
+                             const ParagraphShapes& paragraphShapes,
+                             Pixel32* pixels,
+                             int width,
+                             int height);
 
 /// Draw individual ParagraphShapes.
-ParagraphShape::DrawResults drawParagraphsInner(const ParagraphShapes &shapes,
-                                                Context &ctx,
-                                                const FormattedText &text,
+ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
+                                                const ParagraphShapes &shapes,
+                                                BaselinePolicy baselinePolicy,
+                                                OverflowPolicy overflowPolicy,
                                                 int textWidth,
                                                 RenderScale scale,
                                                 bool isAlphaMask,
