@@ -351,11 +351,22 @@ TextDrawResult drawText(Context &ctx,
                         float scale,
                         bool dry,
                         const compat::Rectangle& viewArea) {
+     if (shapeData.formattedText == nullptr || shapeData.formattedText->getLength() == 0) {
+         return TextDrawOutput{{}};
+     }
+
+    const FormattedTextParams textParams {
+        shapeData.formattedText->verticalAlign(),
+        shapeData.formattedText->boundsMode(),
+        shapeData.formattedText->baselinePolicy(),
+        shapeData.formattedText->overflowPolicy(),
+    };
+
     return drawText(ctx,
                     shapeData.paragraphShapes,
                     shapeData.textTransform,
-                    *shapeData.formattedText,
                     shapeData.textBoundsNoTransform,
+                    textParams,
                     shapeData.baseline,
                     pixels, width, height,
                     scale,
@@ -366,8 +377,8 @@ TextDrawResult drawText(Context &ctx,
 TextDrawResult drawText(Context &ctx,
                         const ParagraphShapes &paragraphShapes,
                         const compat::Matrix3f &textTransform,
-                        const FormattedText &text,
                         const compat::FRectangle &unscaledTextBounds,
+                        const FormattedTextParams &textParams,
                         float baseline,
                         void *pixels,
                         int width,
@@ -382,7 +393,7 @@ TextDrawResult drawText(Context &ctx,
     TextDrawResult drawResult = drawTextInner(
             ctx,
             dry,
-            text,
+            textParams,
             unscaledTextBounds,
             baseline,
             scale, viewAreaTextSpace,
@@ -402,7 +413,7 @@ TextDrawResult drawText(Context &ctx,
 
 TextDrawResult drawTextInner(Context &ctx,
                              bool dry,
-                             const FormattedText& text,
+                             const FormattedTextParams &textParams,
                              const compat::FRectangle& unscaledTextBounds,
                              float baseline,
                              RenderScale scale,
@@ -411,10 +422,6 @@ TextDrawResult drawTextInner(Context &ctx,
                              compat::Pixel32* pixels,
                              int width,
                              int height) {
-    if (text.getLength() == 0) {
-        return TextDrawOutput{{}};
-    }
-
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
     const compat::FRectangle textBounds = scaleRect(unscaledTextBounds, scale);
@@ -425,12 +432,7 @@ TextDrawResult drawTextInner(Context &ctx,
     VerticalPositioning positioning = VerticalPositioning::BASELINE;
     float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
 
-    const OverflowPolicy overflowPolicy = text.overflowPolicy();
-    const BaselinePolicy baselinePolicy = text.baselinePolicy();
-    const VerticalAlign verticalAlign = text.verticalAlign();
-    const BoundsMode boundsMode = text.boundsMode();
-
-    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, baselinePolicy, overflowPolicy, textBounds.w, scale, positioning, caretVerticalPos);
+    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, textParams.baselinePolicy, textParams.overflowPolicy, textBounds.w, scale, positioning, caretVerticalPos);
     if (paragraphResults.empty()) {
         return TextDrawError::PARAGRAPHS_TYPESETING_ERROR;
     }
@@ -438,14 +440,17 @@ TextDrawResult drawTextInner(Context &ctx,
     // account for descenders of last paragraph's last line
     const spacing textBottom = caretVerticalPos - paragraphResults.back().lastlineDescender;
 
-    const spacing baselineOffset = resolveBaselineOffset(paragraphResults.front(), baselinePolicy, verticalAlign);
-    const float verticalOffset = resolveVerticalOffset(boundsMode, verticalAlign, textBounds, textBottom, baselineOffset * scale);
+    const spacing baselineOffset = resolveBaselineOffset(paragraphResults.front(), textParams.baselinePolicy, textParams.verticalAlign);
+    const float verticalOffset = resolveVerticalOffset(textParams.boundsMode, textParams.verticalAlign, textBounds, textBottom, baselineOffset * scale);
 
-    const bool unlimitedVerticalStretch = overflowPolicy == OverflowPolicy::EXTEND_ALL || boundsMode == BoundsMode::AUTO_HEIGHT || verticalAlign != VerticalAlign::TOP;
+    const bool unlimitedVerticalStretch =
+        textParams.overflowPolicy == OverflowPolicy::EXTEND_ALL ||
+        textParams.boundsMode == BoundsMode::AUTO_HEIGHT ||
+        textParams.verticalAlign != VerticalAlign::TOP;
 
     const float verticalStretchLimit = unlimitedVerticalStretch ? 0.0f : textBounds.h;
-    compat::Rectangle stretchedGlyphsBounds;
-    if (boundsMode != BoundsMode::FIXED || overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
+    compat::Rectangle stretchedGlyphsBounds {};
+    if (textParams.boundsMode != BoundsMode::FIXED || textParams.overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
         stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
     }
     compat::FRectangle stretchedTextBounds = stretchBounds(textBounds, stretchedGlyphsBounds);
