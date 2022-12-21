@@ -377,7 +377,7 @@ TextDrawResult drawText(Context &ctx,
                         const compat::Rectangle &viewArea) {
     const compat::Matrix3f inverseTransform = inverse(textTransform);
     const compat::FRectangle viewAreaTextSpaceUnscaled = utils::transform(toFRectangle(viewArea), inverseTransform);
-    const compat::FRectangle viewAreaTextSpace = scaleRect(viewAreaTextSpace, scale);
+    const compat::FRectangle viewAreaTextSpace = scaleRect(viewAreaTextSpaceUnscaled, scale);
 
     TextDrawResult drawResult = drawTextInner(
             ctx,
