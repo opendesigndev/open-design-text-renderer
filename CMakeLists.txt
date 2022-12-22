@@ -123,6 +123,7 @@ set(TEXTIFY_PRIVATE_HEADERS
     ${TEXTIFY_SOURCE_DIR}/textify/textify.h
     ${TEXTIFY_SOURCE_DIR}/textify/TextParser.h
     ${TEXTIFY_SOURCE_DIR}/textify/TextShape.h
+    ${TEXTIFY_SOURCE_DIR}/textify/TextShapeData.h
     ${TEXTIFY_SOURCE_DIR}/textify/types.h
     ${TEXTIFY_SOURCE_DIR}/textify/TypesetJournal.h
 
@@ -185,6 +186,7 @@ set(TEXTIFY_SOURCES
     ${TEXTIFY_SOURCE_DIR}/textify/textify.cpp
     ${TEXTIFY_SOURCE_DIR}/textify/TextParser.cpp
     ${TEXTIFY_SOURCE_DIR}/textify/TextShape.cpp
+    ${TEXTIFY_SOURCE_DIR}/textify/TextShapeData.cpp
     ${TEXTIFY_SOURCE_DIR}/textify/TypesetJournal.cpp
 
     ${TEXTIFY_SOURCE_DIR}/utils/utils.cpp

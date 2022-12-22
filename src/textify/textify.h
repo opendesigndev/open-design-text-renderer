@@ -1,14 +1,11 @@
 #pragma once
 
 #include "errors.h"
-#include "FormattedText.h"
-#include "ParagraphShape.h"
 #include "text-format.h"
+#include "TextShapeData.h"
 
 #include "common/result.hpp"
 #include "compat/basic-types.h"
-
-#include <memory>
 
 // Forward declarations
 namespace octopus {
@@ -20,35 +17,6 @@ namespace textify {
 
 namespace textify {
 namespace priv {
-
-using UsedFaces = std::unordered_set<std::string>;
-using FrameSizeOpt = std::optional<compat::Vector2f>;
-
-struct TextShapeData
-{
-    TextShapeData(FormattedTextPtr text,
-                  FrameSizeOpt frameSize,
-                  const compat::Matrix3f& textTransform,
-                  ParagraphShapes&& shapes,
-                  const compat::FRectangle& boundsNoTransform,
-                  const compat::FRectangle& boundsTransformed,
-                  float baseline);
-
-    // input properties
-    FormattedTextPtr formattedText;
-    FrameSizeOpt frameSize;
-    compat::Matrix3f textTransform;
-    UsedFaces usedFaces;
-
-    // processed
-    ParagraphShapes paragraphShapes;
-    compat::FRectangle textBoundsNoTransform;
-    compat::FRectangle textBoundsTransformed;
-    float baseline;
-};
-
-using TextShapeDataPtr = std::unique_ptr<TextShapeData>;
-using TextShapeResult = Result<TextShapeDataPtr, TextShapeError>;
 
 struct TextDrawOutput
 {
@@ -64,6 +32,7 @@ enum class TextDrawError
     DRAW_BOUNDS_ERROR
 };
 
+using TextShapeResult = Result<TextShapeDataPtr, TextShapeError>;
 using TextDrawResult = Result<TextDrawOutput, TextDrawError>;
 
 // TODO: Matus: Params from the formatted text. Move or cleanup?
