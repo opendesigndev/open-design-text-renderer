@@ -25,14 +25,6 @@ typedef std::unordered_map<std::string, bool> FlagsTable;
 
 typedef icu::UnicodeString ustring;
 
-struct VisualRun
-{
-    long start, end;
-    TextDirection dir;
-    float width;
-};
-using VisualRuns = std::vector<VisualRun>;
-
 inline static bool isWhitespace(compat::qchar c)
 {
     return c == (compat::qchar)' ' || c == (compat::qchar)'\t' || c == 0x2028;

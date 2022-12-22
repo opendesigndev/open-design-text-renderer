@@ -3,6 +3,7 @@
 #include "base.h"
 #include "text-format.h"
 
+#include "VisualRun.h"
 
 namespace textify {
 
@@ -34,6 +35,7 @@ public:
     int getLength() const;
     void append(compat::qchar character, const ImmediateFormat& format);
     void append(const compat::qchar* characters, const ImmediateFormat* format, int len);
+    /// Use the Unicode Bidirectional Algorithm and get visual runs.
     bool analyzeBidi();
     void applyFormatModifiers(FontManager& fontManager);
 
@@ -53,5 +55,5 @@ private:
 };
 using FormattedParagraphs = std::vector<FormattedParagraph>;
 
-}
+} // namespace priv
 } // namespace textify

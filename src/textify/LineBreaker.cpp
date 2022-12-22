@@ -5,18 +5,9 @@
 #include "utils/Log.h"
 
 #include <unicode/brkiter.h>
-#include <unicode/ubidi.h>
-
-#include <algorithm>
-#include <cstdio>
-#include <cmath>
 
 namespace textify {
 namespace priv {
-
-LineSpan::LineSpan(long start, long end, float lineWidth, TextDirection dir, Justifiable justifiable)
-    : start(start), end(end), lineWidth(lineWidth), baseDir(dir), justifiable(justifiable)
-{ }
 
 LineBreaker::LineBreaker(const utils::Log& log,
                          const std::vector<GlyphShape>& glyphs,

@@ -140,7 +140,7 @@ bool FontManager::requiresDefaultEmojiFont() const
 
 void FontManager::setRequiresDefaultEmojiFont()
 {
-    bool hasDefaultEmojiFont = faces_->getFaceItem(DEFAULT_EMOJI_FONT) != nullptr;
+    const bool hasDefaultEmojiFont = faces_->getFaceItem(DEFAULT_EMOJI_FONT) != nullptr;
     if (!hasDefaultEmojiFont) {
         requiresDefaultEmojiFont_ = true;
     }

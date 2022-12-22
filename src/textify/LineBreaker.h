@@ -1,11 +1,12 @@
 #pragma once
 
-#include "GlyphShape.h"
-#include "base.h"
-#include "text-format.h"
-
 #include <optional>
 #include <vector>
+
+#include "base.h"
+#include "text-format.h"
+#include "GlyphShape.h"
+#include "LineSpan.h"
 
 // Forward declaration
 namespace textify {
@@ -16,35 +17,6 @@ class Log;
 
 namespace textify {
 namespace priv {
-
-struct LineSpan
-{
-    enum class Justifiable
-    {
-        POSITIVE, //!< This line can be justified.
-        NEGATIVE, //!< This line should not be justified. Example: The last line in a paragraph.
-        DOCUMENT  //!< Whether this line can be justified or not depends on the document origin. Example: A line
-                  //!< ending with a soft break (0x2028).
-    };
-
-    LineSpan() = default;
-    LineSpan(long start,
-             long end,
-             float lineWidth,
-             TextDirection dir = TextDirection::LEFT_TO_RIGHT,
-             Justifiable justifiable = Justifiable::POSITIVE);
-
-    //! Glyph indices in left-closed interval [start, end)
-    long start, end;
-
-    //! BiDi visual runs.
-    std::vector<VisualRun> visualRuns;
-    float lineWidth;
-    TextDirection baseDir;
-    Justifiable justifiable;
-};
-using LineSpans = std::vector<LineSpan>;
-
 
 class LineBreaker
 {

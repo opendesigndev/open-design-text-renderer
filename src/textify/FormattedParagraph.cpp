@@ -97,9 +97,9 @@ private:
 bool FormattedParagraph::analyzeBidi()
 {
     UErrorCode errorCode = U_ZERO_ERROR;
-    auto utext = ustring::fromUTF32(reinterpret_cast<const UChar32*>(text_.data()), (int) text_.size());
-    auto uLen = utext.length();
-    auto baseDir = ubidi_getBaseDirection(utext.getBuffer(), uLen);
+    const ustring utext = ustring::fromUTF32(reinterpret_cast<const UChar32*>(text_.data()), (int) text_.size());
+    const int32_t uLen = utext.length();
+    const UBiDiDirection baseDir = ubidi_getBaseDirection(utext.getBuffer(), uLen);
     baseDirection_ = static_cast<TextDirection>(baseDir);
     UBidiHandle ubidi = ubidi_openSized(uLen, 0, &errorCode);
 
@@ -114,7 +114,7 @@ bool FormattedParagraph::analyzeBidi()
         return false;
     }
 
-    auto nRuns = ubidi_countRuns(ubidi, &errorCode);
+    const int32_t nRuns = ubidi_countRuns(ubidi, &errorCode);
     if (U_FAILURE(errorCode)) {
         log_.warn("BiDi error: Cannot retrieve runs.");
         return false;
@@ -182,5 +182,5 @@ void FormattedParagraph::resolveEmoji(std::size_t glyphIndex, FontManager& fontM
     }
 }
 
-} // priv
+} // namespace priv
 } // namespace textify

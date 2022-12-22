@@ -127,6 +127,8 @@ set(TEXTIFY_PRIVATE_HEADERS
     ${TEXTIFY_SOURCE_DIR}/textify/TextShapeData.h
     ${TEXTIFY_SOURCE_DIR}/textify/types.h
     ${TEXTIFY_SOURCE_DIR}/textify/TypesetJournal.h
+    ${TEXTIFY_SOURCE_DIR}/textify/VisualRun.h
+    ${TEXTIFY_SOURCE_DIR}/textify/LineSpan.h
 
     ${TEXTIFY_SOURCE_DIR}/utils/utils.h
     ${TEXTIFY_SOURCE_DIR}/utils/Log.h
@@ -190,6 +192,8 @@ set(TEXTIFY_SOURCES
     ${TEXTIFY_SOURCE_DIR}/textify/TextShape.cpp
     ${TEXTIFY_SOURCE_DIR}/textify/TextShapeData.cpp
     ${TEXTIFY_SOURCE_DIR}/textify/TypesetJournal.cpp
+    ${TEXTIFY_SOURCE_DIR}/textify/VisualRun.cpp
+    ${TEXTIFY_SOURCE_DIR}/textify/LineSpan.cpp
 
     ${TEXTIFY_SOURCE_DIR}/utils/utils.cpp
     ${TEXTIFY_SOURCE_DIR}/utils/Log.cpp
