@@ -242,7 +242,6 @@ ImmediateFormat FormattedText::firstFormat() const
     std::vector<ImmediateFormat> textFormat;
     generateFormat(textFormat);
 
-
     return textFormat.empty() ? baseFormat_ : textFormat[0];
     return textFormat[0];
 }
@@ -347,7 +346,6 @@ int FormattedText::debug_getDefautlFontSize() const
 const std::string& FormattedText::debug_getDefautlPostScriptName() const
 {
     return baseFormat_.faceId;
-
 }
 
 void FormattedText::debug_setDefautlPostScriptName(const std::string& name)

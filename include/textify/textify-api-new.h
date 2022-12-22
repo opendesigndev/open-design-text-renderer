@@ -40,12 +40,6 @@ enum class Decoration_NEW {
     DOUBLE_UNDERLINE,
     STRIKE_THROUGH,
 };
-// TODO: Matus: Remove and replace
-struct TypeFeature_NEW {
-    std::string tag;
-    std::int32_t value;
-};
-typedef std::vector<TypeFeature_NEW> TypeFeatures_;
 
 // TODO: Matus: Remove and replace
 /// The values correspond to the values in Octopus
@@ -86,21 +80,11 @@ struct PlacedGlyph {
             // TODO: Matus: Inherited from GlyphsFormat
             float size;
             Ligatures_NEW ligatures;
-            TypeFeatures_ features;
-            std::vector<float> tabStops;
 
             // TODO: Matus: ImmediateFormat
-            float lineHeight;       // px, always positive
-            float minLineHeight;    // px
-            float maxLineHeight;    // px
-            float letterSpacing;    // px in Sketch, can be negative
             float paragraphSpacing; // px in Sketch, cannot be negativ
-            float paragraphIndent;  // px x offset of the first line in a paragraph
             Decoration_NEW decoration;
             HorizontalAlign_NEW align;
-            bool kerning;
-            bool uppercase;
-            bool lowercase;
         } format;
 
         // TODO: Matus: This font face Id should be moved to some other place

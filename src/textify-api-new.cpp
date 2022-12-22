@@ -49,22 +49,6 @@ compat::Matrix3f convertMatrix(const Matrix3f &m) {
 }
 }
 
-TypeFeatures_ convertFromPrivFeatures(const TypeFeatures &features) {
-    TypeFeatures_ features_;
-    for (const TypeFeature &feature : features) {
-        features_.emplace_back(TypeFeature_NEW{ feature.tag, feature.value });
-    }
-    return features_;
-}
-
-TypeFeatures convertFromApiFeatures(const TypeFeatures_ &features_) {
-    TypeFeatures features;
-    for (const TypeFeature_NEW &feature_ : features_) {
-        features.emplace_back(TypeFeature{ feature_.tag, feature_.value });
-    }
-    return features;
-}
-
 PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
     const PlacedGlyph::Temporary::Dimensions dimensions {
         glyph.horizontalAdvance,
@@ -79,22 +63,10 @@ PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
 
     temp.format.size = glyph.format.size;
     temp.format.ligatures = static_cast<Ligatures_NEW>(glyph.format.ligatures);
-    temp.format.features = convertFromPrivFeatures(glyph.format.features);
-    for (float tabStop : glyph.format.tabStops) {
-        temp.format.tabStops.emplace_back(tabStop);
-    }
 
-    temp.format.lineHeight = glyph.format.lineHeight;
-    temp.format.minLineHeight = glyph.format.minLineHeight;
-    temp.format.maxLineHeight = glyph.format.maxLineHeight;
-    temp.format.letterSpacing = glyph.format.letterSpacing;
     temp.format.paragraphSpacing = glyph.format.paragraphSpacing;
-    temp.format.paragraphIndent = glyph.format.paragraphIndent;
     temp.format.decoration = static_cast<Decoration_NEW>(glyph.format.decoration);
     temp.format.align = static_cast<HorizontalAlign_NEW>(glyph.format.align);
-    temp.format.kerning = glyph.format.kerning;
-    temp.format.uppercase = glyph.format.uppercase;
-    temp.format.lowercase = glyph.format.lowercase;
 
     temp.fontFaceId = glyph.format.faceId;
     temp.character = glyph.character;
@@ -125,24 +97,15 @@ priv::GlyphShape convertToGlyphShape(/*const FontSpecifier &fontSpecifier,*/
 
     ImmediateFormat resultFormat;
 
+    // TODO: Matus: Many of the result glyph (or format) parameters are not set - not needed in the rendering phase
     resultFormat.faceId = placedGlyph.temp.fontFaceId;
     resultFormat.size = placedGlyph.temp.format.size;
     resultFormat.ligatures = static_cast<GlyphFormat::Ligatures>(placedGlyph.temp.format.ligatures);
     resultFormat.direction = placedGlyph.temp.leftToRight ? TextDirection::LEFT_TO_RIGHT : TextDirection::RIGHT_TO_LEFT;
-    resultFormat.features = convertFromApiFeatures(placedGlyph.temp.format.features);
-    resultFormat.tabStops = placedGlyph.temp.format.tabStops;
-    resultFormat.lineHeight = placedGlyph.temp.format.lineHeight;
-    resultFormat.minLineHeight = placedGlyph.temp.format.minLineHeight;
-    resultFormat.maxLineHeight = placedGlyph.temp.format.maxLineHeight;
-    resultFormat.letterSpacing = placedGlyph.temp.format.letterSpacing;
     resultFormat.paragraphSpacing = placedGlyph.temp.format.paragraphSpacing;
-    resultFormat.paragraphIndent = placedGlyph.temp.format.paragraphIndent;
     resultFormat.color = placedGlyph.color;
     resultFormat.decoration = static_cast<Decoration>(placedGlyph.temp.format.decoration);
     resultFormat.align = static_cast<HorizontalAlign>(static_cast<HorizontalAlign_NEW>(placedGlyph.temp.format.align));
-    resultFormat.kerning = placedGlyph.temp.format.kerning;
-    resultFormat.uppercase = placedGlyph.temp.format.uppercase;
-    resultFormat.lowercase = placedGlyph.temp.format.lowercase;
 
     result.format = resultFormat;
     result.codepoint = placedGlyph.glyphCodepoint;
