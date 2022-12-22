@@ -90,9 +90,6 @@ struct PlacedGlyph {
         // TODO: Matus: This font face Id should be moved to some other place
         //   Maybe the glyphs should be groupped by face Ids
         std::string fontFaceId;
-
-        // TODO: Matus: The codepoint is what I'm intereseted in
-        uint32_t character;     //!< Unicode
         bool leftToRight;
         std::optional<bool> lineStart;
 
