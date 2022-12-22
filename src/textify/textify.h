@@ -35,14 +35,6 @@ enum class TextDrawError
 using TextShapeResult = Result<TextShapeDataPtr, TextShapeError>;
 using TextDrawResult = Result<TextDrawOutput, TextDrawError>;
 
-// TODO: Matus: Params from the formatted text. Move or cleanup?
-struct FormattedTextParams {
-    VerticalAlign verticalAlign;
-    BoundsMode boundsMode;
-    BaselinePolicy baselinePolicy;
-    OverflowPolicy overflowPolicy;
-};
-
 /// List all font face names that have not been loaded to the context's FontManager.
 FacesNames listMissingFonts(Context &ctx,
                             const octopus::Text& text);
@@ -72,7 +64,7 @@ TextDrawResult drawText(Context &ctx,
                         const ParagraphShapes &paragraphShapes,
                         const compat::Matrix3f &textTransform,
                         const compat::FRectangle &unscaledTextBounds,
-                        const FormattedTextParams &textParams,
+                        const FormattedText::FormattingParams &textParams,
                         float baseline,
                         void *pixels,
                         int width,
@@ -83,7 +75,7 @@ TextDrawResult drawText(Context &ctx,
 
 TextDrawResult drawTextInner(Context &ctx,
                              bool dry, // Only compute the boundaries, the actual drawing does not take place.
-                             const FormattedTextParams &textParams,
+                             const FormattedText::FormattingParams &textParams,
                              const compat::FRectangle& unscaledTextBounds,
                              float baseline,
                              RenderScale scale,

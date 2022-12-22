@@ -22,6 +22,15 @@ class FormattedText
     friend class TextParser;
 
 public:
+    struct FormattingParams {
+        VerticalAlign verticalAlign;
+        BoundsMode boundsMode;
+        float baseline;
+        HorizontalPositionPolicy horizontalPositioning;
+        BaselinePolicy baselinePolicy;
+        OverflowPolicy overflowPolicy;
+    };
+
     FormattedText(VerticalAlign verticalAlign,
                   BoundsMode boundsMode,
                   float baseline,
@@ -56,6 +65,7 @@ public:
     void generateFormat(std::vector<ImmediateFormat>& format) const;
     ImmediateFormat firstFormat() const;
 
+    const FormattingParams &formattingParams() const;
     VerticalAlign verticalAlign() const;
     BoundsMode boundsMode() const;
     float baseline() const;
@@ -65,9 +75,9 @@ public:
     inline const std::string& content() const { return content_; }
     inline const std::vector<FormatModifier> & formatModifiers() const { return formatModifiers_; }
 
-    inline void setBaseline(float baseline) { baseline_ = baseline; }
+    inline void setBaseline(float baseline) { params_.baseline = baseline; }
     inline void setContent(const std::string& content) { content_ = content; };
-    inline void setBoundsMode(BoundsMode mode) { boundsMode_ = mode; }
+    inline void setBoundsMode(BoundsMode mode) { params_.boundsMode = mode; }
 
     std::string getPreview(int len = 12) const;
 
@@ -90,12 +100,7 @@ private:
     std::vector<compat::qchar> text_;
     std::vector<FormatModifier> formatModifiers_;
 
-    VerticalAlign verticalAlign_;
-    BoundsMode boundsMode_;
-    float baseline_;
-    HorizontalPositionPolicy horizontalPositioning_;
-    BaselinePolicy baselinePolicy_;
-    OverflowPolicy overflowPolicy_;
+    FormattingParams params_;
 
     /**
      * Original text value encoded as UTF-8 string

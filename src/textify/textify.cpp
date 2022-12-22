@@ -355,18 +355,11 @@ TextDrawResult drawText(Context &ctx,
          return TextDrawOutput{{}};
      }
 
-    const FormattedTextParams textParams {
-        shapeData.formattedText->verticalAlign(),
-        shapeData.formattedText->boundsMode(),
-        shapeData.formattedText->baselinePolicy(),
-        shapeData.formattedText->overflowPolicy(),
-    };
-
     return drawText(ctx,
                     shapeData.paragraphShapes,
                     shapeData.textTransform,
                     shapeData.textBoundsNoTransform,
-                    textParams,
+                    shapeData.formattedText->formattingParams(),
                     shapeData.baseline,
                     pixels, width, height,
                     scale,
@@ -378,7 +371,7 @@ TextDrawResult drawText(Context &ctx,
                         const ParagraphShapes &paragraphShapes,
                         const compat::Matrix3f &textTransform,
                         const compat::FRectangle &unscaledTextBounds,
-                        const FormattedTextParams &textParams,
+                        const FormattedText::FormattingParams &textParams,
                         float baseline,
                         void *pixels,
                         int width,
@@ -413,7 +406,7 @@ TextDrawResult drawText(Context &ctx,
 
 TextDrawResult drawTextInner(Context &ctx,
                              bool dry,
-                             const FormattedTextParams &textParams,
+                             const FormattedText::FormattingParams &textParams,
                              const compat::FRectangle& unscaledTextBounds,
                              float baseline,
                              RenderScale scale,

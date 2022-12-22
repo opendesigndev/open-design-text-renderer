@@ -20,12 +20,7 @@ FormattedText::FormattedText(VerticalAlign verticalAlign,
                              HorizontalPositionPolicy horizontalPositioning,
                              BaselinePolicy baselinePolicy,
                              OverflowPolicy overflowPolicy)
-    : verticalAlign_(verticalAlign),
-      boundsMode_(boundsMode),
-      baseline_(baseline),
-      horizontalPositioning_(horizontalPositioning),
-      baselinePolicy_(baselinePolicy),
-      overflowPolicy_(overflowPolicy)
+    : params_(FormattingParams { verticalAlign, boundsMode, baseline, horizontalPositioning, baselinePolicy, overflowPolicy })
 {
 }
 
@@ -252,34 +247,38 @@ ImmediateFormat FormattedText::firstFormat() const
     return textFormat[0];
 }
 
+const FormattedText::FormattingParams &FormattedText::formattingParams() const {
+    return params_;
+}
+
 VerticalAlign FormattedText::verticalAlign() const
 {
-    return verticalAlign_;
+    return params_.verticalAlign;
 }
 
 BoundsMode FormattedText::boundsMode() const
 {
-    return boundsMode_;
+    return params_.boundsMode;
 }
 
 float FormattedText::baseline() const
 {
-    return baseline_;
+    return params_.baseline;
 }
 
 HorizontalPositionPolicy FormattedText::horizontalPositionPolicy() const
 {
-    return horizontalPositioning_;
+    return params_.horizontalPositioning;
 }
 
 BaselinePolicy FormattedText::baselinePolicy() const
 {
-    return baselinePolicy_;
+    return params_.baselinePolicy;
 }
 
 OverflowPolicy FormattedText::overflowPolicy() const
 {
-    return overflowPolicy_;
+    return params_.overflowPolicy;
 }
 
 std::string FormattedText::getPreview(int len) const
