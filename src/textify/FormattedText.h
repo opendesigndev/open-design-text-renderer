@@ -104,5 +104,5 @@ private:
 };
 using FormattedTextPtr = std::unique_ptr<FormattedText>;
 
-}
-}
+} // namespace priv
+} // namespace textify

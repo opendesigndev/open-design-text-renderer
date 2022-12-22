@@ -395,5 +395,5 @@ void FormattedText::scale(float scale)
     }
 }
 
-}
-}
+} // namespace priv
+} // namespace textify
