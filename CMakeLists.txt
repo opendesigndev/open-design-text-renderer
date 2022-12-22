@@ -76,6 +76,7 @@ endif()
 
 set(TEXTIFY_PUBLIC_HEADERS
     ${TEXTIFY_INCLUDE_DIR}/textify/textify-api.h
+    ${TEXTIFY_INCLUDE_DIR}/textify/textify-api-new.h
 )
 
 set(TEXTIFY_PRIVATE_HEADERS
@@ -151,6 +152,7 @@ set(TEXTIFY_PRIVATE_HEADERS
 )
 set(TEXTIFY_SOURCES
     ${TEXTIFY_SOURCE_DIR}/textify-api.cpp
+    ${TEXTIFY_SOURCE_DIR}/textify-api-new.cpp
 
     ${TEXTIFY_SOURCE_DIR}/common/buffer_view.cpp
 
