@@ -62,14 +62,12 @@ PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
     PlacedGlyph::Temporary temp;
 
     temp.format.size = glyph.format.size;
-    temp.format.ligatures = static_cast<Ligatures_NEW>(glyph.format.ligatures);
 
     temp.format.paragraphSpacing = glyph.format.paragraphSpacing;
     temp.format.decoration = static_cast<Decoration_NEW>(glyph.format.decoration);
     temp.format.align = static_cast<HorizontalAlign_NEW>(glyph.format.align);
 
     temp.fontFaceId = glyph.format.faceId;
-    temp.leftToRight = glyph.direction == TextDirection::LEFT_TO_RIGHT;
     temp.lineStart = glyph.lineStart;
     temp.defaultLineHeight = glyph.defaultLineHeight;
 
@@ -99,16 +97,13 @@ priv::GlyphShape convertToGlyphShape(/*const FontSpecifier &fontSpecifier,*/
     // TODO: Matus: Many of the result glyph (or format) parameters are not set - not needed in the rendering phase
     resultFormat.faceId = placedGlyph.temp.fontFaceId;
     resultFormat.size = placedGlyph.temp.format.size;
-    resultFormat.ligatures = static_cast<GlyphFormat::Ligatures>(placedGlyph.temp.format.ligatures);
-    resultFormat.direction = placedGlyph.temp.leftToRight ? TextDirection::LEFT_TO_RIGHT : TextDirection::RIGHT_TO_LEFT;
     resultFormat.paragraphSpacing = placedGlyph.temp.format.paragraphSpacing;
     resultFormat.color = placedGlyph.color;
     resultFormat.decoration = static_cast<Decoration>(placedGlyph.temp.format.decoration);
-    resultFormat.align = static_cast<HorizontalAlign>(static_cast<HorizontalAlign_NEW>(placedGlyph.temp.format.align));
+    resultFormat.align = static_cast<HorizontalAlign>(placedGlyph.temp.format.align);
 
     result.format = resultFormat;
     result.codepoint = placedGlyph.glyphCodepoint;
-    result.direction = placedGlyph.temp.leftToRight ? TextDirection::LEFT_TO_RIGHT : TextDirection::RIGHT_TO_LEFT;
     result.lineStart = placedGlyph.temp.lineStart;
 
     result.defaultLineHeight = placedGlyph.temp.defaultLineHeight;

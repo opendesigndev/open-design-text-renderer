@@ -41,15 +41,6 @@ enum class Decoration_NEW {
     STRIKE_THROUGH,
 };
 
-// TODO: Matus: Remove and replace
-/// The values correspond to the values in Octopus
-enum class Ligatures_NEW {
-    NONE = 0,
-    STANDARD = 1,
-    ALTERNATIVE = 2, ///< Inspired by PS behaviour, stands for discretionary and historical
-    ALL = 3
-};
-
 
 // TODO: Matus: Use the full font specifier (family and style?)
 //struct FontSpecifier {
@@ -79,7 +70,6 @@ struct PlacedGlyph {
         struct ImmediateFormat {
             // TODO: Matus: Inherited from GlyphsFormat
             float size;
-            Ligatures_NEW ligatures;
 
             // TODO: Matus: ImmediateFormat
             float paragraphSpacing; // px in Sketch, cannot be negativ
@@ -90,9 +80,7 @@ struct PlacedGlyph {
         // TODO: Matus: This font face Id should be moved to some other place
         //   Maybe the glyphs should be groupped by face Ids
         std::string fontFaceId;
-        bool leftToRight;
         std::optional<bool> lineStart;
-
         float defaultLineHeight;
 
         /// Dimensions (scalable)
