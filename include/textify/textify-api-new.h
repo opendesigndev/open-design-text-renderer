@@ -59,8 +59,11 @@ struct PlacedGlyph {
     struct QuadCorners {
         Vector2d topLeft, topRight, bottomLeft, bottomRight;
     } quadCorners;
-    /// Color - TODO: Matus: this is duplicated in ImmediateFormat
+    /// Glyph color
     uint32_t color;
+    // TODO: Matus: This font face Id should be moved to some other place
+    //   Maybe the glyphs should be groupped by face Ids
+    std::string fontFaceId;
 
     // TODO: Matus: Temporary data
     // TODO: Matus: Remove and replace
@@ -77,9 +80,6 @@ struct PlacedGlyph {
             HorizontalAlign_NEW align;
         } format;
 
-        // TODO: Matus: This font face Id should be moved to some other place
-        //   Maybe the glyphs should be groupped by face Ids
-        std::string fontFaceId;
         float defaultLineHeight;
 
         /// Dimensions (scalable)

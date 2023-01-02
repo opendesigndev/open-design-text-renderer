@@ -58,7 +58,6 @@ PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
     temp.format.decoration = static_cast<Decoration_NEW>(glyph.format.decoration);
     temp.format.align = static_cast<HorizontalAlign_NEW>(glyph.format.align);
 
-    temp.fontFaceId = glyph.format.faceId;
     temp.defaultLineHeight = glyph.defaultLineHeight;
 
     temp.dimensions = {
@@ -73,6 +72,7 @@ PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
     result.glyphCodepoint = glyph.codepoint;
     result.quadCorners = {};
     result.color = glyph.format.color;
+    result.fontFaceId = glyph.format.faceId;
     result.temp = temp;
 
     return result;
@@ -85,7 +85,7 @@ priv::GlyphShape convertToGlyphShape(/*const FontSpecifier &fontSpecifier,*/
     ImmediateFormat resultFormat;
 
     // TODO: Matus: Many of the result glyph (or format) parameters are not set - not needed in the rendering phase
-    resultFormat.faceId = placedGlyph.temp.fontFaceId;
+    resultFormat.faceId = placedGlyph.fontFaceId;
     resultFormat.size = placedGlyph.temp.format.size;
     resultFormat.paragraphSpacing = placedGlyph.temp.format.paragraphSpacing;
     resultFormat.color = placedGlyph.color;

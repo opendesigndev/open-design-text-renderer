@@ -173,7 +173,8 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
         const int leftLimit = left + align * (width - lineWidth);
         const int rightLimit = left + width - (1.0f - align) * (width - lineWidth);
 
-        const bool isFirstLine = &lineSpan == &shapingPhaseOutput_.lineSpans_.front();
+        const bool isFirstLine = (&lineSpan == &shapingPhaseOutput_.lineSpans_.front());
+        const bool isLastLine = (&lineSpan == &shapingPhaseOutput_.lineSpans_.back());
 
         // first line of the paragraph
         if (isFirstLine) {
@@ -185,7 +186,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
             result.leftFirst = leftLimit;
         }
         // last line of the paragraph
-        if (&lineSpan == &shapingPhaseOutput_.lineSpans_.back()) {
+        if (isLastLine) {
             result.lastlineDescender = maxDescender(lineSpan, scale);
         }
 
@@ -221,7 +222,6 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 const bool tabStop = isTabStop(unscaledGlyphShape.character);
 
                 if (j == visualRun.start && !isFirstLine && firstRun && !tabStop) {
-                    auto x = caret.x;
                     auto nextlineOffset = newlineOffset(shapingPhaseOutput_.glyphs_[j].format.tabStops);
                     if (nextlineOffset.has_value()) {
                         caret.x = nextlineOffset.value() * scale;
