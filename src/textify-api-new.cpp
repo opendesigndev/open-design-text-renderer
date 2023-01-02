@@ -50,15 +50,6 @@ compat::Matrix3f convertMatrix(const Matrix3f &m) {
 }
 
 PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
-    const PlacedGlyph::Temporary::Dimensions dimensions {
-        glyph.horizontalAdvance,
-        glyph.ascender,
-        glyph.descender,
-        glyph.bearingX,
-        glyph.bearingY,
-        glyph.lineHeight,
-    };
-
     PlacedGlyph::Temporary temp;
 
     temp.format.size = glyph.format.size;
@@ -70,12 +61,12 @@ PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
     temp.fontFaceId = glyph.format.faceId;
     temp.defaultLineHeight = glyph.defaultLineHeight;
 
-    temp.dimensions.horizontalAdvance = glyph.horizontalAdvance;
-    temp.dimensions.ascender = glyph.ascender;
-    temp.dimensions.descender = glyph.descender;
-    temp.dimensions.bearingX = glyph.bearingX;
-    temp.dimensions.bearingY = glyph.bearingY;
-    temp.dimensions.lineHeight = glyph.lineHeight;
+    temp.dimensions = {
+        glyph.horizontalAdvance,
+        glyph.ascender,
+        glyph.descender,
+        glyph.lineHeight,
+    };
 
     PlacedGlyph result;
 
@@ -108,8 +99,6 @@ priv::GlyphShape convertToGlyphShape(/*const FontSpecifier &fontSpecifier,*/
     result.horizontalAdvance = placedGlyph.temp.dimensions.horizontalAdvance;
     result.ascender = placedGlyph.temp.dimensions.ascender;
     result.descender = placedGlyph.temp.dimensions.descender;
-    result.bearingX = placedGlyph.temp.dimensions.bearingX;
-    result.bearingY = placedGlyph.temp.dimensions.bearingY;
     result.lineHeight = placedGlyph.temp.dimensions.lineHeight;
 
     return result;

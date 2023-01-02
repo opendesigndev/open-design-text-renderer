@@ -146,7 +146,6 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
     }
 
     const float align = evaluateAlign(shapingPhaseOutput_.glyphs_[0].format.align, shapingPhaseOutput_.glyphs_[0].direction);
-    const spacing bearingX = shapingPhaseOutput_.glyphs_[0].bearingX * scale;
 
     Vector2f caret{0.0f, y};
     for (const LineSpan &lineSpan : shapingPhaseOutput_.lineSpans_) {
@@ -203,7 +202,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
             const float direction = runRtl ? -1.0f : 1.0f;
             const float runWidth = visualRun.width * scale;
 
-            bool firstRun = &visualRun == &lineSpan.visualRuns.front();
+            const bool firstRun = &visualRun == &lineSpan.visualRuns.front();
 
             // jump to the beginning of the run
             if (runRtl != lineRtl)
@@ -286,7 +285,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 coord.x += glyph->bitmapBearing.x;
                 coord.y -= glyph->bitmapBearing.y;
 
-                spacing hAdvance = scaledGlyphShape.horizontalAdvance * (1 - (int)fixedHorizontalAdvance);
+                const spacing hAdvance = scaledGlyphShape.horizontalAdvance * (1 - (int)fixedHorizontalAdvance);
                 if (runRtl) {
                     coord.x -= hAdvance + scaledGlyphShape.letterSpacing;
                 }
@@ -327,7 +326,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
             result.maxLineWidth = static_cast<float>(width);
         } else {
             // TODO: what if RTL??
-            auto currentLineWidth = std::ceil(std::max(caret.x - leftLimit, lineWidth));
+            const float currentLineWidth = std::ceil(std::max(caret.x - leftLimit, lineWidth));
             result.maxLineWidth = std::max(result.maxLineWidth, currentLineWidth);
         }
 

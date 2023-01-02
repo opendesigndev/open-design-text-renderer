@@ -87,8 +87,6 @@ struct PlacedGlyph {
             float horizontalAdvance;
             float ascender;     //!< Up to 1px error, see FT reference
             float descender;    //!< Up to 1px error, see FT reference
-            float bearingX;   //!< X-axis bearing of the glyph
-            float bearingY;   //!< Y-axis bearing of the glyph
             float lineHeight; // TODO why is this here and also in format?
         } dimensions;
     } temp;
