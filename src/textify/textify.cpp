@@ -285,7 +285,7 @@ TextShapeResult shapeTextInner(Context &ctx,
     float y = 0.0f;
     VerticalPositioning positioning = VerticalPositioning::TOP_BOUND;
 
-    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, shapes, text.baselinePolicy(), text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, positioning, y);
+    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, positioning, y);
 
     // Rerun glyph bitmaps if previous justification was nonsense (zero width for auto-width bounds)
     if (text.boundsMode() == BoundsMode::AUTO_WIDTH) {
@@ -299,7 +299,7 @@ TextShapeResult shapeTextInner(Context &ctx,
             maxWidth = std::max(maxWidth, paragraphResult.maxLineWidth);
         }
 
-        paragraphResults = drawParagraphsInner(ctx, shapes, text.baselinePolicy(), text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, positioning, y);
+        paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, positioning, y);
     }
 
     if (paragraphResults.empty()) {
@@ -425,7 +425,7 @@ TextDrawResult drawTextInner(Context &ctx,
     VerticalPositioning positioning = VerticalPositioning::BASELINE;
     float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
 
-    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, textParams.baselinePolicy, textParams.overflowPolicy, textBounds.w, scale, positioning, caretVerticalPos);
+    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, textParams.overflowPolicy, textBounds.w, scale, positioning, caretVerticalPos);
     if (paragraphResults.empty()) {
         return TextDrawError::PARAGRAPHS_TYPESETING_ERROR;
     }
@@ -489,7 +489,6 @@ TextDrawResult drawTextInner(Context &ctx,
 
 ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
                                                 const ParagraphShapes &shapes,
-                                                BaselinePolicy baselinePolicy,
                                                 OverflowPolicy overflowPolicy,
                                                 int textWidth,
                                                 RenderScale scale,
@@ -497,11 +496,9 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
                                                 float &caretVerticalPos) {
     ParagraphShape::DrawResults drawResults;
 
-    const bool hasBaselineTransform = baselinePolicy == BaselinePolicy::SET;
-
     for (const ParagraphShapePtr& paragraphShape : shapes) {
         const bool isLast = (paragraphShape == shapes.back());
-        ParagraphShape::DrawResult drawResult = paragraphShape->draw(ctx, 0, textWidth, caretVerticalPos, positioning, scale, isLast, hasBaselineTransform, false);
+        ParagraphShape::DrawResult drawResult = paragraphShape->draw(ctx, 0, textWidth, caretVerticalPos, positioning, scale, isLast, false);
 
         const LastLinePolicy lastLinePolicy =
             (overflowPolicy == OverflowPolicy::CLIP_LINE && drawResult.journal.size() > 1)

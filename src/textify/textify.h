@@ -88,7 +88,6 @@ TextDrawResult drawTextInner(Context &ctx,
 /// Draw individual ParagraphShapes.
 ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
                                                 const ParagraphShapes &shapes,
-                                                BaselinePolicy baselinePolicy,
                                                 OverflowPolicy overflowPolicy,
                                                 int textWidth,
                                                 RenderScale scale,

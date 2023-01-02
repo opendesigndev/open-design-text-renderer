@@ -148,7 +148,6 @@ public:
                     VerticalPositioning& positioning,
                     float scale,
                     bool last,
-                    bool counterBaselineTranslation,
                     bool alphaMask) const;
 
     HorizontalAlign firstLineHorizontalAlignment() const;

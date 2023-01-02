@@ -8,7 +8,7 @@ namespace textify {
 
 using namespace compat;
 
-void Glyph::setDestination(const IPoint2& dest, spacing lineHeight)
+void Glyph::setDestination(const IPoint2& dest)
 {
     destPos_ = dest;
 }

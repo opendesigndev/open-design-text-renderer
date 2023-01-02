@@ -17,7 +17,7 @@ public:
     virtual int bitmapHeight() const = 0;
     virtual int bitmapWidth() const = 0;
     virtual void setColor(const Pixel32& c) = 0;
-    void setDestination(const IPoint2& dest, spacing lineHeight);
+    void setDestination(const IPoint2& dest);
     virtual bool putBitmap(const FT_Bitmap &bitmap) = 0;
     virtual void scaleBitmap(float scale) = 0;
 

@@ -135,7 +135,6 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                                                 VerticalPositioning& positioning,
                                                 float scale,
                                                 bool last,
-                                                bool counterBaselineTranslation,
                                                 bool alphaMask) const
 {
     DrawResult result;
@@ -295,8 +294,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 const float fracOffset = glyph->rsb_delta - glyph->lsb_delta;
                 caret.x += fracOffset * scale;
 
-                glyph->setDestination({static_cast<int>(floor(coord.x)), static_cast<int>(floor(coord.y))},
-                                      counterBaselineTranslation ? 0 : maxAscender(lineSpan, scale));
+                glyph->setDestination({static_cast<int>(floor(coord.x)), static_cast<int>(floor(coord.y))});
                 glyph->setColor(alphaMask ? ~Pixel32() : unscaledGlyphShape.format.color);
 
                 if (unscaledGlyphShape.format.decoration != Decoration::NONE) {
