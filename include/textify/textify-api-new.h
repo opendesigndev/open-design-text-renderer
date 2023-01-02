@@ -80,7 +80,6 @@ struct PlacedGlyph {
         // TODO: Matus: This font face Id should be moved to some other place
         //   Maybe the glyphs should be groupped by face Ids
         std::string fontFaceId;
-        std::optional<bool> lineStart;
         float defaultLineHeight;
 
         /// Dimensions (scalable)
