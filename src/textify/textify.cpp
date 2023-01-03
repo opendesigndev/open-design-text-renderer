@@ -201,24 +201,6 @@ float roundCaretPosition(float pos, bool floorBaseline)
 } // namespace
 
 
-TextShapeData::TextShapeData(FormattedTextPtr text,
-                             FrameSizeOpt frameSize,
-                             const compat::Matrix3f& textTransform,
-                             ParagraphShapes&& shapes,
-                             const compat::FRectangle& boundsNoTransform,
-                             const compat::FRectangle& boundsTransformed,
-                             float baseline)
-    : formattedText(std::move(text)),
-      frameSize(frameSize),
-      textTransform(textTransform),
-      usedFaces(formattedText->collectUsedFaceNames()),
-      paragraphShapes(std::move(shapes)),
-      textBoundsNoTransform(boundsNoTransform),
-      textBoundsTransformed(boundsTransformed),
-      baseline(baseline)
-{ }
-
-
 FacesNames listMissingFonts(Context &ctx, const octopus::Text& text)
 {
     const TextParser::ParseResult parsedText = TextParser(text).parseText();
