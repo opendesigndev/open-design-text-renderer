@@ -91,7 +91,7 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
                                                 OverflowPolicy overflowPolicy,
                                                 int textWidth,
                                                 RenderScale scale,
-                                                VerticalPositioning &positioning,
+                                                VerticalPositioning positioning,
                                                 float &caretVerticalPos);
 
 } // namespace priv

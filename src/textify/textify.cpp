@@ -283,23 +283,20 @@ TextShapeResult shapeTextInner(Context &ctx,
     }
 
     float y = 0.0f;
-    VerticalPositioning positioning = VerticalPositioning::TOP_BOUND;
 
-    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, positioning, y);
+    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, VerticalPositioning::TOP_BOUND, y);
 
     // Rerun glyph bitmaps if previous justification was nonsense (zero width for auto-width bounds)
     if (text.boundsMode() == BoundsMode::AUTO_WIDTH) {
         log.debug("Running second pass for text '{}", text.getPreview());
 
-        y = 0;
-        positioning = VerticalPositioning::TOP_BOUND;
-
-        maxWidth = 0;
+        y = 0.0f;
+        maxWidth = 0.0f;
         for (const auto& paragraphResult : paragraphResults) {
             maxWidth = std::max(maxWidth, paragraphResult.maxLineWidth);
         }
 
-        paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, positioning, y);
+        paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, VerticalPositioning::TOP_BOUND, y);
     }
 
     if (paragraphResults.empty()) {
@@ -422,10 +419,9 @@ TextDrawResult drawTextInner(Context &ctx,
         return TextDrawError::INVALID_SCALE;
     }
 
-    VerticalPositioning positioning = VerticalPositioning::BASELINE;
     float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
 
-    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, textParams.overflowPolicy, textBounds.w, scale, positioning, caretVerticalPos);
+    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, textParams.overflowPolicy, textBounds.w, scale, VerticalPositioning::BASELINE, caretVerticalPos);
     if (paragraphResults.empty()) {
         return TextDrawError::PARAGRAPHS_TYPESETING_ERROR;
     }
@@ -492,7 +488,7 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
                                                 OverflowPolicy overflowPolicy,
                                                 int textWidth,
                                                 RenderScale scale,
-                                                VerticalPositioning &positioning,
+                                                VerticalPositioning positioning,
                                                 float &caretVerticalPos) {
     ParagraphShape::DrawResults drawResults;
 
