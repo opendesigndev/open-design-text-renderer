@@ -174,30 +174,30 @@ void GrayGlyph::blit(Pixel32* dst, const IDims2& dDims, const Vector2i& offset) 
         return;
     }
 
-    auto premultipliedColor = pixelToColor(color_);
+    Color premultipliedColor = pixelToColor(color_);
     premultipliedColor.r *= premultipliedColor.a;
     premultipliedColor.g *= premultipliedColor.a;
     premultipliedColor.b *= premultipliedColor.a;
 
-    auto src = bitmap_->pixels();
+    Pixel8 *src = bitmap_->pixels();
 
     for (auto sy = 0; sy < bitmap_->height(); ++sy) {
         for (auto sx = 0; sx < bitmap_->width(); ++sx, ++src) {
-            auto dx = destPos_.x + sx + offset.x;
-            auto dy = destPos_.y + sy + offset.y;
+            const int dx = destPos_.x + sx + offset.x;
+            const int dy = destPos_.y + sy + offset.y;
 
             if (dx < 0 || dy < 0 || dx >= dDims.x || dy >= dDims.y) {
                 continue;
             }
 
-            auto letterAlpha = *src / 255.f;
-            auto srcColor = premultipliedColor;
+            const float letterAlpha = *src / 255.f;
+            Color srcColor = premultipliedColor;
             srcColor.r *= letterAlpha;
             srcColor.g *= letterAlpha;
             srcColor.b *= letterAlpha;
             srcColor.a *= letterAlpha;
 
-            auto dstColor = pixelToColor(dst[dDims.x * dy + dx]);
+            Color dstColor = pixelToColor(dst[dDims.x * dy + dx]);
             dstColor.r *= 1 - srcColor.a;
             dstColor.g *= 1 - srcColor.a;
             dstColor.b *= 1 - srcColor.a;
@@ -220,21 +220,21 @@ void ColorGlyph::blit(Pixel32* dst, const IDims2& dDims, const Vector2i& offset)
         return;
     }
 
-    auto src = bitmap_->pixels();
+    Pixel32 *src = bitmap_->pixels();
 
-    for (auto sy = 0; sy < bitmap_->height(); ++sy) {
-        for (auto sx = 0; sx < bitmap_->width(); ++sx, ++src) {
-            auto dx = destPos_.x + sx + offset.x;
-            auto dy = destPos_.y + sy + offset.y;
+    for (int sy = 0; sy < bitmap_->height(); ++sy) {
+        for (int sx = 0; sx < bitmap_->width(); ++sx, ++src) {
+            const int dx = destPos_.x + sx + offset.x;
+            const int dy = destPos_.y + sy + offset.y;
 
             if (dx < 0 || dy < 0 || dx >= dDims.x || dy >= dDims.y) {
                 continue;
             }
 
             // color glyphs are already alpha premultiplied
-            auto srcColor = pixelToColor(*src);
+            Color srcColor = pixelToColor(*src);
 
-            auto dstColor = compat::pixelToColor(dst[dDims.x * dy + dx]);
+            Color dstColor = compat::pixelToColor(dst[dDims.x * dy + dx]);
             dstColor.r *= 1 - srcColor.a;
             dstColor.g *= 1 - srcColor.a;
             dstColor.b *= 1 - srcColor.a;
