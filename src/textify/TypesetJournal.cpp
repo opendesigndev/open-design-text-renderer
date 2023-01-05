@@ -11,7 +11,6 @@ using namespace compat;
 void TypesetJournal::startLine(float y)
 {
     lineJournal_.push_back({});
-
     baselines_.push_back(y);
 }
 
@@ -28,7 +27,7 @@ void TypesetJournal::addDecoration(const DecorationInput& d, float scale)
 {
     extendLastDecoration(d.end.x, d.type);
 
-    static const auto STRIKETHROUGH_HEIGHT = 0.25f;
+    static const float STRIKETHROUGH_HEIGHT = 0.25f;
 
     DecorationRecord decoration;
 
@@ -37,17 +36,16 @@ void TypesetJournal::addDecoration(const DecorationInput& d, float scale)
     decoration.color = d.color;
 
     decoration.offset = d.start.y;
-    auto decorOffset = 0.0f;
+    float decorOffset = 0.0f;
     if (d.type == Decoration::STRIKE_THROUGH) {
-        decorOffset =
-            (STRIKETHROUGH_HEIGHT * d.face->scaleFontUnits(d.face->getFtFace()->height, true));
+        decorOffset = (STRIKETHROUGH_HEIGHT * d.face->scaleFontUnits(d.face->getFtFace()->height, true));
     } else {
         decorOffset = (d.face->scaleFontUnits(d.face->getFtFace()->underline_position, true));
     }
 
     decoration.offset -= static_cast<int>(decorOffset * scale);
 
-    auto thickness = d.face->scaleFontUnits(d.face->getFtFace()->underline_thickness, true);
+    const float thickness = d.face->scaleFontUnits(d.face->getFtFace()->underline_thickness, true);
     decoration.thickness = thickness * scale;
 
     decorationJournal_.push_back(decoration);
@@ -64,7 +62,7 @@ void TypesetJournal::extendLastDecoration(int newRange, Decoration type)
 
 TypesetJournal::DrawResult TypesetJournal::draw(BitmapRGBA& bitmap, const Rectangle& bounds, int textHeight, const Rectangle& viewArea, const Vector2i& offset) const
 {
-    DrawResult drawResult = drawGlyphs(bitmap, bounds, textHeight, viewArea, offset);
+    const DrawResult drawResult = drawGlyphs(bitmap, bounds, textHeight, viewArea, offset);
 
     drawDecorations(bitmap, offset);
 
@@ -75,9 +73,8 @@ Rectangle TypesetJournal::stretchedBounds(int yOffset, int yMax) const
 {
     Rectangle bounds = {};
 
-    for (const auto& line : lineJournal_) {
-
-        auto lineExtremes = line.glyphBitmapExtremes();
+    for (const LineRecord& line : lineJournal_) {
+        const LowHighPair lineExtremes = line.glyphBitmapExtremes();
 
         if (yMax > 0 && lineExtremes.high > yMax) {
             // line upper glyph bound is below a visble limit
@@ -89,9 +86,8 @@ Rectangle TypesetJournal::stretchedBounds(int yOffset, int yMax) const
             break;
         }
 
-        for (const auto& rec : line.glyphJournal_) {
-            auto glyphBounds = rec->getBitmapBounds();
-
+        for (const GlyphPtr& rec : line.glyphJournal_) {
+            Rectangle glyphBounds = rec->getBitmapBounds();
             bounds = bounds | glyphBounds;
         }
 
@@ -110,16 +106,16 @@ Rectangle TypesetJournal::stretchedBounds(int yOffset, int yMax) const
 TypesetJournal::DrawResult TypesetJournal::drawGlyphs(BitmapRGBA& bitmap, const Rectangle& bounds, int textHeight, const Rectangle& viewArea, const Vector2i& offset) const
 {
     // auto t0 = Timer::now();
-    auto numGlyphsRendered = 0ul;
+    size_t numGlyphsRendered = 0ul;
 
     for (const auto& line : lineJournal_) {
 
         if (lastLinePolicy_ == LastLinePolicy::CUT && line.lowPoint() + offset.y > textHeight)
             break;
 
-        for (const auto& rec : line.glyphJournal_) {
-            auto glyphBounds = rec->getBitmapBounds();
-            auto placedGlyphBounds = bounds + glyphBounds;
+        for (const GlyphPtr& rec : line.glyphJournal_) {
+            const Rectangle glyphBounds = rec->getBitmapBounds();
+            Rectangle placedGlyphBounds = bounds + glyphBounds;
             placedGlyphBounds.l += offset.x;
             placedGlyphBounds.t += offset.y;
 
@@ -166,20 +162,20 @@ private:
 
 void TypesetJournal::drawDecorations(BitmapRGBA& bitmap, const Vector2i& offset) const
 {
-    auto w = BmpWriter(bitmap);
+    BmpWriter w = BmpWriter(bitmap);
 
-    for (const auto& decoration : decorationJournal_) {
+    for (const DecorationRecord& decoration : decorationJournal_) {
+        const int vpos = decoration.offset + offset.y;
 
-        auto vpos = decoration.offset + offset.y;
         for (int j = 0; j < decoration.range.last - decoration.range.first; j++) {
-            auto penX = decoration.range.first + j + offset.x;
+            const int penX = decoration.range.first + j + offset.x;
             if (!w.checkH(penX)) {
                 continue;
             }
 
             if (decoration.type == Decoration::DOUBLE_UNDERLINE) {
-                auto thickness = static_cast<int>(ceil(decoration.thickness * 2.0 / 3.0));
-                auto offset = static_cast<int>(thickness * 0.5);
+                const int thickness = static_cast<int>(ceil(decoration.thickness * 2.0 / 3.0));
+                const int offset = static_cast<int>(thickness * 0.5);
 
                 for (auto k = 0; k < thickness; k++) {
                     w.write(penX, vpos - offset - k, decoration.color);
@@ -202,6 +198,7 @@ bool TypesetJournal::LowHighPair::partialOverflow(int limit) const
 int TypesetJournal::LineRecord::lowPoint() const
 {
     int low = 0;
+
     for (const auto& rec : glyphJournal_) {
         low = std::max(low, rec->getDestination().y + rec->bitmapHeight());
     }
@@ -211,8 +208,8 @@ int TypesetJournal::LineRecord::lowPoint() const
 
 TypesetJournal::LowHighPair TypesetJournal::LineRecord::glyphBitmapExtremes() const
 {
-    auto high = std::numeric_limits<int>::max();
-    auto low = 0;
+    int high = std::numeric_limits<int>::max();
+    int low = 0;
 
     for (const auto& rec : glyphJournal_) {
         high = std::min(high, rec->getDestination().y);

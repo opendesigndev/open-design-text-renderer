@@ -23,7 +23,7 @@ static const unsigned char * getBitmapRow(const FT_Bitmap &bitmap, unsigned int 
 }
 
 static void convertGrayscaleBitmap(Pixel8 *dst, const FT_Bitmap &bitmap) {
-    unsigned int rowLength = (unsigned int) abs(bitmap.pitch);
+    const unsigned int rowLength = (unsigned int) abs(bitmap.pitch);
     switch (bitmap.pixel_mode) {
         case FT_PIXEL_MODE_MONO: // 1 bit per pixel
             for (unsigned int row = 0; row < bitmap.rows; ++row) {
@@ -181,8 +181,8 @@ void GrayGlyph::blit(Pixel32* dst, const IDims2& dDims, const Vector2i& offset) 
 
     Pixel8 *src = bitmap_->pixels();
 
-    for (auto sy = 0; sy < bitmap_->height(); ++sy) {
-        for (auto sx = 0; sx < bitmap_->width(); ++sx, ++src) {
+    for (int sy = 0; sy < bitmap_->height(); ++sy) {
+        for (int sx = 0; sx < bitmap_->width(); ++sx, ++src) {
             const int dx = destPos_.x + sx + offset.x;
             const int dy = destPos_.y + sy + offset.y;
 
@@ -232,7 +232,7 @@ void ColorGlyph::blit(Pixel32* dst, const IDims2& dDims, const Vector2i& offset)
             }
 
             // color glyphs are already alpha premultiplied
-            Color srcColor = pixelToColor(*src);
+            const Color srcColor = pixelToColor(*src);
 
             Color dstColor = compat::pixelToColor(dst[dDims.x * dy + dx]);
             dstColor.r *= 1 - srcColor.a;

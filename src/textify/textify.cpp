@@ -424,7 +424,7 @@ TextDrawResult drawTextInner(Context &ctx,
     if (textParams.boundsMode != BoundsMode::FIXED || textParams.overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
         stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
     }
-    compat::FRectangle stretchedTextBounds = stretchBounds(textBounds, stretchedGlyphsBounds);
+    const compat::FRectangle stretchedTextBounds = stretchBounds(textBounds, stretchedGlyphsBounds);
 
     compat::Rectangle bitmapBounds = outerRect(stretchedTextBounds);
 
