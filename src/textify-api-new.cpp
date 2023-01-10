@@ -30,6 +30,11 @@
 #include <string>
 #include <vector>
 
+
+namespace textify {
+static std::map<TextShapeHandle, ShapeTextResult_NEW> results_NEW;
+}
+
 namespace textify {
 namespace {
 compat::Rectangle convertRect(const textify::Rectangle &r) {
@@ -161,24 +166,64 @@ priv::LineSpan convertToLineSpan(const Line_NEW &lineSpan) {
 }
 
 
-ShapeTextResult_NEW shapeText_NEW(ContextHandle ctx,
-                                  const octopus::Text &text) {
-    ShapeTextResult_NEW result;
+TextShapeHandle shapeText_NEW(ContextHandle ctx,
+                              const octopus::Text& text)
+{
     if (ctx == nullptr) {
-        return result;
+        return nullptr;
     }
 
     priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
     if (!textShapeResult) {
         ctx->getLogger().error("shaping of a text failed with error: {}", (int)textShapeResult.error());
+        return nullptr;
+    }
+
+    ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue()));
+
+    results_NEW[ctx->shapes.back().get()] = shapeText_NEW_Inner(ctx, text);
+
+    return ctx->shapes.back().get();
+}
+
+ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
+                                        const octopus::Text &text) {
+    ShapeTextResult_NEW result;
+    if (ctx == nullptr) {
         return result;
     }
 
-    const priv::TextShapeDataPtr textShapeData = textShapeResult.moveValue();
+    priv::TextShapeResult_NEW textShapeResult = priv::shapeText_NEW(*ctx, text);
+    if (!textShapeResult) {
+        ctx->getLogger().error("shaping of a text failed with error: {}", (int)textShapeResult.error());
+        return result;
+    }
+
+    const priv::TextShapeDataPtr_NEW textShapeData = textShapeResult.moveValue();
     if (textShapeData == nullptr) {
         return result;
     }
 
+    const auto ConvertQuad = [](const priv::PlacedGlyph::QuadCorners &qc)->PlacedGlyph::QuadCorners {
+        const auto ConvertVec = [](const compat::Vector2f &vf)->Vector2d { return Vector2d { vf.x, vf.y }; };
+        return PlacedGlyph::QuadCorners {
+        ConvertVec(qc.topLeft),
+        ConvertVec(qc.topRight),
+        ConvertVec(qc.bottomLeft),
+        ConvertVec(qc.bottomRight),
+    }; };
+
+    for (const priv::PlacedGlyph &pg : textShapeData->placedGlyphs) {
+        PlacedGlyph pgn;
+        pgn.glyphCodepoint = pg.glyphCodepoint;
+        pgn.quadCorners = ConvertQuad(pg.quadCorners);
+        pgn.color = pg.color;
+        pgn.fontFaceId = pg.fontFaceId;
+        // TODO: Matus: This should not be here at all
+        pgn.temp.format.size = pg.temp.size;
+        pgn.temp.dimensions.ascender = pg.temp.ascender;
+        result.placedGlyphs.emplace_back(pgn);
+    }
     result.textTransform = convertMatrix(textShapeData->textTransform);
     result.textBoundsNoTransform = convertRect(textShapeData->textBoundsNoTransform);
     result.textParams.baseline = textShapeData->baseline;
@@ -204,9 +249,16 @@ ShapeTextResult_NEW shapeText_NEW(ContextHandle ctx,
 }
 
 DrawTextResult drawText_NEW(ContextHandle ctx,
-                            const ShapeTextResult_NEW &textShape_NEW,
-                            void *outputBuffer, int width, int height,
-                            const DrawOptions &drawOptions)
+                            TextShapeHandle textShape,
+                            void* pixels, int width, int height,
+                            const DrawOptions& drawOptions) {
+    return drawText_NEW_Inner(ctx, results_NEW[textShape], pixels, width, height, drawOptions);
+}
+
+DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
+                                  const ShapeTextResult_NEW &textShape_NEW,
+                                  void *outputBuffer, int width, int height,
+                                  const DrawOptions &drawOptions)
 {
     if (ctx == nullptr) {
         return {};
@@ -245,18 +297,46 @@ DrawTextResult drawText_NEW(ContextHandle ctx,
         static_cast<OverflowPolicy>(textShape_NEW.textParams.overflowPolicy),
     };
 
+    priv::PlacedGlyphs pgs;
+    const auto ConvertQuad = [](const PlacedGlyph::QuadCorners &qc)->priv::PlacedGlyph::QuadCorners {
+        const auto ConvertVec = [](const Vector2d &v)->compat::Vector2f { return compat::Vector2f { (float)v.x, (float)v.y }; };
+        return priv::PlacedGlyph::QuadCorners {
+            ConvertVec(qc.topLeft),
+            ConvertVec(qc.topRight),
+            ConvertVec(qc.bottomLeft),
+            ConvertVec(qc.bottomRight),
+    }; };
+    for (const PlacedGlyph &pg : textShape_NEW.placedGlyphs) {
+        priv::PlacedGlyph pgn;
+        pgn.glyphCodepoint = pg.glyphCodepoint;
+        pgn.quadCorners = ConvertQuad(pg.quadCorners);
+        pgn.color = pg.color;
+        pgn.fontFaceId = pg.fontFaceId;
+
+        // TODO: Matus: This should not be here at all
+        pgn.temp.size = pg.temp.format.size;
+        pgn.temp.ascender = pg.temp.dimensions.ascender;
+
+        pgs.emplace_back(pgn);
+    }
+
     const compat::Matrix3f textTransform = convertMatrix(textShape_NEW.textTransform);
     const compat::FRectangle textBoundsNoTransform = convertRect(textShape_NEW.textBoundsNoTransform);
-    const priv::TextDrawResult result = priv::drawText(*ctx,
-                                                       paragraphShapes,
-                                                       textTransform,
-                                                       textBoundsNoTransform,
-                                                       formattedTextParams,
-                                                       textShape_NEW.textParams.baseline,
-                                                       outputBuffer, width, height,
-                                                       drawOptions.scale,
-                                                       false,
-                                                       viewArea);
+    const compat::FRectangle stretchedTextBounds = priv::getStretchedTextBounds(*ctx,
+                                                                                paragraphShapes,
+                                                                                textBoundsNoTransform,
+                                                                                formattedTextParams,
+                                                                                textShape_NEW.textParams.baseline,
+                                                                                drawOptions.scale);
+
+    const priv::TextDrawResult result = priv::drawText_NEW(*ctx,
+                                                           textTransform,
+                                                           stretchedTextBounds,
+                                                           outputBuffer, width, height,
+                                                           drawOptions.scale,
+                                                           viewArea,
+                                                           pgs);
+
     if (result) {
         const auto& drawOutput = result.value();
         return {

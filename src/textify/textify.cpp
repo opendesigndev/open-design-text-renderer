@@ -490,5 +490,339 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
     return drawResults;
 }
 
+
+
+
+
+
+
+TextShapeResult_NEW shapeText_NEW(Context &ctx, const octopus::Text& text)
+{
+    TextParser::ParseResult parsedText = TextParser(text).parseText();
+
+    FrameSizeOpt frameSize;
+    if (text.frame.has_value()) {
+        const auto [w, h] = text.frame.value().size.value_or(octopus::Dimensions{0.0,0.0});
+        frameSize = compat::Vector2f{static_cast<float>(w), static_cast<float>(h)};
+    }
+    return shapeTextInner_NEW(ctx, std::move(parsedText.text), frameSize, parsedText.transformation);
+}
+
+// TODO: Matus: This function is the same as the old one, the only difference is it collects the PlacedGlyphs.
+TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
+                                       FormattedTextPtr formattedText,
+                                       const FrameSizeOpt &frameSize,
+                                       const compat::Matrix3f &textTransform)
+{
+    const utils::Log &log = ctx.getLogger();
+    const FormattedText &text = *formattedText.get();
+
+    // Split the text into paragraphs
+    const FormattedParagraphs paragraphs = splitText(log, text, ctx.getFontManager());
+    if (paragraphs.empty()) {
+        return TextShapeError::NO_PARAGRAPHS;
+    }
+
+    float maxWidth = text.boundsMode() == BoundsMode::AUTO_WIDTH ? 0.0f : frameSize.value_or(compat::Vector2f{0,0}).x;
+
+    const bool loadGlyphsBearings = text.baselinePolicy() == BaselinePolicy::OFFSET_BEARING;
+    // Shape the paragraphs
+    ParagraphShapes shapes;
+    for (const FormattedParagraph& paragraph : paragraphs) {
+        ParagraphShapePtr paragraphShape = std::make_unique<ParagraphShape>(log, ctx.getFontManager().facesTable());
+        const ParagraphShape::ShapeResult shapeResult = paragraphShape->shape(paragraph, maxWidth, loadGlyphsBearings);
+
+        if (shapeResult.success) {
+            shapes.emplace_back(std::move(paragraphShape));
+        }
+    }
+
+    if (shapes.empty()) {
+        return TextShapeError::SHAPE_ERROR;
+    }
+
+    float y = 0.0f;
+    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, VerticalPositioning::TOP_BOUND, y);
+
+    // Rerun glyph bitmaps if previous justification was nonsense (zero width for auto-width bounds)
+    if (text.boundsMode() == BoundsMode::AUTO_WIDTH) {
+        log.debug("Running second pass for text '{}", text.getPreview());
+
+        y = 0.0f;
+        maxWidth = 0.0f;
+        for (const ParagraphShape::DrawResult& paragraphResult : paragraphResults) {
+            maxWidth = std::max(maxWidth, paragraphResult.maxLineWidth);
+        }
+
+        paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, VerticalPositioning::TOP_BOUND, y);
+    }
+
+    if (paragraphResults.empty()) {
+        return TextShapeError::TYPESET_ERROR;
+    }
+
+    const ParagraphShape::DrawResult &p0 = paragraphResults[0];
+
+    if (ctx.config.lastLineDescenderOffset) {
+        y = std::round(y - paragraphResults.back().lastlineDescender);
+    }
+
+    const float firstLineActualHeight = p0.firstAscender + p0.firstDescender;
+
+    float w = 0.0f;
+    float h = std::max(std::ceil(y), std::round(ctx.config.preferRealLineHeightOverExplicit ? firstLineActualHeight : p0.firstLineHeight));
+
+    for (const auto& paragraphResult : paragraphResults) {
+        w = std::max(w, std::floor(paragraphResult.maxLineWidth));
+    }
+
+    const bool isBaselineSet = text.baselinePolicy() == BaselinePolicy::SET;
+    const float l = isBaselineSet ? -std::floor(p0.leftFirst) : 0.0f;
+    const float t = isBaselineSet ? -std::round(p0.firstAscender) : 0.0f;
+
+    preserveFixedDimensions(text.boundsMode(), frameSize, w, h);
+
+    const compat::FRectangle textBoundsNoTransform { l, t, w, h };
+    const compat::FRectangle textBoundsTransform = transform(textBoundsNoTransform, textTransform);
+
+    const float baseline = resolveBaselinePosition(p0, text.baselinePolicy(), text.verticalAlign());
+
+    PlacedGlyphs placedGlyphs {};
+    for (size_t i = 0; i < paragraphResults.size(); i++) {
+        const ParagraphShapePtr &paragraphShape = shapes[i];
+        const ParagraphShape::DrawResult &drawResult = paragraphResults[i];
+
+        size_t j = 0;
+        for (size_t k = 0; k < drawResult.journal.getLines().size(); k++) {
+            const auto & lineRecord = drawResult.journal.getLines()[k];
+
+            for (size_t l = 0; l < lineRecord.glyphJournal_.size(); l++) {
+                const GlyphShape &glyphShape = paragraphShape->glyphs()[j];
+                const GlyphPtr &glyph = lineRecord.glyphJournal_[l];
+
+                const IPoint2 &glyphDestination = glyph->getDestination();
+
+                PlacedGlyph placedGlyph;
+
+                placedGlyph.glyphCodepoint = glyphShape.codepoint;
+                placedGlyph.color = glyphShape.format.color;
+                placedGlyph.fontFaceId = glyphShape.format.faceId;
+
+                const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
+                const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
+
+                placedGlyph.quadCorners.bottomLeft = compat::Vector2f { static_cast<float>(glyphDestination.x), static_cast<float>(glyphDestination.y) };
+                placedGlyph.quadCorners.bottomRight = placedGlyph.quadCorners.bottomLeft + compat::Vector2f { bitmapWidthF, 0.0f };
+                placedGlyph.quadCorners.topLeft = placedGlyph.quadCorners.bottomLeft + compat::Vector2f { 0.0f, bitmapHeightF };
+                placedGlyph.quadCorners.topRight = placedGlyph.quadCorners.bottomLeft + compat::Vector2f { bitmapWidthF, bitmapHeightF };
+
+                // TODO: Matus: This should not be here at all
+                placedGlyph.temp.size = glyphShape.format.size;
+                placedGlyph.temp.ascender = glyphShape.ascender;
+
+                placedGlyphs.emplace_back(placedGlyph);
+
+                j++;
+            }
+        }
+    }
+
+    return std::make_unique<TextShapeData_NEW>(
+        std::move(formattedText),
+        frameSize,
+        textTransform,
+        std::move(shapes),
+        textBoundsNoTransform,
+        textBoundsTransform,
+        baseline,
+        placedGlyphs
+    );
+}
+
+
+// TODO: Matus: NEW function
+GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
+                           const FaceTable &faceTable,
+                           RenderScale scale,
+                           bool internalDisableHinting) {
+    const FaceId &faceID = placedGlyph.fontFaceId;
+    const FaceTable::Item* faceItem = faceTable.getFaceItem(placedGlyph.fontFaceId);
+    if (!faceItem) {
+//        log_.warn("[Textify / ParagraphShape::draw] Line drawing error: Missing font face \"{}\"", faceID);
+        return;
+    }
+
+    FacePtr face = faceItem->face;
+
+    // TODO: Matus: Here I need `format.size` and `ascender`
+    float glyphScale = 1.0f;
+    const font_size desiredSize = face->isScalable() ? std::ceil(placedGlyph.temp.size * scale) : placedGlyph.temp.size;
+    const Result<font_size,bool> setSizeRes = face->getBestSizeToSet(1.0f);
+    if (setSizeRes && !face->isScalable()) {
+        glyphScale = (placedGlyph.temp.ascender * scale) / (float)setSizeRes.value();
+    }
+
+    // TODO: Matus: Offset?
+    const compat::Vector2f offset { 0.0f, 0.0f };
+    const ScaleParams glyphScaleParams { scale, glyphScale };
+
+    GlyphPtr glyph = face->acquireGlyph(placedGlyph.glyphCodepoint, offset, glyphScaleParams, internalDisableHinting);
+    if (!glyph) {
+        return nullptr;
+    }
+
+    const compat::Vector2f& placedGlyphPosition = placedGlyph.quadCorners.bottomLeft;
+
+    glyph->setDestination({static_cast<int>(floor(placedGlyphPosition.x)), static_cast<int>(floor(placedGlyphPosition.y))});
+    glyph->setColor(placedGlyph.color);
+
+    return glyph;
+}
+
+//// TODO: Matus: NEW function
+//void drawGlyph(compat::BitmapRGBA& bitmap,
+//               const Glyph &glyph,
+//               const compat::Rectangle& bounds,
+//               const compat::Rectangle& viewArea,
+//               const compat::Vector2i& offset)
+//{
+//    const compat::Rectangle glyphBounds = glyph.getBitmapBounds();
+//    compat::Rectangle placedGlyphBounds = bounds + glyphBounds;
+//    placedGlyphBounds.l += offset.x;
+//    placedGlyphBounds.t += offset.y;
+//
+//    if (!(placedGlyphBounds & viewArea)) {
+//        // skips glyphs outside of view area
+//        return;
+//    }
+//
+//    const IDims2 destDims{ bitmap.width(), bitmap.height() };
+//    glyph.blit(bitmap.pixels(), destDims, offset);
+//}
+
+// TODO: Matus: NEW function
+void drawGlyph(compat::BitmapRGBA& bitmap,
+               const Glyph &glyph,
+               const compat::Rectangle& viewArea)
+{
+    const compat::Rectangle placedGlyphBounds = glyph.getBitmapBounds();
+
+    if (!(placedGlyphBounds & viewArea)) {
+        // skips glyphs outside of view area
+        return;
+    }
+
+    const IDims2 destDims{ bitmap.width(), bitmap.height() };
+    glyph.blit(bitmap.pixels(), destDims, compat::Vector2i{ 0, 0 });
+}
+
+
+compat::FRectangle getStretchedTextBounds(Context &ctx,
+                                          const ParagraphShapes &paragraphShapes,
+                                          const compat::FRectangle &unscaledTextBounds,
+                                          const FormattedText::FormattingParams &textParams,
+                                          float baseline,
+                                          float scale) {
+    const compat::FRectangle textBounds = scaleRect(unscaledTextBounds, scale);
+    if (!textBounds) {
+        return compat::FRectangle{};
+    }
+
+    float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
+
+    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, textParams.overflowPolicy, textBounds.w, scale, VerticalPositioning::BASELINE, caretVerticalPos);
+    if (paragraphResults.empty()) {
+        return compat::FRectangle{};
+    }
+
+    // account for descenders of last paragraph's last line
+    const spacing textBottom = caretVerticalPos - paragraphResults.back().lastlineDescender;
+
+    const spacing baselineOffset = resolveBaselineOffset(paragraphResults.front(), textParams.baselinePolicy, textParams.verticalAlign);
+    const float verticalOffset = resolveVerticalOffset(textParams.boundsMode, textParams.verticalAlign, textBounds, textBottom, baselineOffset * scale);
+
+    const bool unlimitedVerticalStretch =
+        textParams.overflowPolicy == OverflowPolicy::EXTEND_ALL ||
+        textParams.boundsMode == BoundsMode::AUTO_HEIGHT ||
+        textParams.verticalAlign != VerticalAlign::TOP;
+
+    const float verticalStretchLimit = unlimitedVerticalStretch ? 0.0f : textBounds.h;
+    compat::Rectangle stretchedGlyphsBounds {};
+    if (textParams.boundsMode != BoundsMode::FIXED || textParams.overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
+        stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
+    }
+
+    return stretchBounds(textBounds, stretchedGlyphsBounds);
+}
+
+
+compat::Rectangle computeDrawBounds(Context &ctx,
+                                    const compat::Matrix3f &textTransform,
+                                    const compat::FRectangle &stretchedTextBounds,
+                                    float scale,
+                                    const compat::FRectangle& viewAreaTextSpace) {
+    const compat::Rectangle bitmapBounds = ctx.config.enableViewAreaCutout
+        ? outerRect(viewAreaTextSpace & stretchedTextBounds)
+        : outerRect(stretchedTextBounds);
+    return bitmapBounds;
+}
+
+
+// TODO: Matus: this function just calls the INNER function.
+TextDrawResult drawText_NEW(Context &ctx,
+                            const compat::Matrix3f &textTransform,
+                            const compat::FRectangle &stretchedTextBounds,
+                            void *pixels, int width, int height,
+                            float scale,
+                            const compat::Rectangle &viewArea,
+                            const PlacedGlyphs &placedGlyphs) {
+    const compat::Matrix3f inverseTransform = inverse(textTransform);
+    const compat::FRectangle viewAreaTextSpaceUnscaled = utils::transform(toFRectangle(viewArea), inverseTransform);
+    const compat::FRectangle viewAreaTextSpace = scaleRect(viewAreaTextSpaceUnscaled, scale);
+
+    TextDrawResult drawResult = drawTextInner_NEW(
+        ctx,
+        scale,
+        viewAreaTextSpace,
+        static_cast<Pixel32*>(pixels), width, height,
+        placedGlyphs);
+
+    if (drawResult) {
+        TextDrawOutput value = drawResult.moveValue();
+        value.transform = textTransform;
+        value.transform[2][0] *= scale;
+        value.transform[2][1] *= scale;
+        value.drawBounds = computeDrawBounds(ctx, textTransform, stretchedTextBounds, scale, viewAreaTextSpace);
+        return value;
+    } else {
+        return drawResult.error();
+    }
+}
+
+// TODO: Matus: This function is IMPORTANT.
+TextDrawResult drawTextInner_NEW(Context &ctx,
+                                 RenderScale scale,
+                                 const compat::FRectangle& viewArea,
+                                 Pixel32* pixels, int width, int height,
+                                 const PlacedGlyphs &placedGlyphs) {
+    std::vector<GlyphPtr> renderedGlyphs;
+    for (const PlacedGlyph &pg : placedGlyphs) {
+        renderedGlyphs.emplace_back(renderPlacedGlyph(pg,
+                                                      ctx.getFontManager().facesTable(),
+                                                      scale,
+                                                      ctx.config.internalDisableHinting));
+    }
+
+    compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
+
+    const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? outerRect(viewArea) : compat::INFINITE_BOUNDS;
+
+    for (const GlyphPtr &renderedGlyph : renderedGlyphs) {
+        drawGlyph(output, *renderedGlyph, viewAreaBounds);
+    }
+
+    return TextDrawOutput{};
+}
+
 } // namespace priv
 } // namespace textify

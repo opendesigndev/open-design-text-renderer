@@ -127,6 +127,8 @@ using Paragraph_NEW_vec = std::vector<Paragraph_NEW>;
 
 // TODO: Matus: Remove and replace
 struct ShapeTextResult_NEW {
+    PlacedGlyphs placedGlyphs;
+
     Paragraph_NEW_vec paragraphs;
     Matrix3f textTransform;
     FRectangle textBoundsNoTransform;
@@ -169,12 +171,18 @@ struct ShapeTextResult_NEW {
 
 
 /// Shape text.
-ShapeTextResult_NEW shapeText_NEW(ContextHandle ctx,
-                                  const octopus::Text &text);
+TextShapeHandle shapeText_NEW(ContextHandle ctx,
+                              const octopus::Text& text);
+ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
+                                        const octopus::Text &text);
 
 /// Draw text.
 DrawTextResult drawText_NEW(ContextHandle ctx,
-                            const ShapeTextResult_NEW &textShape_NEW,
-                            void *outputBuffer, int width, int height,
-                            const DrawOptions &drawOptions);
+                            TextShapeHandle textShape,
+                            void* pixels, int width, int height,
+                            const DrawOptions& drawOptions = {});
+DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
+                                  const ShapeTextResult_NEW &textShape_NEW,
+                                  void *outputBuffer, int width, int height,
+                                  const DrawOptions &drawOptions);
 }

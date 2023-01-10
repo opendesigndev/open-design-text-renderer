@@ -94,5 +94,111 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
                                                 VerticalPositioning positioning,
                                                 float &caretVerticalPos);
 
+
+
+
+
+struct PlacedGlyph {
+    /// Glyph codepoint - index within the loaded font file
+    uint32_t glyphCodepoint;
+    /// Glyph position, specified by its four quad corners.
+    struct QuadCorners {
+        compat::Vector2f topLeft, topRight, bottomLeft, bottomRight;
+    } quadCorners;
+    /// Glyph color
+    uint32_t color;
+    // TODO: Matus: This font face Id should be moved to some other place
+    //   Maybe the glyphs should be groupped by face Ids
+    std::string fontFaceId;
+
+    // TODO: Matus: This should not be here at all
+    struct Temp {
+        float size = 0.0f;
+        float ascender = 0.0f;
+    } temp;
+};
+using PlacedGlyphs = std::vector<PlacedGlyph>;
+
+using UsedFaces = std::unordered_set<std::string>;
+using FrameSizeOpt = std::optional<compat::Vector2f>;
+
+
+struct TextShapeData_NEW
+{
+    TextShapeData_NEW(FormattedTextPtr text,
+                      FrameSizeOpt frameSize,
+                      const compat::Matrix3f& textTransform,
+                      ParagraphShapes&& shapes,
+                      const compat::FRectangle& boundsNoTransform,
+                      const compat::FRectangle& boundsTransformed,
+                      float baseline,
+                      const PlacedGlyphs &placedGlyphs)
+        : formattedText(std::move(text)),
+          frameSize(frameSize),
+          textTransform(textTransform),
+          usedFaces(formattedText->collectUsedFaceNames()),
+          paragraphShapes(std::move(shapes)),
+          textBoundsNoTransform(boundsNoTransform),
+          textBoundsTransformed(boundsTransformed),
+          baseline(baseline),
+          placedGlyphs(placedGlyphs)
+    {
+    }
+
+    // input properties
+    FormattedTextPtr formattedText;
+    FrameSizeOpt frameSize;
+    compat::Matrix3f textTransform;
+    UsedFaces usedFaces;
+
+    // processed
+    ParagraphShapes paragraphShapes;
+    compat::FRectangle textBoundsNoTransform;
+    compat::FRectangle textBoundsTransformed;
+    float baseline;
+
+    // TODO: Matus
+    PlacedGlyphs placedGlyphs;
+};
+using TextShapeDataPtr_NEW = std::unique_ptr<TextShapeData_NEW>;
+using TextShapeResult_NEW = Result<TextShapeDataPtr_NEW, TextShapeError>;
+
+
+TextShapeResult_NEW shapeText_NEW(Context &ctx,
+                                  const octopus::Text& text);
+
+TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
+                                       FormattedTextPtr text,
+                                       const FrameSizeOpt &frameSize,
+                                       const compat::Matrix3f &textTransform);
+
+compat::FRectangle getStretchedTextBounds(Context &ctx,
+                                          const ParagraphShapes &paragraphShapes,
+                                          const compat::FRectangle &unscaledTextBounds,
+                                          const FormattedText::FormattingParams &textParams,
+                                          float baseline,
+                                          float scale);
+
+compat::Rectangle computeDrawBounds(Context &ctx,
+                                    const compat::Matrix3f &textTransform,
+                                    const compat::FRectangle &stretchedTextBounds,
+                                    float scale,
+                                    const compat::FRectangle& viewAreaTextSpace);
+
+// TODO: Matus: Cleanup this function - make sure all the arguments are optimal etc.
+TextDrawResult drawText_NEW(Context &ctx,
+                            const compat::Matrix3f &textTransform,
+                            const compat::FRectangle &stretchedTextBounds,
+                            void *pixels, int width, int height,
+                            float scale,
+                            const compat::Rectangle &viewArea,
+                            const PlacedGlyphs &placedGlyphs);
+
+TextDrawResult drawTextInner_NEW(Context &ctx,
+                                 RenderScale scale,
+                                 const compat::FRectangle& viewArea,
+                                 Pixel32* pixels, int width, int height,
+                                 const PlacedGlyphs &placedGlyphs);
+
 } // namespace priv
 } // namespace textify
