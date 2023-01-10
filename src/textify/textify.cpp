@@ -679,27 +679,6 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
     return glyph;
 }
 
-//// TODO: Matus: NEW function
-//void drawGlyph(compat::BitmapRGBA& bitmap,
-//               const Glyph &glyph,
-//               const compat::Rectangle& bounds,
-//               const compat::Rectangle& viewArea,
-//               const compat::Vector2i& offset)
-//{
-//    const compat::Rectangle glyphBounds = glyph.getBitmapBounds();
-//    compat::Rectangle placedGlyphBounds = bounds + glyphBounds;
-//    placedGlyphBounds.l += offset.x;
-//    placedGlyphBounds.t += offset.y;
-//
-//    if (!(placedGlyphBounds & viewArea)) {
-//        // skips glyphs outside of view area
-//        return;
-//    }
-//
-//    const IDims2 destDims{ bitmap.width(), bitmap.height() };
-//    glyph.blit(bitmap.pixels(), destDims, offset);
-//}
-
 // TODO: Matus: NEW function
 void drawGlyph(compat::BitmapRGBA& bitmap,
                const Glyph &glyph,
