@@ -657,7 +657,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
     // TODO: Matus: Here I need `format.size` and `ascender`
     float glyphScale = 1.0f;
     const font_size desiredSize = face->isScalable() ? std::ceil(placedGlyph.temp.size * scale) : placedGlyph.temp.size;
-    const Result<font_size,bool> setSizeRes = face->getBestSizeToSet(1.0f);
+    const Result<font_size,bool> setSizeRes = face->getBestSizeToSet(desiredSize);
     if (setSizeRes && !face->isScalable()) {
         glyphScale = (placedGlyph.temp.ascender * scale) / (float)setSizeRes.value();
     }
@@ -740,10 +740,9 @@ compat::Rectangle computeDrawBounds(Context &ctx,
                                     const compat::FRectangle &stretchedTextBounds,
                                     float scale,
                                     const compat::FRectangle& viewAreaTextSpace) {
-    const compat::Rectangle bitmapBounds = ctx.config.enableViewAreaCutout
+    return ctx.config.enableViewAreaCutout
         ? outerRect(viewAreaTextSpace & stretchedTextBounds)
         : outerRect(stretchedTextBounds);
-    return bitmapBounds;
 }
 
 
