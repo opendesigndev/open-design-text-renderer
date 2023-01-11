@@ -66,7 +66,6 @@ PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
     temp.defaultLineHeight = glyph.defaultLineHeight;
 
     temp.dimensions = {
-        glyph.horizontalAdvance,
         glyph.ascender,
         glyph.descender,
         glyph.lineHeight,
@@ -101,7 +100,6 @@ priv::GlyphShape convertToGlyphShape(/*const FontSpecifier &fontSpecifier,*/
     result.codepoint = placedGlyph.glyphCodepoint;
 
     result.defaultLineHeight = placedGlyph.temp.defaultLineHeight;
-    result.horizontalAdvance = placedGlyph.temp.dimensions.horizontalAdvance;
     result.ascender = placedGlyph.temp.dimensions.ascender;
     result.descender = placedGlyph.temp.dimensions.descender;
     result.lineHeight = placedGlyph.temp.dimensions.lineHeight;

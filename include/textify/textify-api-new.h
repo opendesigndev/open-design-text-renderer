@@ -84,7 +84,6 @@ struct PlacedGlyph {
 
         /// Dimensions (scalable)
         struct Dimensions {
-            float horizontalAdvance;
             float ascender;     //!< Up to 1px error, see FT reference
             float descender;    //!< Up to 1px error, see FT reference
             float lineHeight; // TODO why is this here and also in format?
