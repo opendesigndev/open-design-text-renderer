@@ -107,62 +107,6 @@ priv::GlyphShape convertToGlyphShape(/*const FontSpecifier &fontSpecifier,*/
     return result;
 }
 
-VisualRun_NEW convertToVisualRun_NEW(const VisualRun &visualRun) {
-    VisualRun_NEW result;
-
-    result.start = visualRun.start;
-    result.end = visualRun.end;
-    result.width = visualRun.width;
-    result.leftToRight = visualRun.dir == TextDirection::LEFT_TO_RIGHT;
-
-    return result;
-}
-
-Line_NEW convertToLineSpan_NEW(const priv::LineSpan &lineSpan) {
-    Line_NEW result;
-
-    result.start = lineSpan.start;
-    result.end = lineSpan.end;
-
-    for (const VisualRun &visualRun : lineSpan.visualRuns) {
-        result.visualRuns.emplace_back(convertToVisualRun_NEW(visualRun));
-    }
-
-    result.lineWidth = lineSpan.lineWidth;
-    result.baseDirLeftToRight = lineSpan.baseDir == TextDirection::LEFT_TO_RIGHT;
-    result.justifiable = static_cast<Justifiable_NEW>(lineSpan.justifiable);
-
-    return result;
-}
-
-VisualRun convertToVisualRun(const VisualRun_NEW &visualRun) {
-    VisualRun result;
-
-    result.start = visualRun.start;
-    result.end = visualRun.end;
-    result.width = visualRun.width;
-    result.dir = visualRun.leftToRight ? TextDirection::LEFT_TO_RIGHT : TextDirection::RIGHT_TO_LEFT;
-
-    return result;
-}
-
-priv::LineSpan convertToLineSpan(const Line_NEW &lineSpan) {
-    priv::LineSpan result;
-
-    result.start = lineSpan.start;
-    result.end = lineSpan.end;
-
-    for (const VisualRun_NEW &visualRun : lineSpan.visualRuns) {
-        result.visualRuns.emplace_back(convertToVisualRun(visualRun));
-    }
-
-    result.lineWidth = lineSpan.lineWidth;
-    result.baseDir = lineSpan. baseDirLeftToRight ? TextDirection::LEFT_TO_RIGHT :  TextDirection::RIGHT_TO_LEFT;
-    result.justifiable = static_cast<priv::LineSpan::Justifiable>(lineSpan.justifiable);
-
-    return result;
-}
-
 
 TextShapeHandle shapeText_NEW(ContextHandle ctx,
                               const octopus::Text& text)
@@ -223,25 +167,7 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
         result.placedGlyphs.emplace_back(pgn);
     }
     result.textTransform = convertMatrix(textShapeData->textTransform);
-    result.textBoundsNoTransform = convertRect(textShapeData->textBoundsNoTransform);
-    result.textParams.baseline = textShapeData->baseline;
-    result.textParams.verticalAlign = static_cast<ShapeTextResult_NEW::TextParams::VerticalAlign>(textShapeData->formattedText->verticalAlign());
-    result.textParams.boundsMode = static_cast<ShapeTextResult_NEW::TextParams::BoundsMode>(textShapeData->formattedText->boundsMode());
-    result.textParams.baselinePolicy = static_cast<ShapeTextResult_NEW::TextParams::BaselinePolicy>(textShapeData->formattedText->baselinePolicy());
-    result.textParams.overflowPolicy = static_cast<ShapeTextResult_NEW::TextParams::OverflowPolicy>(textShapeData->formattedText->overflowPolicy());
-
-    for (const priv::ParagraphShapePtr &paragraphShape : textShapeData->paragraphShapes) {
-        if (paragraphShape == nullptr)
-            continue;
-
-        Paragraph_NEW &pNew = result.paragraphs.emplace_back();
-        for (const priv::GlyphShape &glyph : paragraphShape->glyphs()) {
-            pNew.glyphs_.emplace_back(convertToPlacedGlyph(glyph));
-        }
-        for (const priv::LineSpan &lineSpan : paragraphShape->lineSpans()) {
-            pNew.lines_.emplace_back(convertToLineSpan_NEW(lineSpan));
-        }
-    }
+    result.unstretchedTextBounds = convertRect(textShapeData->unstretchedTextBounds);
 
     return result;
 }
@@ -262,38 +188,11 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
         return {};
     }
 
-    priv::ParagraphShapes paragraphShapes;
-
-    for (const Paragraph_NEW &paragraphShape : textShape_NEW.paragraphs) {
-        priv::ParagraphShapePtr &paragraph = paragraphShapes.emplace_back(std::make_unique<priv::ParagraphShape>(ctx->getLogger(), ctx->getFontManager().facesTable()));
-
-        priv::GlyphShapes glyphs;
-        priv::LineSpans lineSpans;
-
-        for (const PlacedGlyph &placedGlyph : paragraphShape.glyphs_) {
-            glyphs.emplace_back(convertToGlyphShape(placedGlyph));
-        }
-        for (const Line_NEW &lineNew : paragraphShape.lines_) {
-            lineSpans.emplace_back(convertToLineSpan(lineNew));
-        }
-
-        paragraph->initialize(glyphs, lineSpans);
-    }
-
 //    if (textShape && sanitizeShape(ctx, textShape)) {
 
     const compat::Rectangle viewArea = drawOptions.viewArea.has_value()
         ? convertRect(drawOptions.viewArea.value())
         : compat::INFINITE_BOUNDS;
-
-    const priv::FormattedText::FormattingParams formattedTextParams {
-        static_cast<VerticalAlign>(textShape_NEW.textParams.verticalAlign),
-        static_cast<BoundsMode>(textShape_NEW.textParams.boundsMode),
-        textShape_NEW.textParams.baseline,
-        static_cast<HorizontalPositionPolicy>(textShape_NEW.textParams.horizontalPolicy), // TODO: Matus: This does not get set and is unused. Have a closer look!
-        static_cast<BaselinePolicy>(textShape_NEW.textParams.baselinePolicy),
-        static_cast<OverflowPolicy>(textShape_NEW.textParams.overflowPolicy),
-    };
 
     priv::PlacedGlyphs_pr pgs;
     const auto ConvertQuad = [](const PlacedGlyph::QuadCorners &qc)->priv::PlacedGlyph_pr::QuadCorners {
@@ -319,13 +218,9 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
     }
 
     const compat::Matrix3f textTransform = convertMatrix(textShape_NEW.textTransform);
-    const compat::FRectangle textBoundsNoTransform = convertRect(textShape_NEW.textBoundsNoTransform);
-    const compat::FRectangle stretchedTextBounds = priv::getStretchedTextBounds(*ctx,
-                                                                                paragraphShapes,
-                                                                                textBoundsNoTransform,
-                                                                                formattedTextParams,
-                                                                                textShape_NEW.textParams.baseline,
-                                                                                drawOptions.scale);
+
+    const compat::FRectangle unstretchedTextBounds = convertRect(textShape_NEW.unstretchedTextBounds);
+    const compat::FRectangle stretchedTextBounds = unstretchedTextBounds * drawOptions.scale;
 
     const priv::TextDrawResult result = priv::drawText_NEW(*ctx,
                                                            textTransform,

@@ -627,6 +627,9 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
         }
     }
 
+    // Compute the unscaled stretched bounds
+    const compat::FRectangle unstretchedTextBounds = getStretchedTextBounds(ctx, shapes, textBoundsNoTransform, formattedText->formattingParams(), baseline, 1.0f);
+
     return std::make_unique<TextShapeData_NEW>(
         std::move(formattedText),
         frameSize,
@@ -635,7 +638,8 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
         textBoundsNoTransform,
         textBoundsTransform,
         baseline,
-        placedGlyphs
+        placedGlyphs,
+        unstretchedTextBounds
     );
 }
 

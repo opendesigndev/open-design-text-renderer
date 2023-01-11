@@ -132,7 +132,8 @@ struct TextShapeData_NEW
                       const compat::FRectangle& boundsNoTransform,
                       const compat::FRectangle& boundsTransformed,
                       float baseline,
-                      const PlacedGlyphs_pr &placedGlyphs)
+                      const PlacedGlyphs_pr &placedGlyphs,
+                      const compat::FRectangle unstretchedTextBounds)
         : formattedText(std::move(text)),
           frameSize(frameSize),
           textTransform(textTransform),
@@ -141,7 +142,8 @@ struct TextShapeData_NEW
           textBoundsNoTransform(boundsNoTransform),
           textBoundsTransformed(boundsTransformed),
           baseline(baseline),
-          placedGlyphs(placedGlyphs)
+          placedGlyphs(placedGlyphs),
+          unstretchedTextBounds(unstretchedTextBounds)
     {
     }
 
@@ -159,6 +161,7 @@ struct TextShapeData_NEW
 
     // TODO: Matus
     PlacedGlyphs_pr placedGlyphs;
+    compat::FRectangle unstretchedTextBounds;
 };
 using TextShapeDataPtr_NEW = std::unique_ptr<TextShapeData_NEW>;
 using TextShapeResult_NEW = Result<TextShapeDataPtr_NEW, TextShapeError>;

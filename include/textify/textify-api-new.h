@@ -93,79 +93,11 @@ struct PlacedGlyph {
 using PlacedGlyphs = std::vector<PlacedGlyph>;
 
 // TODO: Matus: Remove and replace
-struct VisualRun_NEW {
-    long start, end;
-    bool leftToRight;
-    float width;
-};
-
-// TODO: Matus: Remove and replace
-enum class Justifiable_NEW {
-    POSITIVE,
-    NEGATIVE,
-    DOCUMENT
-};
-
-// TODO: Matus: Remove and replace
-struct Line_NEW {
-    long start, end;
-    //! BiDi visual runs.
-    std::vector<VisualRun_NEW> visualRuns;
-    float lineWidth;
-    bool baseDirLeftToRight = true;
-    Justifiable_NEW justifiable;
-};
-using Line_NEW_vec = std::vector<Line_NEW>;
-
-// TODO: Matus: Remove and replace
-struct Paragraph_NEW {
-    PlacedGlyphs glyphs_;
-    Line_NEW_vec lines_;
-};
-using Paragraph_NEW_vec = std::vector<Paragraph_NEW>;
-
-// TODO: Matus: Remove and replace
 struct ShapeTextResult_NEW {
     PlacedGlyphs placedGlyphs;
 
-    Paragraph_NEW_vec paragraphs;
     Matrix3f textTransform;
-    FRectangle textBoundsNoTransform;
-
-    struct TextParams {
-        enum class VerticalAlign {
-            TOP,
-            CENTER,
-            BOTTOM
-        } verticalAlign;
-
-        enum class BoundsMode {
-            AUTO_WIDTH,    //!< bounds extended horizontally
-            AUTO_HEIGHT,   //!< fixed width, bounds extended vertically
-            FIXED,         //!< bounds of a fixed size
-        } boundsMode;
-
-        float baseline = 0.0f;
-
-        enum class HorizontalPositionPolicy {
-            ALIGN_TO_FRAME,
-            FRAME_AS_HINT,
-        } horizontalPolicy;
-
-        enum class BaselinePolicy {
-            SET,
-            CENTER,
-            OFFSET_ASCENDER,
-            OFFSET_BEARING
-        } baselinePolicy;
-
-        enum class OverflowPolicy {
-            NO_OVERFLOW,
-            CLIP_LINE,
-            EXTEND_LINE,
-            EXTEND_ALL
-        } overflowPolicy;
-    } textParams;
+    FRectangle unstretchedTextBounds;
 };
 
 
