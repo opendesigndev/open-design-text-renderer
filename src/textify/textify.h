@@ -110,6 +110,13 @@ struct PlacedGlyph_pr {
     // TODO: Matus: This font face Id should be moved to some other place
     //   Maybe the glyphs should be groupped by face Ids
     std::string fontFaceId;
+    /// Decoration - underline, strikethrough etc.
+    enum class Decoration {
+        NONE = 0,
+        UNDERLINE,
+        DOUBLE_UNDERLINE,
+        STRIKE_THROUGH,
+    } decoration;
 
     // TODO: Matus: This should not be here at all
     struct Temp {

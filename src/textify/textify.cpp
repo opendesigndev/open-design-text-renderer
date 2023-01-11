@@ -607,6 +607,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
                 placedGlyph.glyphCodepoint = glyphShape.codepoint;
                 placedGlyph.color = glyphShape.format.color;
                 placedGlyph.fontFaceId = glyphShape.format.faceId;
+                placedGlyph.decoration = static_cast<PlacedGlyph_pr::Decoration>(glyphShape.format.decoration);
 
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
                 const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
@@ -684,9 +685,9 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
 }
 
 // TODO: Matus: NEW function
-void drawGlyph(compat::BitmapRGBA& bitmap,
+void drawGlyph(compat::BitmapRGBA &bitmap,
                const Glyph &glyph,
-               const compat::Rectangle& viewArea)
+               const compat::Rectangle &viewArea)
 {
     const compat::Rectangle placedGlyphBounds = glyph.getBitmapBounds();
 

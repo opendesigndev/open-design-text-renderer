@@ -136,6 +136,7 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
         pgn.color = pg.color;
         pgn.fontFaceId = pg.fontFaceId;
+        pgn.decoration = static_cast<PlacedGlyph::Decoration>(pg.decoration);
         // TODO: Matus: This should not be here at all
         pgn.temp.format.size = pg.temp.size;
         pgn.temp.dimensions.ascender = pg.temp.ascender;
@@ -184,6 +185,7 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
         pgn.color = pg.color;
         pgn.fontFaceId = pg.fontFaceId;
+        pgn.decoration = static_cast<priv::PlacedGlyph_pr::Decoration>(pg.decoration);
 
         // TODO: Matus: This should not be here at all
         pgn.temp.size = pg.temp.format.size;
