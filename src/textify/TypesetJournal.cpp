@@ -35,15 +35,11 @@ void TypesetJournal::addDecoration(const DecorationInput& d, float scale)
     decoration.type = d.type;
     decoration.color = d.color;
 
-    decoration.offset = d.start.y;
-    float decorOffset = 0.0f;
-    if (d.type == Decoration::STRIKE_THROUGH) {
-        decorOffset = (STRIKETHROUGH_HEIGHT * d.face->scaleFontUnits(d.face->getFtFace()->height, true));
-    } else {
-        decorOffset = (d.face->scaleFontUnits(d.face->getFtFace()->underline_position, true));
-    }
+    const float decorOffset = (d.type == Decoration::STRIKE_THROUGH)
+        ? (STRIKETHROUGH_HEIGHT * d.face->scaleFontUnits(d.face->getFtFace()->height, true))
+        : (d.face->scaleFontUnits(d.face->getFtFace()->underline_position, true));
 
-    decoration.offset -= static_cast<int>(decorOffset * scale);
+    decoration.offset = d.start.y - static_cast<int>(decorOffset * scale);
 
     const float thickness = d.face->scaleFontUnits(d.face->getFtFace()->underline_thickness, true);
     decoration.thickness = thickness * scale;
