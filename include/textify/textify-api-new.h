@@ -33,14 +33,6 @@ enum class HorizontalAlign_NEW {
     START,
     END
 };
-// TODO: Matus: Remove and replace
-enum class Decoration_NEW {
-    NONE = 0,
-    UNDERLINE,
-    DOUBLE_UNDERLINE,
-    STRIKE_THROUGH,
-};
-
 
 // TODO: Matus: Use the full font specifier (family and style?)
 //struct FontSpecifier {
@@ -64,6 +56,13 @@ struct PlacedGlyph {
     // TODO: Matus: This font face Id should be moved to some other place
     //   Maybe the glyphs should be groupped by face Ids
     std::string fontFaceId;
+    /// Decoration - underline, strikethrough etc.
+    enum class Decoration {
+        NONE = 0,
+        UNDERLINE,
+        DOUBLE_UNDERLINE,
+        STRIKE_THROUGH,
+    } decoration;
 
     // TODO: Matus: Temporary data
     // TODO: Matus: Remove and replace
@@ -76,7 +75,6 @@ struct PlacedGlyph {
 
             // TODO: Matus: ImmediateFormat
             float paragraphSpacing; // px in Sketch, cannot be negativ
-            Decoration_NEW decoration;
             HorizontalAlign_NEW align;
         } format;
 
