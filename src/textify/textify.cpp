@@ -647,18 +647,9 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
 // TODO: Matus: NEW function
 GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
-                           const FaceTable &faceTable,
+                           const FacePtr &face,
                            RenderScale scale,
                            bool internalDisableHinting) {
-    const FaceId &faceID = placedGlyph.fontFaceId;
-    const FaceTable::Item* faceItem = faceTable.getFaceItem(placedGlyph.fontFaceId);
-    if (!faceItem) {
-//        log_.warn("[Textify / ParagraphShape::draw] Line drawing error: Missing font face \"{}\"", faceID);
-        return;
-    }
-
-    FacePtr face = faceItem->face;
-
     // TODO: Matus: Here I need `format.size` and `ascender`
     float glyphScale = 1.0f;
     const font_size desiredSize = face->isScalable() ? std::ceil(placedGlyph.temp.size * scale) : placedGlyph.temp.size;
@@ -698,6 +689,31 @@ void drawGlyph(compat::BitmapRGBA &bitmap,
 
     const IDims2 destDims{ bitmap.width(), bitmap.height() };
     glyph.blit(bitmap.pixels(), destDims, compat::Vector2i{ 0, 0 });
+}
+
+// TODO: Matus: NEW function
+void drawDecoration(compat::BitmapRGBA &bitmap,
+                    const PlacedGlyph_pr &pg,
+                    const Glyph &glyph,
+                    RenderScale scale,
+                    const FacePtr &face) {
+    const PlacedGlyph_pr::Decoration decorationType = pg.decoration;
+    const compat::Vector2f &pgPosition = pg.quadCorners.bottomLeft;
+
+    const IPoint2 start { static_cast<int>(floor(pgPosition.x)), static_cast<int>(floor(pgPosition.y)) };
+    const IPoint2 end = { static_cast<int>(round(pgPosition.x)) + glyph.bitmapWidth(), static_cast<int>(floor(pgPosition.y)) };
+
+    // TODO: Matus: Move some place else
+    static const float STRIKETHROUGH_HEIGHT = 0.25f;
+
+    const float decorOffset = (decorationType == PlacedGlyph_pr::Decoration::STRIKE_THROUGH)
+        ? (STRIKETHROUGH_HEIGHT * face->scaleFontUnits(face->getFtFace()->height, true))
+        : (face->scaleFontUnits(face->getFtFace()->underline_position, true));
+
+    const float offset = start.y - static_cast<int>(decorOffset * scale);
+
+    const float thickness = face->scaleFontUnits(face->getFtFace()->underline_thickness, true) * scale;
+
 }
 
 
@@ -788,20 +804,30 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
                                  const compat::FRectangle& viewArea,
                                  Pixel32* pixels, int width, int height,
                                  const PlacedGlyphs_pr &placedGlyphs) {
-    std::vector<GlyphPtr> renderedGlyphs;
-    for (const PlacedGlyph_pr &pg : placedGlyphs) {
-        renderedGlyphs.emplace_back(renderPlacedGlyph(pg,
-                                                      ctx.getFontManager().facesTable(),
-                                                      scale,
-                                                      ctx.config.internalDisableHinting));
-    }
-
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
     const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? outerRect(viewArea) : compat::INFINITE_BOUNDS;
 
-    for (const GlyphPtr &renderedGlyph : renderedGlyphs) {
-        drawGlyph(output, *renderedGlyph, viewAreaBounds);
+    for (const PlacedGlyph_pr &pg : placedGlyphs) {
+        const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(pg.fontFaceId);
+        if (!faceItem) {
+    //        log_.warn("[Textify / ParagraphShape::draw] Line drawing error: Missing font face \"{}\"", placedGlyph.fontFaceId);
+            continue;
+        }
+        const FacePtr face = faceItem->face;
+        if (face == nullptr) {
+            continue;
+        }
+
+        const GlyphPtr renderedGlyph = renderPlacedGlyph(pg,
+                                                 face,
+                                                 scale,
+                                                 ctx.config.internalDisableHinting);
+
+        if (renderedGlyph != nullptr) {
+            drawGlyph(output, *renderedGlyph, viewAreaBounds);
+            drawDecoration(output, pg, *renderedGlyph, scale, face);
+        }
     }
 
     return TextDrawOutput{};

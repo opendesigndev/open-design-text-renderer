@@ -1,7 +1,10 @@
+
 #include "TypesetJournal.h"
 
 #include <algorithm>
 #include <cmath>
+
+#include "BmpWriter.h"
 
 namespace textify {
 namespace priv {
@@ -131,30 +134,6 @@ TypesetJournal::DrawResult TypesetJournal::drawGlyphs(BitmapRGBA& bitmap, const 
 
     return DrawResultData{numGlyphsRendered /* , std::move(t0) */};
 }
-
-class BmpWriter
-{
-public:
-    explicit BmpWriter(BitmapRGBA& bitmap)
-        : bitmap_(bitmap)
-    { }
-
-    bool checkV(int y) {
-        return y >= 0 && y < bitmap_.height();
-    }
-
-    bool checkH(int x) {
-        return x >= 0 && x < bitmap_.width();
-    }
-
-    void write(int x, int y, Pixel32 color) {
-        if (checkV(y)) {
-            bitmap_.pixels()[y * bitmap_.width() + x] = color;
-        }
-    }
-private:
-    BitmapRGBA& bitmap_;
-};
 
 void TypesetJournal::drawDecorations(BitmapRGBA& bitmap, const Vector2i& offset) const
 {
