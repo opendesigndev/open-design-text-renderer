@@ -202,7 +202,7 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
         return result;
     }
 
-    const auto ConvertQuad = [](const priv::PlacedGlyph::QuadCorners &qc)->PlacedGlyph::QuadCorners {
+    const auto ConvertQuad = [](const priv::PlacedGlyph_pr::QuadCorners &qc)->PlacedGlyph::QuadCorners {
         const auto ConvertVec = [](const compat::Vector2f &vf)->Vector2d { return Vector2d { vf.x, vf.y }; };
         return PlacedGlyph::QuadCorners {
         ConvertVec(qc.topLeft),
@@ -211,7 +211,7 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
         ConvertVec(qc.bottomRight),
     }; };
 
-    for (const priv::PlacedGlyph &pg : textShapeData->placedGlyphs) {
+    for (const priv::PlacedGlyph_pr &pg : textShapeData->placedGlyphs) {
         PlacedGlyph pgn;
         pgn.glyphCodepoint = pg.glyphCodepoint;
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
@@ -295,17 +295,17 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
         static_cast<OverflowPolicy>(textShape_NEW.textParams.overflowPolicy),
     };
 
-    priv::PlacedGlyphs pgs;
-    const auto ConvertQuad = [](const PlacedGlyph::QuadCorners &qc)->priv::PlacedGlyph::QuadCorners {
+    priv::PlacedGlyphs_pr pgs;
+    const auto ConvertQuad = [](const PlacedGlyph::QuadCorners &qc)->priv::PlacedGlyph_pr::QuadCorners {
         const auto ConvertVec = [](const Vector2d &v)->compat::Vector2f { return compat::Vector2f { (float)v.x, (float)v.y }; };
-        return priv::PlacedGlyph::QuadCorners {
+        return priv::PlacedGlyph_pr::QuadCorners {
             ConvertVec(qc.topLeft),
             ConvertVec(qc.topRight),
             ConvertVec(qc.bottomLeft),
             ConvertVec(qc.bottomRight),
     }; };
     for (const PlacedGlyph &pg : textShape_NEW.placedGlyphs) {
-        priv::PlacedGlyph pgn;
+        priv::PlacedGlyph_pr pgn;
         pgn.glyphCodepoint = pg.glyphCodepoint;
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
         pgn.color = pg.color;

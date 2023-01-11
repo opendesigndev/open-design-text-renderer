@@ -98,7 +98,7 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
 
 
 
-struct PlacedGlyph {
+struct PlacedGlyph_pr {
     /// Glyph codepoint - index within the loaded font file
     uint32_t glyphCodepoint;
     /// Glyph position, specified by its four quad corners.
@@ -117,7 +117,7 @@ struct PlacedGlyph {
         float ascender = 0.0f;
     } temp;
 };
-using PlacedGlyphs = std::vector<PlacedGlyph>;
+using PlacedGlyphs_pr = std::vector<PlacedGlyph_pr>;
 
 using UsedFaces = std::unordered_set<std::string>;
 using FrameSizeOpt = std::optional<compat::Vector2f>;
@@ -132,7 +132,7 @@ struct TextShapeData_NEW
                       const compat::FRectangle& boundsNoTransform,
                       const compat::FRectangle& boundsTransformed,
                       float baseline,
-                      const PlacedGlyphs &placedGlyphs)
+                      const PlacedGlyphs_pr &placedGlyphs)
         : formattedText(std::move(text)),
           frameSize(frameSize),
           textTransform(textTransform),
@@ -158,7 +158,7 @@ struct TextShapeData_NEW
     float baseline;
 
     // TODO: Matus
-    PlacedGlyphs placedGlyphs;
+    PlacedGlyphs_pr placedGlyphs;
 };
 using TextShapeDataPtr_NEW = std::unique_ptr<TextShapeData_NEW>;
 using TextShapeResult_NEW = Result<TextShapeDataPtr_NEW, TextShapeError>;
@@ -192,13 +192,13 @@ TextDrawResult drawText_NEW(Context &ctx,
                             void *pixels, int width, int height,
                             float scale,
                             const compat::Rectangle &viewArea,
-                            const PlacedGlyphs &placedGlyphs);
+                            const PlacedGlyphs_pr &placedGlyphs);
 
 TextDrawResult drawTextInner_NEW(Context &ctx,
                                  RenderScale scale,
                                  const compat::FRectangle& viewArea,
                                  Pixel32* pixels, int width, int height,
-                                 const PlacedGlyphs &placedGlyphs);
+                                 const PlacedGlyphs_pr &placedGlyphs);
 
 } // namespace priv
 } // namespace textify

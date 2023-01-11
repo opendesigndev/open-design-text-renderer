@@ -572,7 +572,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
     float w = 0.0f;
     float h = std::max(std::ceil(y), std::round(ctx.config.preferRealLineHeightOverExplicit ? firstLineActualHeight : p0.firstLineHeight));
 
-    for (const auto& paragraphResult : paragraphResults) {
+    for (const ParagraphShape::DrawResult& paragraphResult : paragraphResults) {
         w = std::max(w, std::floor(paragraphResult.maxLineWidth));
     }
 
@@ -587,7 +587,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
     const float baseline = resolveBaselinePosition(p0, text.baselinePolicy(), text.verticalAlign());
 
-    PlacedGlyphs placedGlyphs {};
+    PlacedGlyphs_pr placedGlyphs {};
     for (size_t i = 0; i < paragraphResults.size(); i++) {
         const ParagraphShapePtr &paragraphShape = shapes[i];
         const ParagraphShape::DrawResult &drawResult = paragraphResults[i];
@@ -602,7 +602,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
                 const IPoint2 &glyphDestination = glyph->getDestination();
 
-                PlacedGlyph placedGlyph;
+                PlacedGlyph_pr placedGlyph;
 
                 placedGlyph.glyphCodepoint = glyphShape.codepoint;
                 placedGlyph.color = glyphShape.format.color;
@@ -641,7 +641,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
 
 // TODO: Matus: NEW function
-GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
+GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
                            const FaceTable &faceTable,
                            RenderScale scale,
                            bool internalDisableHinting) {
@@ -671,7 +671,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
         return nullptr;
     }
 
-    const compat::Vector2f& placedGlyphPosition = placedGlyph.quadCorners.bottomLeft;
+    const compat::Vector2f &placedGlyphPosition = placedGlyph.quadCorners.bottomLeft;
 
     glyph->setDestination({static_cast<int>(floor(placedGlyphPosition.x)), static_cast<int>(floor(placedGlyphPosition.y))});
     glyph->setColor(placedGlyph.color);
@@ -753,7 +753,7 @@ TextDrawResult drawText_NEW(Context &ctx,
                             void *pixels, int width, int height,
                             float scale,
                             const compat::Rectangle &viewArea,
-                            const PlacedGlyphs &placedGlyphs) {
+                            const PlacedGlyphs_pr &placedGlyphs) {
     const compat::Matrix3f inverseTransform = inverse(textTransform);
     const compat::FRectangle viewAreaTextSpaceUnscaled = utils::transform(toFRectangle(viewArea), inverseTransform);
     const compat::FRectangle viewAreaTextSpace = scaleRect(viewAreaTextSpaceUnscaled, scale);
@@ -782,9 +782,9 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
                                  RenderScale scale,
                                  const compat::FRectangle& viewArea,
                                  Pixel32* pixels, int width, int height,
-                                 const PlacedGlyphs &placedGlyphs) {
+                                 const PlacedGlyphs_pr &placedGlyphs) {
     std::vector<GlyphPtr> renderedGlyphs;
-    for (const PlacedGlyph &pg : placedGlyphs) {
+    for (const PlacedGlyph_pr &pg : placedGlyphs) {
         renderedGlyphs.emplace_back(renderPlacedGlyph(pg,
                                                       ctx.getFontManager().facesTable(),
                                                       scale,
