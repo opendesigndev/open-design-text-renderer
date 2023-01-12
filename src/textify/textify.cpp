@@ -10,6 +10,7 @@
 #include "text-format.h"
 #include "TextParser.h"
 #include "types.h"
+#include "BmpWriter.h"
 
 #include "compat/affine-transform.h"
 #include "compat/basic-types.h"
@@ -698,7 +699,7 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
                     RenderScale scale,
                     const FacePtr &face) {
     const PlacedGlyph_pr::Decoration decorationType = pg.decoration;
-    const compat::Vector2f &pgPosition = pg.quadCorners.bottomLeft;
+    const compat::Vector2f &pgPosition = pg.quadCorners.topLeft;
 
     const IPoint2 start { static_cast<int>(floor(pgPosition.x)), static_cast<int>(floor(pgPosition.y)) };
     const IPoint2 end = { static_cast<int>(round(pgPosition.x)) + glyph.bitmapWidth(), static_cast<int>(floor(pgPosition.y)) };
@@ -710,10 +711,31 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
         ? (STRIKETHROUGH_HEIGHT * face->scaleFontUnits(face->getFtFace()->height, true))
         : (face->scaleFontUnits(face->getFtFace()->underline_position, true));
 
-    const float offset = start.y - static_cast<int>(decorOffset * scale);
+    const int offset = start.y - static_cast<int>(decorOffset * scale);
+    const float decorationThickness = face->scaleFontUnits(face->getFtFace()->underline_thickness, true) * scale;
 
-    const float thickness = face->scaleFontUnits(face->getFtFace()->underline_thickness, true) * scale;
+    BmpWriter w = BmpWriter(bitmap);
 
+    for (int j = 0; j < end.x - start.x; j++) {
+        const int penX = start.x + j;
+        if (!w.checkH(penX)) {
+            continue;
+        }
+
+        if (decorationType == PlacedGlyph_pr::Decoration::DOUBLE_UNDERLINE) {
+            const int thickness = static_cast<int>(ceil(decorationThickness * 2.0 / 3.0));
+            const int vOffset = static_cast<int>(thickness * 0.5);
+
+            for (int k = 0; k < thickness; k++) {
+                w.write(penX, offset - vOffset - k, pg.color);
+                w.write(penX, offset + vOffset + k, pg.color);
+            }
+        } else /* UNDERLINE || STRIKETHROUGH */ {
+            for (int k = 0; k < decorationThickness; k++) {
+                w.write(penX, offset - k, pg.color);
+            }
+        }
+    }
 }
 
 
@@ -826,7 +848,9 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
 
         if (renderedGlyph != nullptr) {
             drawGlyph(output, *renderedGlyph, viewAreaBounds);
-            drawDecoration(output, pg, *renderedGlyph, scale, face);
+            if (pg.decoration != PlacedGlyph_pr::Decoration::NONE) {
+                drawDecoration(output, pg, *renderedGlyph, scale, face);
+            }
         }
     }
 
