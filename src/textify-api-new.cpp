@@ -76,7 +76,9 @@ PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
     result.quadCorners = {};
     result.color = glyph.format.color;
     result.fontFaceId = glyph.format.faceId;
-    result.decoration = static_cast<PlacedGlyph::Decoration>(glyph.format.decoration);
+    for (Decoration d : glyph.format.decorations) {
+        result.decorations.emplace_back(static_cast<PlacedGlyph::Decoration>(d));
+    }
     result.temp = temp;
 
     return result;
@@ -136,7 +138,9 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
         pgn.color = pg.color;
         pgn.fontFaceId = pg.fontFaceId;
-        pgn.decoration = static_cast<PlacedGlyph::Decoration>(pg.decoration);
+        for (priv::PlacedGlyph_pr::Decoration d : pg.decorations) {
+            pgn.decorations.emplace_back(static_cast<PlacedGlyph::Decoration>(d));
+        }
         // TODO: Matus: This should not be here at all
         pgn.temp.format.size = pg.temp.size;
         pgn.temp.dimensions.ascender = pg.temp.ascender;
@@ -185,7 +189,9 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
         pgn.color = pg.color;
         pgn.fontFaceId = pg.fontFaceId;
-        pgn.decoration = static_cast<priv::PlacedGlyph_pr::Decoration>(pg.decoration);
+        for (PlacedGlyph::Decoration d : pg.decorations) {
+            pgn.decorations.emplace_back(static_cast<priv::PlacedGlyph_pr::Decoration>(d));
+        }
 
         // TODO: Matus: This should not be here at all
         pgn.temp.size = pg.temp.format.size;

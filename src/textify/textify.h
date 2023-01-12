@@ -116,7 +116,8 @@ struct PlacedGlyph_pr {
         UNDERLINE,
         DOUBLE_UNDERLINE,
         STRIKE_THROUGH,
-    } decoration;
+    };
+    std::vector<Decoration> decorations;
 
     // TODO: Matus: This should not be here at all
     struct Temp {

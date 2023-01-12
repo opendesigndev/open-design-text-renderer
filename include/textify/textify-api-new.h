@@ -62,7 +62,8 @@ struct PlacedGlyph {
         UNDERLINE,
         DOUBLE_UNDERLINE,
         STRIKE_THROUGH,
-    } decoration;
+    };
+    std::vector<Decoration> decorations;
 
     // TODO: Matus: Temporary data
     // TODO: Matus: Remove and replace

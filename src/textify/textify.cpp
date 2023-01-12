@@ -608,7 +608,9 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
                 placedGlyph.glyphCodepoint = glyphShape.codepoint;
                 placedGlyph.color = glyphShape.format.color;
                 placedGlyph.fontFaceId = glyphShape.format.faceId;
-                placedGlyph.decoration = static_cast<PlacedGlyph_pr::Decoration>(glyphShape.format.decoration);
+                for (Decoration d : glyphShape.format.decorations) {
+                    placedGlyph.decorations.emplace_back(static_cast<PlacedGlyph_pr::Decoration>(d));
+                }
 
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
                 const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
@@ -693,46 +695,51 @@ void drawGlyph(compat::BitmapRGBA &bitmap,
 }
 
 // TODO: Matus: NEW function
-void drawDecoration(compat::BitmapRGBA &bitmap,
-                    const PlacedGlyph_pr &pg,
-                    const Glyph &glyph,
-                    RenderScale scale,
-                    const FacePtr &face) {
-    const PlacedGlyph_pr::Decoration decorationType = pg.decoration;
-    const compat::Vector2f &pgPosition = pg.quadCorners.topLeft;
-
-    const IPoint2 start { static_cast<int>(floor(pgPosition.x)), static_cast<int>(floor(pgPosition.y)) };
-    const IPoint2 end = { static_cast<int>(round(pgPosition.x)) + glyph.bitmapWidth(), static_cast<int>(floor(pgPosition.y)) };
-
-    // TODO: Matus: Move some place else
-    static const float STRIKETHROUGH_HEIGHT = 0.25f;
-
-    const float decorOffset = (decorationType == PlacedGlyph_pr::Decoration::STRIKE_THROUGH)
-        ? (STRIKETHROUGH_HEIGHT * face->scaleFontUnits(face->getFtFace()->height, true))
-        : (face->scaleFontUnits(face->getFtFace()->underline_position, true));
-
-    const int offset = start.y - static_cast<int>(decorOffset * scale);
-    const float decorationThickness = face->scaleFontUnits(face->getFtFace()->underline_thickness, true) * scale;
-
-    BmpWriter w = BmpWriter(bitmap);
-
-    for (int j = 0; j < end.x - start.x; j++) {
-        const int penX = start.x + j;
-        if (!w.checkH(penX)) {
+void drawDecorations(compat::BitmapRGBA &bitmap,
+                     const PlacedGlyph_pr &pg,
+                     const Glyph &glyph,
+                     RenderScale scale,
+                     const FacePtr &face) {
+    for (PlacedGlyph_pr::Decoration decorationType : pg.decorations) {
+        if (decorationType == PlacedGlyph_pr::Decoration::NONE) {
             continue;
         }
 
-        if (decorationType == PlacedGlyph_pr::Decoration::DOUBLE_UNDERLINE) {
-            const int thickness = static_cast<int>(ceil(decorationThickness * 2.0 / 3.0));
-            const int vOffset = static_cast<int>(thickness * 0.5);
+        const compat::Vector2f &pgPosition = pg.quadCorners.topLeft;
 
-            for (int k = 0; k < thickness; k++) {
-                w.write(penX, offset - vOffset - k, pg.color);
-                w.write(penX, offset + vOffset + k, pg.color);
+        const IPoint2 start { static_cast<int>(floor(pgPosition.x)), static_cast<int>(floor(pgPosition.y)) };
+        const IPoint2 end = { static_cast<int>(round(pgPosition.x)) + glyph.bitmapWidth(), static_cast<int>(floor(pgPosition.y)) };
+
+        // TODO: Matus: Move some place else
+        static const float STRIKETHROUGH_HEIGHT = 0.25f;
+
+        const float decorOffset = (decorationType == PlacedGlyph_pr::Decoration::STRIKE_THROUGH)
+            ? (STRIKETHROUGH_HEIGHT * face->scaleFontUnits(face->getFtFace()->height, true))
+            : (face->scaleFontUnits(face->getFtFace()->underline_position, true));
+
+        const int offset = start.y - static_cast<int>(decorOffset * scale);
+        const float decorationThickness = face->scaleFontUnits(face->getFtFace()->underline_thickness, true) * scale;
+
+        BmpWriter w = BmpWriter(bitmap);
+
+        for (int j = 0; j < end.x - start.x; j++) {
+            const int penX = start.x + j;
+            if (!w.checkH(penX)) {
+                continue;
             }
-        } else /* UNDERLINE || STRIKETHROUGH */ {
-            for (int k = 0; k < decorationThickness; k++) {
-                w.write(penX, offset - k, pg.color);
+
+            if (decorationType == PlacedGlyph_pr::Decoration::DOUBLE_UNDERLINE) {
+                const int thickness = static_cast<int>(ceil(decorationThickness * 2.0 / 3.0));
+                const int vOffset = static_cast<int>(thickness * 0.5);
+
+                for (int k = 0; k < thickness; k++) {
+                    w.write(penX, offset - vOffset - k, pg.color);
+                    w.write(penX, offset + vOffset + k, pg.color);
+                }
+            } else /* UNDERLINE || STRIKETHROUGH */ {
+                for (int k = 0; k < decorationThickness; k++) {
+                    w.write(penX, offset - k, pg.color);
+                }
             }
         }
     }
@@ -848,9 +855,7 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
 
         if (renderedGlyph != nullptr) {
             drawGlyph(output, *renderedGlyph, viewAreaBounds);
-            if (pg.decoration != PlacedGlyph_pr::Decoration::NONE) {
-                drawDecoration(output, pg, *renderedGlyph, scale, face);
-            }
+            drawDecorations(output, pg, *renderedGlyph, scale, face);
         }
     }
 
