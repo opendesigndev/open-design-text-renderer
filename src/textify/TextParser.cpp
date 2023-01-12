@@ -176,7 +176,7 @@ ImmediateFormat TextParser::parseBaseFormat(const octopus::TextStyle& style) con
     baseFormat.paragraphSpacing = 0.0f;
     baseFormat.paragraphIndent  = 0.0f;
     baseFormat.color            = parseColor(style);
-    baseFormat.decoration       = parseDecoration(style);
+    baseFormat.decoration       = parseUnderline(style);
     baseFormat.kerning          = style.kerning.value_or(true);
     baseFormat.uppercase        = style.letterCase.value_or(octopus::TextStyle::LetterCase::NONE) == octopus::TextStyle::LetterCase::UPPERCASE;
     baseFormat.lowercase        = style.letterCase.value_or(octopus::TextStyle::LetterCase::NONE) == octopus::TextStyle::LetterCase::LOWERCASE;
@@ -187,7 +187,7 @@ ImmediateFormat TextParser::parseBaseFormat(const octopus::TextStyle& style) con
     return baseFormat;
 }
 
-Decoration TextParser::parseDecoration(const octopus::TextStyle& style) const
+Decoration TextParser::parseUnderline(const octopus::TextStyle& style) const
 {
     switch(style.underline.value_or(octopus::TextStyle::Underline::NONE)) {
         case octopus::TextStyle::Underline::SINGLE:
@@ -198,7 +198,6 @@ Decoration TextParser::parseDecoration(const octopus::TextStyle& style) const
 
         default:
             return Decoration::NONE;
-
     }
 }
 
@@ -233,7 +232,7 @@ void TextParser::parseStyles(ParseResult* result) const
     }
 
     for (const auto& styleRange : text.styles.value()) {
-        auto modifier = parseStyle(styleRange.style);
+        FormatModifier modifier = parseStyle(styleRange.style);
         if (modifier.types) {
             for (const auto& [from, to] : styleRange.ranges) {
                 modifier.range.start = from;
@@ -280,7 +279,7 @@ FormatModifier TextParser::parseStyle(const octopus::TextStyle& style) const
     }
     if (style.underline.has_value()) {
         modifier.types |= FormatModifier::DECORATION;
-        modifier.decoration = parseDecoration(style);
+        modifier.decoration = parseUnderline(style);
     }
     if (style.linethrough.has_value()) {
         modifier.types |= FormatModifier::DECORATION;
