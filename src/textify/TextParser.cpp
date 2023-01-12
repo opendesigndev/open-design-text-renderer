@@ -282,13 +282,10 @@ FormatModifier TextParser::parseStyle(const octopus::TextStyle& style) const
         modifier.types |= FormatModifier::DECORATION;
         modifier.decoration = parseDecoration(style);
     }
-    // TODO: strikethrough
-    /*
-    if (style.font.linethrough.has_value()) {
+    if (style.linethrough.has_value()) {
         modifier.types |= FormatModifier::DECORATION;
-        modifier.decoration = style.font.linethrough.value() ? Decoration::STRIKE_THROUGH : modifier.decoration;
+        modifier.decoration = style.linethrough.value() ? Decoration::STRIKE_THROUGH : modifier.decoration;
     }
-    */
     if (style.kerning.has_value()) {
         modifier.types |= FormatModifier::KERNING;
         modifier.kerning = style.kerning.value();

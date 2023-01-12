@@ -28,7 +28,7 @@ void TypesetJournal::addGlyph(GlyphPtr glyph)
 
 void TypesetJournal::addDecoration(const DecorationInput& d, float scale)
 {
-    extendLastDecoration(d.end.x, d.type);
+    extendLastDecoration(d.start.x, d.type);
 
     static const float STRIKETHROUGH_HEIGHT = 0.25f;
 
@@ -152,12 +152,12 @@ void TypesetJournal::drawDecorations(BitmapRGBA& bitmap, const Vector2i& offset)
                 const int thickness = static_cast<int>(ceil(decoration.thickness * 2.0 / 3.0));
                 const int offset = static_cast<int>(thickness * 0.5);
 
-                for (auto k = 0; k < thickness; k++) {
+                for (int k = 0; k < thickness; k++) {
                     w.write(penX, vpos - offset - k, decoration.color);
                     w.write(penX, vpos + offset + k, decoration.color);
                 }
             } else /* UNDERLINE || STRIKETHROUGH */ {
-                for (auto k = 0; k < decoration.thickness; k++) {
+                for (int k = 0; k < decoration.thickness; k++) {
                     w.write(penX, vpos - k, decoration.color);
                 }
             }
