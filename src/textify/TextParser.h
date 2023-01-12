@@ -53,7 +53,7 @@ private:
     GlyphFormat::Ligatures parseLigatures(const octopus::TextStyle& style) const;
     compat::Pixel32 parseColor(const octopus::TextStyle& style) const;
     void parseStyles(ParseResult* result) const;
-    FormatModifier parseStyle(const octopus::TextStyle& style) const;
+    FormatModifiers parseStyle(const octopus::TextStyle& style) const;
 
     const octopus::Text& text;
 };

@@ -176,7 +176,7 @@ ImmediateFormat TextParser::parseBaseFormat(const octopus::TextStyle& style) con
     baseFormat.paragraphSpacing = 0.0f;
     baseFormat.paragraphIndent  = 0.0f;
     baseFormat.color            = parseColor(style);
-    baseFormat.decoration       = parseUnderline(style);
+    baseFormat.decorations      = { parseUnderline(style) };
     baseFormat.kerning          = style.kerning.value_or(true);
     baseFormat.uppercase        = style.letterCase.value_or(octopus::TextStyle::LetterCase::NONE) == octopus::TextStyle::LetterCase::UPPERCASE;
     baseFormat.lowercase        = style.letterCase.value_or(octopus::TextStyle::LetterCase::NONE) == octopus::TextStyle::LetterCase::LOWERCASE;
@@ -232,18 +232,20 @@ void TextParser::parseStyles(ParseResult* result) const
     }
 
     for (const auto& styleRange : text.styles.value()) {
-        FormatModifier modifier = parseStyle(styleRange.style);
-        if (modifier.types) {
-            for (const auto& [from, to] : styleRange.ranges) {
-                modifier.range.start = from;
-                modifier.range.end = to;
-                result->text->addFormatModifier(modifier);
+        FormatModifiers modifiers = parseStyle(styleRange.style);
+        for (FormatModifier &modifier : modifiers) {
+            if (modifier.types) {
+                for (const auto& [from, to] : styleRange.ranges) {
+                    modifier.range.start = from;
+                    modifier.range.end = to;
+                    result->text->addFormatModifier(modifier);
+                }
             }
         }
     }
 }
 
-FormatModifier TextParser::parseStyle(const octopus::TextStyle& style) const
+FormatModifiers TextParser::parseStyle(const octopus::TextStyle& style) const
 {
     FormatModifier modifier = {};
 
@@ -314,7 +316,17 @@ FormatModifier TextParser::parseStyle(const octopus::TextStyle& style) const
     }
     */
 
-    return modifier;
+    // Handle the case when the text has both underline and strikethrough
+    const bool hasStrikeThrough = style.linethrough.has_value() && style.linethrough.value();
+    const bool hasUnderline = style.underline.has_value() && style.underline.value() != octopus::TextStyle::Underline::NONE;
+    if (hasStrikeThrough && hasUnderline) {
+        FormatModifier underlineModifier = modifier;
+        underlineModifier.decoration = parseUnderline(style);
+
+        return { modifier, underlineModifier };
+    }
+
+    return { modifier };
 }
 
 } // namespace priv

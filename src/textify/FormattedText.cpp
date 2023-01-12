@@ -180,7 +180,8 @@ void FormattedText::generateFormat(std::vector<ImmediateFormat>& format) const
 
     const auto textLen = static_cast<unsigned int>(text_.size());
     format.assign(textLen, baseFormat_);
-    for (const auto& modifier : formatModifiers_) {
+
+    for (const FormatModifier& modifier : formatModifiers_) {
         auto pos = std::distance(cumulativeLengths.begin(),
                                  std::find(cumulativeLengths.begin(), cumulativeLengths.end(), modifier.range.start));
         auto end = std::distance(cumulativeLengths.begin(),
@@ -208,7 +209,7 @@ void FormattedText::generateFormat(std::vector<ImmediateFormat>& format) const
                 format[pos].color = modifier.color;
             }
             if (modifier.types & FormatModifier::DECORATION) {
-                format[pos].decoration = modifier.decoration;
+                format[pos].decorations.emplace_back(modifier.decoration);
             }
             if (modifier.types & FormatModifier::ALIGN) {
                 format[pos].align = modifier.align;

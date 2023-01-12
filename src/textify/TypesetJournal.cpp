@@ -52,11 +52,13 @@ void TypesetJournal::addDecoration(const DecorationInput& d, float scale)
 
 void TypesetJournal::extendLastDecoration(int newRange, Decoration type)
 {
-    if (decorationJournal_.empty() || decorationJournal_.back().type != type) {
-        return;
+    // TODO: Matus: This is nasty and it doesn't work as expected. In case there is a break in decorations
+    //   (a chunk of text is not underlined) then this undelines the whole text
+    if (!decorationJournal_.empty() && decorationJournal_.back().type == type) {
+        decorationJournal_.back().range.last = newRange;
+    } else if (decorationJournal_.size() >= 2 && decorationJournal_[decorationJournal_.size()-2].type == type) {
+        decorationJournal_[decorationJournal_.size()-2].range.last = newRange;
     }
-
-    decorationJournal_.back().range.last = newRange;
 }
 
 TypesetJournal::DrawResult TypesetJournal::draw(BitmapRGBA& bitmap, const Rectangle& bounds, int textHeight, const Rectangle& viewArea, const Vector2i& offset) const

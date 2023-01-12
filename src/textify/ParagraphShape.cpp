@@ -297,13 +297,15 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 glyph->setDestination({static_cast<int>(floor(coord.x)), static_cast<int>(floor(coord.y))});
                 glyph->setColor(alphaMask ? ~Pixel32() : unscaledGlyphShape.format.color);
 
-                if (unscaledGlyphShape.format.decoration != Decoration::NONE) {
-                    result.journal.addDecoration(
-                        {{static_cast<int>(floor(coord.x)), static_cast<int>(floor(caret.y))},
-                         {static_cast<int>(round(coord.x)) + glyph->bitmapWidth(), static_cast<int>(floor(caret.y))},
-                         unscaledGlyphShape.format.decoration,
-                         unscaledGlyphShape.format.color,
-                         face}, scale);
+                for (Decoration decoration : unscaledGlyphShape.format.decorations) {
+                    if (decoration != Decoration::NONE) {
+                        result.journal.addDecoration(
+                            {{static_cast<int>(floor(coord.x)), static_cast<int>(floor(caret.y))},
+                            {static_cast<int>(round(coord.x)) + glyph->bitmapWidth(), static_cast<int>(floor(caret.y))},
+                            decoration,
+                            unscaledGlyphShape.format.color,
+                            face}, scale);
+                    }
                 }
 
                 if (!tabStop) {

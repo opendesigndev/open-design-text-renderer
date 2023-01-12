@@ -203,7 +203,7 @@ struct ImmediateFormat : GlyphFormat
     spacing paragraphSpacing; // px in Sketch, cannot be negativ
     spacing paragraphIndent;  // px x offset of the first line in a paragraph
     Pixel32 color;
-    Decoration decoration;
+    std::vector<Decoration> decorations;
     HorizontalAlign align;
     bool kerning;
     bool uppercase;
@@ -253,3 +253,4 @@ struct FormatModifier
     TypeFeatures features;
     TabStops tabStops;
 };
+using FormatModifiers = std::vector<FormatModifier>;
