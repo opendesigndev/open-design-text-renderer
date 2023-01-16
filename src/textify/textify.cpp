@@ -56,7 +56,7 @@ compat::Rectangle stretchedBounds(const std::vector<ParagraphShape::DrawResult>&
 {
     compat::Rectangle stretchedBounds = {};
 
-    for (const auto& result : paragraphResults) {
+    for (const ParagraphShape::DrawResult &result : paragraphResults) {
         stretchedBounds = stretchedBounds | result.journal.stretchedBounds(verticalOffset, limit);
     }
 
@@ -79,10 +79,10 @@ compat::FRectangle scaleRect(const compat::FRectangle& rect, const RenderScale& 
 {
     if (scale == 1.f)
         return rect;
-    float l = scale*rect.l;
-    float t = scale*rect.t;
-    float r = scale*(rect.l+rect.w);
-    float b = scale*(rect.t+rect.h);
+    const float l = scale*rect.l;
+    const float t = scale*rect.t;
+    const float r = scale*(rect.l+rect.w);
+    const float b = scale*(rect.t+rect.h);
     return {l, t, r-l, b-t};
 }
 
@@ -102,16 +102,15 @@ std::vector<FormattedParagraph> splitText(const utils::Log& log, const Formatted
 
     for (int limit = text.getLength(); limit > 0; ) {
         paragraphs.emplace_back(FormattedParagraph(log));
-        int parLen = FormattedParagraph::extractParagraph(paragraphs.back(), textPtr, formatPtr, limit);
+        const int parLen = FormattedParagraph::extractParagraph(paragraphs.back(), textPtr, formatPtr, limit);
 
         textPtr += parLen;
         formatPtr += parLen;
         limit -= parLen;
     }
 
-    for (auto& p : paragraphs) {
+    for (FormattedParagraph &p : paragraphs) {
         p.analyzeBidi();
-
         p.applyFormatModifiers(fontManager);
     }
 
@@ -218,7 +217,7 @@ FacesNames listMissingFonts(Context &ctx, const octopus::Text& text)
 
 TextShapeResult shapeText(Context &ctx, const octopus::Text& text)
 {
-    auto parsedText = TextParser(text).parseText();
+    TextParser::ParseResult parsedText = TextParser(text).parseText();
 
     FrameSizeOpt frameSize;
     if (text.frame.has_value()) {
