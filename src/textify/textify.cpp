@@ -599,6 +599,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
             for (size_t l = 0; l < lineRecord.glyphJournal_.size(); l++) {
                 const GlyphShape &glyphShape = paragraphShape->glyphs()[j];
                 const GlyphPtr &glyph = lineRecord.glyphJournal_[l];
+                const compat::Vector2f &offset = lineRecord.offsets_[l];
 
                 const IPoint2 &glyphDestination = glyph->getDestination();
 
@@ -614,7 +615,9 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
                 const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
 
-                placedGlyph.quadCorners.bottomLeft = compat::Vector2f { static_cast<float>(glyphDestination.x), static_cast<float>(glyphDestination.y) };
+                placedGlyph.quadCorners.bottomLeft = compat::Vector2f {
+                    static_cast<float>(glyphDestination.x) + offset.x,
+                    static_cast<float>(glyphDestination.y) + offset.y };
                 placedGlyph.quadCorners.bottomRight = placedGlyph.quadCorners.bottomLeft + compat::Vector2f { bitmapWidthF, 0.0f };
                 placedGlyph.quadCorners.topLeft = placedGlyph.quadCorners.bottomLeft + compat::Vector2f { 0.0f, bitmapHeightF };
                 placedGlyph.quadCorners.topRight = placedGlyph.quadCorners.bottomLeft + compat::Vector2f { bitmapWidthF, bitmapHeightF };
@@ -660,8 +663,10 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
         glyphScale = (placedGlyph.temp.ascender * scale) / (float)setSizeRes.value();
     }
 
-    // TODO: Matus: Offset?
-    const compat::Vector2f offset { 0.0f, 0.0f };
+    const compat::Vector2f offset {
+        static_cast<float>(placedGlyph.quadCorners.bottomLeft.x - floor(placedGlyph.quadCorners.bottomLeft.x)),
+        static_cast<float>(placedGlyph.quadCorners.bottomLeft.y - floor(placedGlyph.quadCorners.bottomLeft.y)),
+    };
     const ScaleParams glyphScaleParams { scale, glyphScale };
 
     GlyphPtr glyph = face->acquireGlyph(placedGlyph.glyphCodepoint, offset, glyphScaleParams, true, internalDisableHinting);
@@ -848,9 +853,9 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
         }
 
         const GlyphPtr renderedGlyph = renderPlacedGlyph(pg,
-                                                 face,
-                                                 scale,
-                                                 ctx.config.internalDisableHinting);
+                                                         face,
+                                                         scale,
+                                                         ctx.config.internalDisableHinting);
 
         if (renderedGlyph != nullptr) {
             drawGlyph(output, *renderedGlyph, viewAreaBounds);

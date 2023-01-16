@@ -309,7 +309,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 }
 
                 if (!tabStop) {
-                    result.journal.addGlyph(std::move(glyph));
+                    result.journal.addGlyph(std::move(glyph), offset);
                 }
             }
 

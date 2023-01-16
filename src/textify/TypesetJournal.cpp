@@ -17,13 +17,14 @@ void TypesetJournal::startLine(float y)
     baselines_.push_back(y);
 }
 
-void TypesetJournal::addGlyph(GlyphPtr glyph)
+void TypesetJournal::addGlyph(GlyphPtr glyph, const compat::Vector2f &offset)
 {
     if (lineJournal_.empty()) {
         lineJournal_.push_back({});
     }
 
     lineJournal_.back().glyphJournal_.emplace_back(std::move(glyph));
+    lineJournal_.back().offsets_.emplace_back(offset);
 }
 
 void TypesetJournal::addDecoration(const DecorationInput& d, float scale)

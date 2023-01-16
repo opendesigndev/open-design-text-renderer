@@ -39,6 +39,8 @@ public:
         LowHighPair glyphBitmapExtremes() const;
 
         std::vector<GlyphPtr> glyphJournal_;
+        // TODO: Matus: offsets
+        std::vector<compat::Vector2f> offsets_;
     };
 
     /// Specifies a decoration for a range of pixels
@@ -79,7 +81,7 @@ public:
     void setLastLinePolicy(LastLinePolicy policy) { lastLinePolicy_ = policy; }
 
     void startLine(float y);
-    void addGlyph(GlyphPtr glyph);
+    void addGlyph(GlyphPtr glyph, const compat::Vector2f &offset);
 
     /**
      * Add decoration, extend the last one if possible.
