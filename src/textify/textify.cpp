@@ -664,7 +664,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
     const compat::Vector2f offset { 0.0f, 0.0f };
     const ScaleParams glyphScaleParams { scale, glyphScale };
 
-    GlyphPtr glyph = face->acquireGlyph(placedGlyph.glyphCodepoint, offset, glyphScaleParams, internalDisableHinting);
+    GlyphPtr glyph = face->acquireGlyph(placedGlyph.glyphCodepoint, offset, glyphScaleParams, true, internalDisableHinting);
     if (!glyph) {
         return nullptr;
     }
