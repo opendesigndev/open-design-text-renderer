@@ -156,31 +156,6 @@ hb_font_t* Face::getHbFont() const
     return hbFont_;
 }
 
-Result<font_size,bool> Face::getBestSizeToSet(font_size size) const {
-    if (params_.scalable) {
-        return size;
-    }
-
-    if (ftFace_->num_fixed_sizes == 0)
-        return false;
-
-    const font_size charSize = FreetypeHandle::to26_6fixed(float(size));
-
-    int best_match = 0;
-    int diff = std::numeric_limits<int>::max();
-
-    for (int i = 0; i < ftFace_->num_fixed_sizes; ++i) {
-        const int ndiff = std::abs(charSize - ftFace_->available_sizes[i].size);
-        if (ndiff < diff) {
-            best_match = i;
-            diff = ndiff;
-        }
-    }
-    size = font_size(FreetypeHandle::from26_6fixed(ftFace_->available_sizes[best_match].size));
-
-    return size;
-}
-
 Result<font_size,bool> Face::setSize(font_size size)
 {
     auto selectedSize = size;
