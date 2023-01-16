@@ -22,7 +22,7 @@ public:
     virtual void scaleBitmap(float scale) = 0;
 
     compat::Rectangle getBitmapBounds() const;
-    IPoint2 getDestination() const { return destPos_; }
+    const IPoint2 &getDestination() const { return destPos_; }
 
     IPoint2 bitmapBearing;        /// Position of bitmap relative to baseline
     spacing lsb_delta, rsb_delta; /// left / right side bearing delta, see FT_GlyphSlotRec_ for details

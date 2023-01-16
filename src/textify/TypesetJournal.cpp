@@ -109,8 +109,7 @@ TypesetJournal::DrawResult TypesetJournal::drawGlyphs(BitmapRGBA& bitmap, const 
     // auto t0 = Timer::now();
     size_t numGlyphsRendered = 0ul;
 
-    for (const auto& line : lineJournal_) {
-
+    for (const LineRecord &line : lineJournal_) {
         if (lastLinePolicy_ == LastLinePolicy::CUT && line.lowPoint() + offset.y > textHeight)
             break;
 
@@ -141,7 +140,7 @@ void TypesetJournal::drawDecorations(BitmapRGBA& bitmap, const Vector2i& offset)
 {
     BmpWriter w = BmpWriter(bitmap);
 
-    for (const DecorationRecord& decoration : decorationJournal_) {
+    for (const DecorationRecord &decoration : decorationJournal_) {
         const int vpos = decoration.offset + offset.y;
 
         for (int j = 0; j < decoration.range.last - decoration.range.first; j++) {
@@ -176,8 +175,9 @@ int TypesetJournal::LineRecord::lowPoint() const
 {
     int low = 0;
 
-    for (const auto& rec : glyphJournal_) {
-        low = std::max(low, rec->getDestination().y + rec->bitmapHeight());
+    for (const GlyphPtr &rec : glyphJournal_) {
+        const IPoint2 &pos = rec->getDestination();
+        low = std::max(low, pos.y + rec->bitmapHeight());
     }
 
     return low;
@@ -188,9 +188,10 @@ TypesetJournal::LowHighPair TypesetJournal::LineRecord::glyphBitmapExtremes() co
     int high = std::numeric_limits<int>::max();
     int low = 0;
 
-    for (const auto& rec : glyphJournal_) {
-        high = std::min(high, rec->getDestination().y);
-        low = std::max(low, rec->getDestination().y + rec->bitmapHeight());
+    for (const GlyphPtr &rec : glyphJournal_) {
+        const IPoint2 &pos = rec->getDestination();
+        high = std::min(high, pos.y);
+        low = std::max(low, pos.y + rec->bitmapHeight());
     }
 
     return {high, low};

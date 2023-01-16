@@ -210,7 +210,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
             for (int j = static_cast<int>(visualRun.start); j < static_cast<int>(visualRun.end); ++j) {
                 const GlyphShape &unscaledGlyphShape = shapingPhaseOutput_.glyphs_[j];
-                const GlyphShape::Scalable &scaledGlyphShape = shapingPhaseOutput_.glyphs_[j].scaledGlyphShape(scale);
+                const GlyphShape::Scalable scaledGlyphShape = shapingPhaseOutput_.glyphs_[j].scaledGlyphShape(scale);
                 bool fixedHorizontalAdvance = false;
 
                 if (unscaledGlyphShape.character == 0x2028) { // Blank line
@@ -527,7 +527,7 @@ spacing ParagraphShape::maxAscender(const LineSpan& lineSpan, float scale) const
 {
     spacing ascender = 0;
 
-    for (auto i = lineSpan.start; i < lineSpan.end; ++i) {
+    for (long i = lineSpan.start; i < lineSpan.end; ++i) {
         ascender = std::max(shapingPhaseOutput_.glyphs_[i].ascender * scale, ascender);
     }
 
@@ -538,7 +538,7 @@ spacing ParagraphShape::maxLineHeight(const LineSpan& lineSpan, float scale) con
 {
     spacing height = 0;
 
-    for (auto i = lineSpan.start; i < lineSpan.end; ++i) {
+    for (long i = lineSpan.start; i < lineSpan.end; ++i) {
         height = std::max(shapingPhaseOutput_.glyphs_[i].lineHeight * scale, height);
     }
 
@@ -549,7 +549,7 @@ spacing ParagraphShape::maxLineDefaultHeight(const LineSpan& lineSpan, float sca
 {
     spacing defaultLineHeight = 0;
 
-    for (auto i = lineSpan.start; i < lineSpan.end; ++i) {
+    for (long i = lineSpan.start; i < lineSpan.end; ++i) {
         defaultLineHeight = std::max(shapingPhaseOutput_.glyphs_[i].defaultLineHeight * scale, defaultLineHeight);
     }
 
@@ -560,7 +560,7 @@ spacing ParagraphShape::maxBearing(const LineSpan& lineSpan, float scale) const
 {
     spacing bearing = 0;
 
-    for (auto i = lineSpan.start; i < lineSpan.end; ++i) {
+    for (long i = lineSpan.start; i < lineSpan.end; ++i) {
         bearing = std::max(shapingPhaseOutput_.glyphs_[i].bearingY * scale, bearing);
     }
 
@@ -571,11 +571,11 @@ std::vector<hb_feature_t> ParagraphShape::setupFeatures(const ImmediateFormat& f
 {
     typedef std::pair<const char*, std::uint32_t> featureItem;
 
-    auto liga = format.ligatures == GlyphFormat::Ligatures::STANDARD || format.ligatures == GlyphFormat::Ligatures::ALL;
-    auto alt = format.ligatures == GlyphFormat::Ligatures::ALTERNATIVE || format.ligatures == GlyphFormat::Ligatures::ALL;
+    const bool liga = format.ligatures == GlyphFormat::Ligatures::STANDARD || format.ligatures == GlyphFormat::Ligatures::ALL;
+    const bool alt = format.ligatures == GlyphFormat::Ligatures::ALTERNATIVE || format.ligatures == GlyphFormat::Ligatures::ALL;
 
     // those **typically** correspond to OpenType features
-    auto tags = std::vector<featureItem>{
+    std::vector<featureItem> tags {
         featureItem(otf::feature::LIGA, liga),           // standard ligatures
         featureItem(otf::feature::DLIG, alt),            // discretionary ligatures
         featureItem(otf::feature::HLIG, alt),            // historical ligatures
@@ -583,13 +583,12 @@ std::vector<hb_feature_t> ParagraphShape::setupFeatures(const ImmediateFormat& f
         featureItem(otf::feature::KERN, format.kerning), // modern kerning feature
     };
 
-    for (const auto& userFeature : format.features) {
-
+    for (const TypeFeature &userFeature : format.features) {
         tags.emplace_back(featureItem(userFeature.tag.c_str(), userFeature.value));
     }
 
     std::vector<hb_feature_t> hbFeatures;
-    for (const auto& tag : tags) {
+    for (const featureItem &tag : tags) {
         hb_feature_t ftr;
         if (hb_feature_from_string(tag.first, -1, &ftr)) {
             ftr.value = tag.second;
@@ -643,32 +642,32 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
         reportedFaces_.insert({seq.format.faceId, ReportedFontReason::POSTSCRIPTNAME_MISMATCH});
     }
 
-    auto desiredSize = seq.format.size;
-    auto actualSizeResult = face->setSize(desiredSize);
-    float resizeFactor = 1.0f;
-    if (actualSizeResult && actualSizeResult.value() != desiredSize) {
-        resizeFactor = (float)desiredSize / (float)actualSizeResult.value();
-    }
+    const font_size desiredSize = seq.format.size;
+    const Result<font_size,bool> actualSizeResult = face->setSize(desiredSize);
+
+    const float resizeFactor = (actualSizeResult && actualSizeResult.value() != desiredSize)
+        ? (float)desiredSize / (float)actualSizeResult.value()
+        : 1.0f;
 
     hb_buffer_t* hbBuffer = hb_buffer_create();
     hb_buffer_add_utf32(hbBuffer, &paragraph.text_[0], static_cast<int>(paragraph.text_.size()), seq.start, seq.len);
     hb_buffer_guess_segment_properties(hbBuffer);
-    auto rtl = hb_buffer_get_direction(hbBuffer) == HB_DIRECTION_RTL;
+    const bool rtl = hb_buffer_get_direction(hbBuffer) == HB_DIRECTION_RTL;
 
     validateUserFeatures(face, paragraph.format_[seq.start].features);
-    auto hbFeatures = setupFeatures(paragraph.format_[seq.start]);
+    const std::vector<hb_feature_t> hbFeatures = setupFeatures(paragraph.format_[seq.start]);
 
     hb_shape(face->getHbFont(), hbBuffer, hbFeatures.data(), static_cast<unsigned int>(hbFeatures.size()));
 
     bool isGlyphMissing = false;
 
     GlyphShape glyph;
-    auto hbLen = hb_buffer_get_length(hbBuffer);
+    const unsigned int hbLen = hb_buffer_get_length(hbBuffer);
     const hb_glyph_position_t* hbPos = hb_buffer_get_glyph_positions(hbBuffer, nullptr);
     const hb_glyph_info_t* hbInfo = hb_buffer_get_glyph_infos(hbBuffer, nullptr);
     for (unsigned i = 0; i < hbLen; ++i) {
-        int k = rtl ? hbLen - i - 1 : i;
-        int p = hbInfo[k].cluster;
+        const int k = rtl ? hbLen - i - 1 : i;
+        const int p = hbInfo[k].cluster;
         const auto& fmt = paragraph.format_[p];
 
         // If HB does not evaluate emoji modifiers and ZWJ sequences correctly,

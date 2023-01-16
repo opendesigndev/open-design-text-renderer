@@ -595,7 +595,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
         size_t j = 0;
         for (size_t k = 0; k < drawResult.journal.getLines().size(); k++) {
-            const auto & lineRecord = drawResult.journal.getLines()[k];
+            const TypesetJournal::LineRecord &lineRecord = drawResult.journal.getLines()[k];
 
             for (size_t l = 0; l < lineRecord.glyphJournal_.size(); l++) {
                 const GlyphShape &glyphShape = paragraphShape->glyphs()[j];
