@@ -244,13 +244,9 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
                 FacePtr face = faceItem->face;
 
-                float glyphScale = 1.0f;
                 const font_size desiredSize = face->isScalable() ? unscaledGlyphShape.format.size : scaledGlyphShape.size;
-
                 const Result<font_size,bool> setSizeRes = face->setSize(desiredSize);
-                if (setSizeRes && !face->isScalable()) {
-                    glyphScale = scaledGlyphShape.ascender / (float)setSizeRes.value();
-                }
+                const float glyphScale = (setSizeRes && !face->isScalable()) ? scaledGlyphShape.ascender / (float)setSizeRes.value() : 1.0f;
 
                 const Vector2f offset {
                     static_cast<float>(caret.x - floor(caret.x)),
