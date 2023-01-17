@@ -136,8 +136,6 @@ private:
     // Shape::Paths scalableJournal_;
 
     LastLinePolicy lastLinePolicy_;
-
-    std::vector<float> baselines_;
 };
 
 } // namespace priv

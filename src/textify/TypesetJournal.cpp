@@ -14,7 +14,6 @@ using namespace compat;
 void TypesetJournal::startLine(float y)
 {
     lineJournal_.push_back({});
-    baselines_.push_back(y);
 }
 
 void TypesetJournal::addGlyph(GlyphPtr glyph, const compat::Vector2f &offset)
