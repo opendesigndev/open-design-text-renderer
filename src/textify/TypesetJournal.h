@@ -71,7 +71,6 @@ public:
     struct DrawResultData
     {
         std::size_t numGlyphsRendered;
-        // Timer glyphsRenderTime;
     };
 
     using DrawResult = Result<DrawResultData,bool>;

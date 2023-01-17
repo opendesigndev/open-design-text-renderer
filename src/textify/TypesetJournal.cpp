@@ -16,7 +16,7 @@ void TypesetJournal::startLine(float y)
     lineJournal_.push_back({});
 }
 
-void TypesetJournal::addGlyph(GlyphPtr glyph, const compat::Vector2f &offset)
+void TypesetJournal::addGlyph(GlyphPtr glyph, const Vector2f &offset)
 {
     if (lineJournal_.empty()) {
         lineJournal_.push_back({});
@@ -106,7 +106,6 @@ Rectangle TypesetJournal::stretchedBounds(int yOffset, int yMax) const
 
 TypesetJournal::DrawResult TypesetJournal::drawGlyphs(BitmapRGBA& bitmap, const Rectangle& bounds, int textHeight, const Rectangle& viewArea, const Vector2i& offset) const
 {
-    // auto t0 = Timer::now();
     size_t numGlyphsRendered = 0ul;
 
     for (const LineRecord &line : lineJournal_) {
@@ -131,9 +130,7 @@ TypesetJournal::DrawResult TypesetJournal::drawGlyphs(BitmapRGBA& bitmap, const 
         }
     }
 
-    // t0.stop();
-
-    return DrawResultData{numGlyphsRendered /* , std::move(t0) */};
+    return DrawResultData { numGlyphsRendered };
 }
 
 void TypesetJournal::drawDecorations(BitmapRGBA& bitmap, const Vector2i& offset) const

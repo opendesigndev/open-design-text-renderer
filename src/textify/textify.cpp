@@ -453,7 +453,7 @@ TextDrawResult drawTextInner(Context &ctx,
     // vertical align offset
     offset.y += int(verticalOffset - stretchedGlyphsBounds.t);
 
-    for (const auto& paragraphResult : paragraphResults) {
+    for (const ParagraphShape::DrawResult &paragraphResult : paragraphResults) {
         const TypesetJournal::DrawResult journalDrawResult = paragraphResult.journal.draw(output, bitmapBounds, stretchedTextBounds.h, viewAreaBounds, offset);
 
         if (journalDrawResult) {
