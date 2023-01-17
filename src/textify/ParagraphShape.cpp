@@ -377,7 +377,8 @@ void ParagraphShape::startCaret(const LineSpan& lineSpan, float& y, VerticalPosi
             yShift = std::round(maxLineHeight(lineSpan, scale));
             break;
         case VerticalPositioning::TOP_BOUND:
-            yShift = maxAscender(lineSpan, scale);
+            // TODO: Matus: Is this rounding correct?
+            yShift = std::round(maxAscender(lineSpan, scale));
             break;
     }
 
