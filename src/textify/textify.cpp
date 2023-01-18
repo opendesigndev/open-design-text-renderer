@@ -657,7 +657,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
                            bool internalDisableHinting) {
     // TODO: Matus: Here I need `format.size` and `ascender`
     float glyphScale = 1.0f;
-    const font_size desiredSize = face->isScalable() ? std::ceil(placedGlyph.temp.size * scale) : placedGlyph.temp.size;
+    const font_size desiredSize = face->isScalable() ? (placedGlyph.temp.size * scale) : placedGlyph.temp.size;
     const Result<font_size,bool> setSizeRes = face->setSize(desiredSize);
     if (setSizeRes && !face->isScalable()) {
         glyphScale = (placedGlyph.temp.ascender * scale) / (float)setSizeRes.value();
