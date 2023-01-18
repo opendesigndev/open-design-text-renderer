@@ -17,12 +17,6 @@ namespace octopus {
 
 namespace textify {
 
-struct Context;
-struct TextShape;
-
-/// NEW API:
-/// TODO: Remove all unnecessary API state
-
 // TODO: Matus: Remove and replace
 enum class HorizontalAlign_NEW {
     DEFAULT,
@@ -34,13 +28,6 @@ enum class HorizontalAlign_NEW {
     END
 };
 
-// TODO: Matus: Use the full font specifier (family and style?)
-//struct FontSpecifier {
-//    std::string postScriptName;
-//    std::optional<std::string> family;
-//    std::optional<std::string> style;
-//};
-using FontSpecifier = std::string;
 struct Vector2d {
     double x, y;
 };
@@ -56,6 +43,8 @@ struct PlacedGlyph {
     // TODO: Matus: This font face Id should be moved to some other place
     //   Maybe the glyphs should be groupped by face Ids
     std::string fontFaceId;
+
+    // TODO: Matus: Remove decorations, move to some other place
     /// Decoration - underline, strikethrough etc.
     enum class Decoration {
         NONE = 0,
@@ -79,8 +68,6 @@ struct PlacedGlyph {
             HorizontalAlign_NEW align;
         } format;
 
-        float defaultLineHeight;
-
         /// Dimensions (scalable)
         struct Dimensions {
             float ascender;     //!< Up to 1px error, see FT reference
@@ -91,7 +78,7 @@ struct PlacedGlyph {
 };
 using PlacedGlyphs = std::vector<PlacedGlyph>;
 
-// TODO: Matus: Remove and replace
+// TODO: Matus: Remove and replace -> this should be just PlacedGlyphs
 struct ShapeTextResult_NEW {
     PlacedGlyphs placedGlyphs;
 

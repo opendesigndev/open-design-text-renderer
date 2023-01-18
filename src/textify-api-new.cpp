@@ -62,8 +62,6 @@ PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
     temp.format.paragraphSpacing = glyph.format.paragraphSpacing;
     temp.format.align = static_cast<HorizontalAlign_NEW>(glyph.format.align);
 
-    temp.defaultLineHeight = glyph.defaultLineHeight;
-
     temp.dimensions = {
         glyph.ascender,
         glyph.descender,
