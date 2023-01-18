@@ -57,16 +57,8 @@ compat::Matrix3f convertMatrix(const Matrix3f &m) {
 PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
     PlacedGlyph::Temporary temp;
 
-    temp.format.size = glyph.format.size;
-
-    temp.format.paragraphSpacing = glyph.format.paragraphSpacing;
-    temp.format.align = static_cast<HorizontalAlign_NEW>(glyph.format.align);
-
-    temp.dimensions = {
-        glyph.ascender,
-        glyph.descender,
-        glyph.lineHeight,
-    };
+    temp.size = glyph.format.size;
+    temp.ascender = glyph.ascender;
 
     PlacedGlyph result;
 
@@ -140,8 +132,8 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
             pgn.decorations.emplace_back(static_cast<PlacedGlyph::Decoration>(d));
         }
         // TODO: Matus: This should not be here at all
-        pgn.temp.format.size = pg.temp.size;
-        pgn.temp.dimensions.ascender = pg.temp.ascender;
+        pgn.temp.size = pg.temp.size;
+        pgn.temp.ascender = pg.temp.ascender;
         result.placedGlyphs.emplace_back(pgn);
     }
     result.textTransform = convertMatrix(textShapeData->textTransform);
@@ -192,8 +184,8 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
         }
 
         // TODO: Matus: This should not be here at all
-        pgn.temp.size = pg.temp.format.size;
-        pgn.temp.ascender = pg.temp.dimensions.ascender;
+        pgn.temp.size = pg.temp.size;
+        pgn.temp.ascender = pg.temp.ascender;
 
         pgs.emplace_back(pgn);
     }

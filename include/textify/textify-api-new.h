@@ -57,23 +57,8 @@ struct PlacedGlyph {
     // TODO: Matus: Temporary data
     // TODO: Matus: Remove and replace
     struct Temporary {
-        // Immediate format:
-        // inherited: faceId, size;
-        struct ImmediateFormat {
-            // TODO: Matus: Inherited from GlyphsFormat
-            float size;
-
-            // TODO: Matus: ImmediateFormat
-            float paragraphSpacing; // px in Sketch, cannot be negativ
-            HorizontalAlign_NEW align;
-        } format;
-
-        /// Dimensions (scalable)
-        struct Dimensions {
-            float ascender;     //!< Up to 1px error, see FT reference
-            float descender;    //!< Up to 1px error, see FT reference
-            float lineHeight; // TODO why is this here and also in format?
-        } dimensions;
+        float size = 0.0f;
+        float ascender = 0.0f;
     } temp;
 };
 using PlacedGlyphs = std::vector<PlacedGlyph>;
