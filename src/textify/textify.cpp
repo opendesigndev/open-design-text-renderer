@@ -634,7 +634,10 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
     }
 
     // Compute the unscaled stretched bounds
-    const compat::FRectangle unstretchedTextBounds = getStretchedTextBounds(ctx, shapes, textBoundsNoTransform, formattedText->formattingParams(), baseline, 1.0f);
+    const compat::Vector2f textTranslation { textTransform.m[2][0], textTransform.m[2][1] };
+    compat::FRectangle unstretchedTextBounds =
+        getStretchedTextBounds(ctx, shapes, textBoundsNoTransform, formattedText->formattingParams(), baseline, 1.0f) +
+        textTranslation;
 
     return std::make_unique<TextShapeData_NEW>(
         std::move(formattedText),
@@ -790,7 +793,6 @@ compat::FRectangle getStretchedTextBounds(Context &ctx,
 
 
 compat::Rectangle computeDrawBounds(Context &ctx,
-                                    const compat::Matrix3f &textTransform,
                                     const compat::FRectangle &stretchedTextBounds,
                                     float scale,
                                     const compat::FRectangle& viewAreaTextSpace) {
@@ -802,15 +804,12 @@ compat::Rectangle computeDrawBounds(Context &ctx,
 
 // TODO: Matus: this function just calls the INNER function.
 TextDrawResult drawText_NEW(Context &ctx,
-                            const compat::Matrix3f &textTransform,
                             const compat::FRectangle &stretchedTextBounds,
                             void *pixels, int width, int height,
                             float scale,
                             const compat::Rectangle &viewArea,
                             const PlacedGlyphs_pr &placedGlyphs) {
-    const compat::Matrix3f inverseTransform = inverse(textTransform);
-    const compat::FRectangle viewAreaTextSpaceUnscaled = utils::transform(toFRectangle(viewArea), inverseTransform);
-    const compat::FRectangle viewAreaTextSpace = scaleRect(viewAreaTextSpaceUnscaled, scale);
+    const compat::FRectangle viewAreaTextSpace = scaleRect(toFRectangle(viewArea), scale);
 
     TextDrawResult drawResult = drawTextInner_NEW(
         ctx,
@@ -821,10 +820,8 @@ TextDrawResult drawText_NEW(Context &ctx,
 
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
-        value.transform = textTransform;
-        value.transform[2][0] *= scale;
-        value.transform[2][1] *= scale;
-        value.drawBounds = computeDrawBounds(ctx, textTransform, stretchedTextBounds, scale, viewAreaTextSpace);
+        value.transform = compat::Matrix3f::identity;
+        value.drawBounds = computeDrawBounds(ctx, stretchedTextBounds, scale, viewAreaTextSpace);
         return value;
     } else {
         return drawResult.error();

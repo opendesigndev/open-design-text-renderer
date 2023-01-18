@@ -67,7 +67,6 @@ using PlacedGlyphs = std::vector<PlacedGlyph>;
 struct ShapeTextResult_NEW {
     PlacedGlyphs placedGlyphs;
 
-    Matrix3f textTransform;
     FRectangle unstretchedTextBounds;
 };
 

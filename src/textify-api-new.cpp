@@ -136,7 +136,7 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
         pgn.temp.ascender = pg.temp.ascender;
         result.placedGlyphs.emplace_back(pgn);
     }
-    result.textTransform = convertMatrix(textShapeData->textTransform);
+
     result.unstretchedTextBounds = convertRect(textShapeData->unstretchedTextBounds);
 
     return result;
@@ -190,13 +190,10 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
         pgs.emplace_back(pgn);
     }
 
-    const compat::Matrix3f textTransform = convertMatrix(textShape_NEW.textTransform);
-
     const compat::FRectangle unstretchedTextBounds = convertRect(textShape_NEW.unstretchedTextBounds);
     const compat::FRectangle stretchedTextBounds = unstretchedTextBounds * drawOptions.scale;
 
     const priv::TextDrawResult result = priv::drawText_NEW(*ctx,
-                                                           textTransform,
                                                            stretchedTextBounds,
                                                            outputBuffer, width, height,
                                                            drawOptions.scale,

@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "errors.h"
@@ -198,7 +199,6 @@ compat::Rectangle computeDrawBounds(Context &ctx,
 
 // TODO: Matus: Cleanup this function - make sure all the arguments are optimal etc.
 TextDrawResult drawText_NEW(Context &ctx,
-                            const compat::Matrix3f &textTransform,
                             const compat::FRectangle &stretchedTextBounds,
                             void *pixels, int width, int height,
                             float scale,
