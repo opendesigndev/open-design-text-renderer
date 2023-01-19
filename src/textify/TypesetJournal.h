@@ -27,22 +27,6 @@ public:
         bool partialOverflow(int limit) const;
     };
 
-    struct LineRecord
-    {
-        int lowPoint() const;
-
-        /**
-         * Returns the highest and the lowest point of the glyphs within a line.
-         *
-         * @return      pair of high and low point
-         */
-        LowHighPair glyphBitmapExtremes() const;
-
-        std::vector<GlyphPtr> glyphJournal_;
-        // TODO: Matus: offsets
-        std::vector<compat::Vector2f> offsets_;
-    };
-
     /// Specifies a decoration for a range of pixels
     struct DecorationRecord
     {
@@ -55,6 +39,8 @@ public:
         Pixel32 color;
         int offset; ///< vertical distance from the top
         float thickness;
+
+        LowHighPair indices { 0, 0 };
     };
 
     struct DecorationInput
@@ -66,6 +52,24 @@ public:
         Pixel32 color;
 
         const Face* face;
+    };
+
+    struct LineRecord
+    {
+        int lowPoint() const;
+
+        /**
+         * Returns the highest and the lowest point of the glyphs within a line.
+         *
+         * @return      pair of high and low point
+         */
+        LowHighPair glyphBitmapExtremes() const;
+
+        std::vector<GlyphPtr> glyphJournal_;
+        std::vector<DecorationRecord> decorationJournal_;
+
+        // TODO: Matus: offsets
+        std::vector<compat::Vector2f> offsets_;
     };
 
     struct DrawResultData
@@ -85,7 +89,7 @@ public:
     /**
      * Add decoration, extend the last one if possible.
      */
-    void addDecoration(const DecorationInput& d, float scale);
+    void addDecoration(const DecorationInput& d, float scale, int index);
 
     /**
      * Draw glyphs and decoration stored within jounal to the given bitmap.
@@ -96,16 +100,13 @@ public:
     size_t size() const { return lineJournal_.size(); }
     const auto& getLines() const { return lineJournal_; }
 
-    // const auto& getScalables() const { return scalableJournal_; }
-    // auto&& moveScalables() { return std::move(scalableJournal_); }
-
     compat::Rectangle stretchedBounds(int yOffset, int yMax) const;
 
 private:
     /**
      * Extends range of the last decoration if it shares the @a type.
      **/
-    void extendLastDecoration(int dist, Decoration type);
+    bool extendLastDecoration(Decoration type, int newRange, int newIndex);
 
     /**
      * Renders glyphs from lines journal to the given bitmap.
@@ -127,12 +128,8 @@ private:
      */
     void drawDecorations(compat::BitmapRGBA& bitmap, const compat::Vector2i& offset) const;
 
+    /// Lines
     std::vector<LineRecord> lineJournal_;
-
-    std::vector<DecorationRecord> decorationJournal_;
-
-    /// Glyphs converted to paths to be scaled as vector shapes
-    // Shape::Paths scalableJournal_;
 
     LastLinePolicy lastLinePolicy_;
 };

@@ -2,12 +2,9 @@
 #pragma once
 
 #include <cstdint>
-#include <functional>
 #include <optional>
 #include <string>
 #include <vector>
-
-#include <map>
 
 #include "textify-api.h"
 
@@ -18,9 +15,15 @@ namespace octopus {
 
 namespace textify {
 
+struct Context;
+struct TextShape;
+typedef Context* ContextHandle;
+typedef TextShape* TextShapeHandle;
+
 struct Vector2f {
     float x, y;
 };
+
 struct PlacedGlyph {
     /// Glyph codepoint - index within the loaded font file
     uint32_t glyphCodepoint;

@@ -1,34 +1,10 @@
 
 #include "textify/textify-api-new.h"
 
-#include "textify/textify-api.h"
+#include <map>
 
-#include "compat/affine-transform.h"
-#include "compat/basic-types.h"
-
-#include "fonts/FontManager.h"
-
-#include "textify/Config.h"
-#include "textify/Context.h"
 #include "textify/textify.h"
-#include "textify/TextShape.h"
-#include "textify/types.h"
-
 #include "utils/utils.h"
-#include "utils/Log.h"
-#include "utils/fmt.h"
-
-#include "vendor/fmt/core.h"
-
-#include "textify/text-format.h"
-
-#include <octopus/text.h>
-
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <vector>
 
 
 namespace textify {

@@ -11,6 +11,8 @@ namespace priv {
 
 using namespace compat;
 
+static const float STRIKETHROUGH_HEIGHT = 0.25f;
+
 void TypesetJournal::startLine(float y)
 {
     lineJournal_.push_back({});
@@ -26,11 +28,15 @@ void TypesetJournal::addGlyph(GlyphPtr glyph, const Vector2f &offset)
     lineJournal_.back().offsets_.emplace_back(offset);
 }
 
-void TypesetJournal::addDecoration(const DecorationInput& d, float scale)
+void TypesetJournal::addDecoration(const DecorationInput& d, float scale, int index)
 {
-    extendLastDecoration(d.start.x, d.type);
+    if (lineJournal_.empty()) {
+        return;
+    }
 
-    static const float STRIKETHROUGH_HEIGHT = 0.25f;
+    if (extendLastDecoration(d.type, d.end.x, index)) {
+        return;
+    }
 
     DecorationRecord decoration;
 
@@ -47,18 +53,34 @@ void TypesetJournal::addDecoration(const DecorationInput& d, float scale)
     const float thickness = d.face->scaleFontUnits(d.face->getFtFace()->underline_thickness, true);
     decoration.thickness = thickness * scale;
 
-    decorationJournal_.push_back(decoration);
+    decoration.indices.low = index;
+    decoration.indices.high = index;
+
+    lineJournal_.back().decorationJournal_.push_back(decoration);
 }
 
-void TypesetJournal::extendLastDecoration(int newRange, Decoration type)
+bool TypesetJournal::extendLastDecoration(Decoration type, int newRange, int newIndex)
 {
-    // TODO: Matus: This is nasty and it doesn't work as expected. In case there is a break in decorations
-    //   (a chunk of text is not underlined) then this undelines the whole text
-    if (!decorationJournal_.empty() && decorationJournal_.back().type == type) {
-        decorationJournal_.back().range.last = newRange;
-    } else if (decorationJournal_.size() >= 2 && decorationJournal_[decorationJournal_.size()-2].type == type) {
-        decorationJournal_[decorationJournal_.size()-2].range.last = newRange;
+    const size_t decorationsCount = lineJournal_.back().decorationJournal_.size();
+    if (decorationsCount >= 1) {
+        DecorationRecord &lastDecoration = lineJournal_.back().decorationJournal_.back();
+        if (lastDecoration.indices.high + 1 == newIndex && lastDecoration.type == type) {
+            lastDecoration.range.last = newRange;
+            lastDecoration.indices.high = newIndex;
+            return true;
+        }
+
+        if (decorationsCount >= 2) {
+            DecorationRecord &subultimateDecoration = lineJournal_.back().decorationJournal_[lineJournal_.back().decorationJournal_.size()-2];
+            if (subultimateDecoration.indices.high + 1 == newIndex && subultimateDecoration.type == type) {
+                subultimateDecoration.range.last = newRange;
+                subultimateDecoration.indices.high = newIndex;
+                return true;
+            }
+        }
     }
+
+    return false;
 }
 
 TypesetJournal::DrawResult TypesetJournal::draw(BitmapRGBA& bitmap, const Rectangle& bounds, int textHeight, const Rectangle& viewArea, const Vector2i& offset) const
@@ -137,26 +159,28 @@ void TypesetJournal::drawDecorations(BitmapRGBA& bitmap, const Vector2i& offset)
 {
     BmpWriter w = BmpWriter(bitmap);
 
-    for (const DecorationRecord &decoration : decorationJournal_) {
-        const int vpos = decoration.offset + offset.y;
+    for (const LineRecord &line : lineJournal_) {
+        for (const DecorationRecord &decoration : line.decorationJournal_) {
+            const int vpos = decoration.offset + offset.y;
 
-        for (int j = 0; j < decoration.range.last - decoration.range.first; j++) {
-            const int penX = decoration.range.first + j + offset.x;
-            if (!w.checkH(penX)) {
-                continue;
-            }
-
-            if (decoration.type == Decoration::DOUBLE_UNDERLINE) {
-                const int thickness = static_cast<int>(ceil(decoration.thickness * 2.0 / 3.0));
-                const int offset = static_cast<int>(thickness * 0.5);
-
-                for (int k = 0; k < thickness; k++) {
-                    w.write(penX, vpos - offset - k, decoration.color);
-                    w.write(penX, vpos + offset + k, decoration.color);
+            for (int j = 0; j < decoration.range.last - decoration.range.first; j++) {
+                const int penX = decoration.range.first + j + offset.x;
+                if (!w.checkH(penX)) {
+                    continue;
                 }
-            } else /* UNDERLINE || STRIKETHROUGH */ {
-                for (int k = 0; k < decoration.thickness; k++) {
-                    w.write(penX, vpos - k, decoration.color);
+
+                if (decoration.type == Decoration::DOUBLE_UNDERLINE) {
+                    const int thickness = static_cast<int>(ceil(decoration.thickness * 2.0 / 3.0));
+                    const int offset = static_cast<int>(thickness * 0.5);
+
+                    for (int k = 0; k < thickness; k++) {
+                        w.write(penX, vpos - offset - k, decoration.color);
+                        w.write(penX, vpos + offset + k, decoration.color);
+                    }
+                } else /* UNDERLINE || STRIKETHROUGH */ {
+                    for (int k = 0; k < decoration.thickness; k++) {
+                        w.write(penX, vpos - k, decoration.color);
+                    }
                 }
             }
         }

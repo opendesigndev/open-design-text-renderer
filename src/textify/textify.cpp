@@ -583,7 +583,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
     preserveFixedDimensions(text.boundsMode(), frameSize, w, h);
 
     const compat::FRectangle textBoundsNoTransform { l, t, w, h };
-    const compat::FRectangle textBoundsTransform = transform(textBoundsNoTransform, textTransform);
+    const compat::FRectangle textBoundsTransformed = transform(textBoundsNoTransform, textTransform);
 
     const float baseline = resolveBaselinePosition(p0, text.baselinePolicy(), text.verticalAlign());
 
@@ -645,7 +645,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
         textTransform,
         std::move(shapes),
         textBoundsNoTransform,
-        textBoundsTransform,
+        textBoundsTransformed,
         baseline,
         placedGlyphs,
         unstretchedTextBounds

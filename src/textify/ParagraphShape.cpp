@@ -295,12 +295,14 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
                 for (Decoration decoration : unscaledGlyphShape.format.decorations) {
                     if (decoration != Decoration::NONE) {
-                        result.journal.addDecoration(
-                            {{static_cast<int>(floor(coord.x)), static_cast<int>(floor(caret.y))},
+                        const TypesetJournal::DecorationInput decorationInput {
+                            {static_cast<int>(floor(coord.x)), static_cast<int>(floor(caret.y))},
                             {static_cast<int>(round(coord.x)) + glyph->bitmapWidth(), static_cast<int>(floor(caret.y))},
                             decoration,
                             unscaledGlyphShape.format.color,
-                            face}, scale);
+                            face
+                        };
+                        result.journal.addDecoration(decorationInput, scale, j);
                     }
                 }
 
