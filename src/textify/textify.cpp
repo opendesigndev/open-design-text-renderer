@@ -701,6 +701,23 @@ void drawGlyph(compat::BitmapRGBA &bitmap,
     glyph.blit(bitmap.pixels(), destDims, compat::Vector2i{ 0, 0 });
 }
 
+void drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap,
+                                const PlacedGlyph_pr &pg)
+{
+    const Pixel32 bottomLeftColor = 0x55000088;
+    const Pixel32 topRightColor = 0x55880000;
+    BmpWriter w = BmpWriter(bitmap);
+
+    for (int x = pg.quadCorners.bottomLeft.x; x < pg.quadCorners.bottomRight.x; x += 2) {
+        w.write(x, pg.quadCorners.bottomLeft.y, bottomLeftColor);
+        w.write(x, pg.quadCorners.topRight.y, topRightColor);
+    }
+    for (int y = pg.quadCorners.bottomLeft.y; y < pg.quadCorners.topLeft.y; y += 2) {
+        w.write(pg.quadCorners.bottomLeft.x, y, bottomLeftColor);
+        w.write(pg.quadCorners.topRight.x, y, topRightColor);
+    }
+}
+
 // TODO: Matus: NEW function
 void drawDecorations(compat::BitmapRGBA &bitmap,
                      const PlacedGlyph_pr &pg,
