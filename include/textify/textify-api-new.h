@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <cstdint>
@@ -17,26 +18,15 @@ namespace octopus {
 
 namespace textify {
 
-// TODO: Matus: Remove and replace
-enum class HorizontalAlign_NEW {
-    DEFAULT,
-    LEFT,
-    RIGHT,
-    CENTER,
-    JUSTIFY,
-    START,
-    END
-};
-
-struct Vector2d {
-    double x, y;
+struct Vector2f {
+    float x, y;
 };
 struct PlacedGlyph {
     /// Glyph codepoint - index within the loaded font file
     uint32_t glyphCodepoint;
     /// Glyph position, specified by its four quad corners.
     struct QuadCorners {
-        Vector2d topLeft, topRight, bottomLeft, bottomRight;
+        Vector2f topLeft, topRight, bottomLeft, bottomRight;
     } quadCorners;
     /// Glyph color
     uint32_t color;
@@ -63,11 +53,11 @@ struct PlacedGlyph {
 };
 using PlacedGlyphs = std::vector<PlacedGlyph>;
 
-// TODO: Matus: Remove and replace -> this should be just PlacedGlyphs
 struct ShapeTextResult_NEW {
     PlacedGlyphs placedGlyphs;
 
-    FRectangle unstretchedTextBounds;
+    // TODO: Matus: Remove and replace -> this should be just PlacedGlyphs
+    FRectangle textBounds;
 };
 
 

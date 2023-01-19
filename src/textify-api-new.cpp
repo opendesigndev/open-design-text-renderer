@@ -114,7 +114,7 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
     }
 
     const auto ConvertQuad = [](const priv::PlacedGlyph_pr::QuadCorners &qc)->PlacedGlyph::QuadCorners {
-        const auto ConvertVec = [](const compat::Vector2f &vf)->Vector2d { return Vector2d { vf.x, vf.y }; };
+        const auto ConvertVec = [](const compat::Vector2f &vf)->Vector2f { return Vector2f { vf.x, vf.y }; };
         return PlacedGlyph::QuadCorners {
         ConvertVec(qc.topLeft),
         ConvertVec(qc.topRight),
@@ -137,7 +137,7 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
         result.placedGlyphs.emplace_back(pgn);
     }
 
-    result.unstretchedTextBounds = convertRect(textShapeData->unstretchedTextBounds);
+    result.textBounds = convertRect(textShapeData->unstretchedTextBounds);
 
     return result;
 }
@@ -158,15 +158,13 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
         return {};
     }
 
-//    if (textShape && sanitizeShape(ctx, textShape)) {
-
     const compat::Rectangle viewArea = drawOptions.viewArea.has_value()
         ? convertRect(drawOptions.viewArea.value())
         : compat::INFINITE_BOUNDS;
 
     priv::PlacedGlyphs_pr pgs;
     const auto ConvertQuad = [](const PlacedGlyph::QuadCorners &qc)->priv::PlacedGlyph_pr::QuadCorners {
-        const auto ConvertVec = [](const Vector2d &v)->compat::Vector2f { return compat::Vector2f { (float)v.x, (float)v.y }; };
+        const auto ConvertVec = [](const Vector2f &v)->compat::Vector2f { return compat::Vector2f { (float)v.x, (float)v.y }; };
         return priv::PlacedGlyph_pr::QuadCorners {
             ConvertVec(qc.topLeft),
             ConvertVec(qc.topRight),
@@ -190,8 +188,8 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
         pgs.emplace_back(pgn);
     }
 
-    const compat::FRectangle unstretchedTextBounds = convertRect(textShape_NEW.unstretchedTextBounds);
-    const compat::FRectangle stretchedTextBounds = unstretchedTextBounds * drawOptions.scale;
+    const compat::FRectangle textBounds = convertRect(textShape_NEW.textBounds);
+    const compat::FRectangle stretchedTextBounds = textBounds * drawOptions.scale;
 
     const priv::TextDrawResult result = priv::drawText_NEW(*ctx,
                                                            stretchedTextBounds,
@@ -207,8 +205,6 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
             false
         };
     }
-
-//    }
 
     return DrawTextResult {};
 }
