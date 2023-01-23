@@ -111,14 +111,6 @@ struct PlacedGlyph_pr {
     // TODO: Matus: This font face Id should be moved to some other place
     //   Maybe the glyphs should be groupped by face Ids
     std::string fontFaceId;
-    /// Decoration - underline, strikethrough etc.
-    enum class Decoration {
-        NONE = 0,
-        UNDERLINE,
-        DOUBLE_UNDERLINE,
-        STRIKE_THROUGH,
-    };
-    std::vector<Decoration> decorations;
 
     // TODO: Matus: This should not be here at all
     struct Temp {
@@ -127,6 +119,26 @@ struct PlacedGlyph_pr {
     } temp;
 };
 using PlacedGlyphs_pr = std::vector<PlacedGlyph_pr>;
+
+struct PlacedDecoration_pr {
+    /// Decoration - underline, strikethrough etc.
+    enum class Type {
+        NONE = 0,
+        UNDERLINE,
+        DOUBLE_UNDERLINE,
+        STRIKE_THROUGH,
+    } type;
+
+    struct
+    {
+        int first, last;
+    } xRange; ///< horizontal range in pixels
+
+    Pixel32 color;
+    int yOffset;
+    float thickness;
+};
+using PlacedDecorations_pr = std::vector<PlacedDecoration_pr>;
 
 using UsedFaces = std::unordered_set<std::string>;
 using FrameSizeOpt = std::optional<compat::Vector2f>;
@@ -142,6 +154,7 @@ struct TextShapeData_NEW
                       const compat::FRectangle& boundsTransformed,
                       float baseline,
                       const PlacedGlyphs_pr &placedGlyphs,
+                      const PlacedDecorations_pr &placedDecorations,
                       const compat::FRectangle unstretchedTextBounds)
         : formattedText(std::move(text)),
           frameSize(frameSize),
@@ -152,6 +165,7 @@ struct TextShapeData_NEW
           textBoundsTransformed(boundsTransformed),
           baseline(baseline),
           placedGlyphs(placedGlyphs),
+          placedDecorations(placedDecorations),
           unstretchedTextBounds(unstretchedTextBounds)
     {
     }
@@ -170,6 +184,7 @@ struct TextShapeData_NEW
 
     // TODO: Matus
     PlacedGlyphs_pr placedGlyphs;
+    PlacedDecorations_pr placedDecorations;
     compat::FRectangle unstretchedTextBounds;
 };
 using TextShapeDataPtr_NEW = std::unique_ptr<TextShapeData_NEW>;
@@ -203,13 +218,15 @@ TextDrawResult drawText_NEW(Context &ctx,
                             void *pixels, int width, int height,
                             float scale,
                             const compat::Rectangle &viewArea,
-                            const PlacedGlyphs_pr &placedGlyphs);
+                            const PlacedGlyphs_pr &placedGlyphs,
+                            const PlacedDecorations_pr &placedDecorations);
 
 TextDrawResult drawTextInner_NEW(Context &ctx,
                                  RenderScale scale,
                                  const compat::FRectangle& viewArea,
                                  Pixel32* pixels, int width, int height,
-                                 const PlacedGlyphs_pr &placedGlyphs);
+                                 const PlacedGlyphs_pr &placedGlyphs,
+                                 const PlacedDecorations_pr &placedDecorations);
 
 } // namespace priv
 } // namespace textify

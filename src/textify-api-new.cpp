@@ -42,9 +42,6 @@ PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
     result.quadCorners = {};
     result.color = glyph.format.color;
     result.fontFaceId = glyph.format.faceId;
-    for (Decoration d : glyph.format.decorations) {
-        result.decorations.emplace_back(static_cast<PlacedGlyph::Decoration>(d));
-    }
     result.temp = temp;
 
     return result;
@@ -104,13 +101,23 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
         pgn.color = pg.color;
         pgn.fontFaceId = pg.fontFaceId;
-        for (priv::PlacedGlyph_pr::Decoration d : pg.decorations) {
-            pgn.decorations.emplace_back(static_cast<PlacedGlyph::Decoration>(d));
-        }
         // TODO: Matus: This should not be here at all
         pgn.temp.size = pg.temp.size;
         pgn.temp.ascender = pg.temp.ascender;
         result.placedGlyphs.emplace_back(pgn);
+    }
+
+    for (const priv::PlacedDecoration_pr &pd : textShapeData->placedDecorations) {
+        PlacedDecoration pdn;
+
+        pdn.type = static_cast<PlacedDecoration::Type>(pd.type);
+        pdn.color = pd.color;
+        pdn.thickness = pd.thickness;
+        pdn.yOffset = pd.yOffset;
+        pdn.xRange.first = pd.xRange.first;
+        pdn.xRange.last = pd.xRange.last;
+
+        result.placedDecorations.emplace_back(pdn);
     }
 
     result.textBounds = convertRect(textShapeData->unstretchedTextBounds);
@@ -153,15 +160,26 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
         pgn.color = pg.color;
         pgn.fontFaceId = pg.fontFaceId;
-        for (PlacedGlyph::Decoration d : pg.decorations) {
-            pgn.decorations.emplace_back(static_cast<priv::PlacedGlyph_pr::Decoration>(d));
-        }
 
         // TODO: Matus: This should not be here at all
         pgn.temp.size = pg.temp.size;
         pgn.temp.ascender = pg.temp.ascender;
 
         pgs.emplace_back(pgn);
+    }
+
+    priv::PlacedDecorations_pr pds;
+    for (const PlacedDecoration &pd : textShape_NEW.placedDecorations) {
+        priv::PlacedDecoration_pr pdn;
+
+        pdn.type = static_cast<priv::PlacedDecoration_pr::Type>(pd.type);
+        pdn.color = pd.color;
+        pdn.thickness = pd.thickness;
+        pdn.yOffset = pd.yOffset;
+        pdn.xRange.first = pd.xRange.first;
+        pdn.xRange.last = pd.xRange.last;
+
+        pds.emplace_back(pdn);
     }
 
     const compat::FRectangle textBounds = convertRect(textShape_NEW.textBounds);
@@ -172,7 +190,7 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
                                                            outputBuffer, width, height,
                                                            drawOptions.scale,
                                                            viewArea,
-                                                           pgs);
+                                                           pgs, pds);
 
     if (result) {
         const auto& drawOutput = result.value();

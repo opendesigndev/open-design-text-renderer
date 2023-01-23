@@ -587,7 +587,9 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
     const float baseline = resolveBaselinePosition(p0, text.baselinePolicy(), text.verticalAlign());
 
-    PlacedGlyphs_pr placedGlyphs {};
+    PlacedGlyphs_pr placedGlyphs;
+    PlacedDecorations_pr placedDecorations;
+
     for (size_t i = 0; i < paragraphResults.size(); i++) {
         const ParagraphShapePtr &paragraphShape = shapes[i];
         const ParagraphShape::DrawResult &drawResult = paragraphResults[i];
@@ -608,9 +610,6 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
                 placedGlyph.glyphCodepoint = glyphShape.codepoint;
                 placedGlyph.color = glyphShape.format.color;
                 placedGlyph.fontFaceId = glyphShape.format.faceId;
-                for (Decoration d : glyphShape.format.decorations) {
-                    placedGlyph.decorations.emplace_back(static_cast<PlacedGlyph_pr::Decoration>(d));
-                }
 
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
                 const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
@@ -630,6 +629,20 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
                 j++;
             }
+
+            for (size_t l = 0; l < lineRecord.decorationJournal_.size(); l++) {
+                const TypesetJournal::DecorationRecord &decoration = lineRecord.decorationJournal_[l];
+
+                PlacedDecoration_pr placedDecoration;
+                placedDecoration.type = static_cast<PlacedDecoration_pr::Type>(decoration.type);
+                placedDecoration.color = decoration.color;
+                placedDecoration.xRange.first = decoration.range.first;
+                placedDecoration.xRange.last = decoration.range.last;
+                placedDecoration.yOffset = decoration.offset;
+                placedDecoration.thickness = decoration.thickness;
+
+                placedDecorations.emplace_back(placedDecoration);
+            }
         }
     }
 
@@ -648,6 +661,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
         textBoundsTransformed,
         baseline,
         placedGlyphs,
+        placedDecorations,
         unstretchedTextBounds
     );
 }
@@ -734,51 +748,38 @@ void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap,
 }
 
 // TODO: Matus: NEW function
-void drawDecorations(compat::BitmapRGBA &bitmap,
-                     const PlacedGlyph_pr &pg,
-                     const Glyph &glyph,
-                     RenderScale scale,
-                     const FacePtr &face) {
-    for (PlacedGlyph_pr::Decoration decorationType : pg.decorations) {
-        if (decorationType == PlacedGlyph_pr::Decoration::NONE) {
+void drawDecoration(compat::BitmapRGBA &bitmap,
+                    const PlacedDecoration_pr &pd,
+                    RenderScale scale,
+                    const FacePtr &face) {
+    if (pd.type == PlacedDecoration_pr::Type::NONE) {
+        return;
+    }
+
+    const IPoint2 start { static_cast<int>(floor(pd.xRange.first)), static_cast<int>(floor(pd.yOffset)) };
+    const IPoint2 end { static_cast<int>(round(pd.xRange.last)), static_cast<int>(floor(pd.yOffset)) };
+
+    const float decorationThickness = pd.thickness * scale;
+
+    BmpWriter w = BmpWriter(bitmap);
+
+    for (int j = 0; j < end.x - start.x; j++) {
+        const int penX = start.x + j;
+        if (!w.checkH(penX)) {
             continue;
         }
 
-        const compat::Vector2f &pgPosition = pg.quadCorners.topLeft;
+        if (pd.type == PlacedDecoration_pr::Type::DOUBLE_UNDERLINE) {
+            const int thickness = static_cast<int>(ceil(decorationThickness * 2.0 / 3.0));
+            const int vOffset = static_cast<int>(thickness * 0.5);
 
-        const IPoint2 start { static_cast<int>(floor(pgPosition.x)), static_cast<int>(floor(pgPosition.y)) };
-        const IPoint2 end = { static_cast<int>(round(pgPosition.x)) + glyph.bitmapWidth(), static_cast<int>(floor(pgPosition.y)) };
-
-        // TODO: Matus: Move some place else
-        static const float STRIKETHROUGH_HEIGHT = 0.25f;
-
-        const float decorOffset = (decorationType == PlacedGlyph_pr::Decoration::STRIKE_THROUGH)
-            ? (STRIKETHROUGH_HEIGHT * face->scaleFontUnits(face->getFtFace()->height, true))
-            : (face->scaleFontUnits(face->getFtFace()->underline_position, true));
-
-        const int offset = start.y - static_cast<int>(decorOffset * scale);
-        const float decorationThickness = face->scaleFontUnits(face->getFtFace()->underline_thickness, true) * scale;
-
-        BmpWriter w = BmpWriter(bitmap);
-
-        for (int j = 0; j < end.x - start.x; j++) {
-            const int penX = start.x + j;
-            if (!w.checkH(penX)) {
-                continue;
+            for (int k = 0; k < thickness; k++) {
+                w.write(penX, start.y - vOffset - k, pd.color);
+                w.write(penX, start.y + vOffset + k, pd.color);
             }
-
-            if (decorationType == PlacedGlyph_pr::Decoration::DOUBLE_UNDERLINE) {
-                const int thickness = static_cast<int>(ceil(decorationThickness * 2.0 / 3.0));
-                const int vOffset = static_cast<int>(thickness * 0.5);
-
-                for (int k = 0; k < thickness; k++) {
-                    w.write(penX, offset - vOffset - k, pg.color);
-                    w.write(penX, offset + vOffset + k, pg.color);
-                }
-            } else /* UNDERLINE || STRIKETHROUGH */ {
-                for (int k = 0; k < decorationThickness; k++) {
-                    w.write(penX, offset - k, pg.color);
-                }
+        } else /* UNDERLINE || STRIKETHROUGH */ {
+            for (int k = 0; k < decorationThickness; k++) {
+                w.write(penX, start.y - k, pd.color);
             }
         }
     }
@@ -840,7 +841,8 @@ TextDrawResult drawText_NEW(Context &ctx,
                             void *pixels, int width, int height,
                             float scale,
                             const compat::Rectangle &viewArea,
-                            const PlacedGlyphs_pr &placedGlyphs) {
+                            const PlacedGlyphs_pr &placedGlyphs,
+                            const PlacedDecorations_pr &placedDecorations) {
     const compat::FRectangle viewAreaTextSpace = scaleRect(toFRectangle(viewArea), scale);
 
     TextDrawResult drawResult = drawTextInner_NEW(
@@ -848,7 +850,7 @@ TextDrawResult drawText_NEW(Context &ctx,
         scale,
         viewAreaTextSpace,
         static_cast<Pixel32*>(pixels), width, height,
-        placedGlyphs);
+        placedGlyphs, placedDecorations);
 
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
@@ -865,7 +867,8 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
                                  RenderScale scale,
                                  const compat::FRectangle& viewArea,
                                  Pixel32* pixels, int width, int height,
-                                 const PlacedGlyphs_pr &placedGlyphs) {
+                                 const PlacedGlyphs_pr &placedGlyphs,
+                                 const PlacedDecorations_pr &placedDecorations) {
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
     debug_drawBitmapBoundaries(output, width, height);
@@ -891,6 +894,19 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
             drawGlyph(output, *renderedGlyph, viewAreaBounds);
             debug_drawGlyphBoundingRectangle(output, pg);
         }
+    }
+
+    for (const PlacedDecoration_pr& pd : placedDecorations) {
+        const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(placedGlyphs.front().fontFaceId);
+        if (!faceItem) {
+            continue;
+        }
+        const FacePtr face = faceItem->face;
+        if (face == nullptr) {
+            continue;
+        }
+
+        drawDecoration(output, pd, scale, face);
     }
 
     return TextDrawOutput{};

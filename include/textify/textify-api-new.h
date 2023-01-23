@@ -37,16 +37,6 @@ struct PlacedGlyph {
     //   Maybe the glyphs should be groupped by face Ids
     std::string fontFaceId;
 
-    // TODO: Matus: Remove decorations, move to some other place
-    /// Decoration - underline, strikethrough etc.
-    enum class Decoration {
-        NONE = 0,
-        UNDERLINE,
-        DOUBLE_UNDERLINE,
-        STRIKE_THROUGH,
-    };
-    std::vector<Decoration> decorations;
-
     // TODO: Matus: Temporary data
     // TODO: Matus: Remove and replace
     struct Temporary {
@@ -56,8 +46,29 @@ struct PlacedGlyph {
 };
 using PlacedGlyphs = std::vector<PlacedGlyph>;
 
+struct PlacedDecoration {
+    /// Decoration - underline, strikethrough etc.
+    enum class Type {
+        NONE = 0,
+        UNDERLINE,
+        DOUBLE_UNDERLINE,
+        STRIKE_THROUGH,
+    } type;
+
+    struct
+    {
+        int first, last;
+    } xRange; ///< horizontal range in pixels
+
+    uint32_t color;
+    int yOffset;
+    float thickness;
+};
+using PlacedDecorations = std::vector<PlacedDecoration>;
+
 struct ShapeTextResult_NEW {
     PlacedGlyphs placedGlyphs;
+    PlacedDecorations placedDecorations;
 
     // TODO: Matus: Remove and replace -> this should be just PlacedGlyphs
     FRectangle textBounds;
