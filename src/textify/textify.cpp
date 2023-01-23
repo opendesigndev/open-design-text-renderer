@@ -701,8 +701,23 @@ void drawGlyph(compat::BitmapRGBA &bitmap,
     glyph.blit(bitmap.pixels(), destDims, compat::Vector2i{ 0, 0 });
 }
 
-void drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap,
-                                const PlacedGlyph_pr &pg)
+void debug_drawBitmapBoundaries(compat::BitmapRGBA &bitmap, int width, int height) {
+    const Pixel32 color = 0x55008800;
+
+    BmpWriter w = BmpWriter(bitmap);
+
+    for (int x = 0; x < width; x += 2) {
+        w.write(x, 0, color);
+        w.write(x, height - 1, color);
+    }
+    for (int y = 0; y < height; y += 2) {
+        w.write(0, y, color);
+        w.write(width - 1, y, color);
+    }
+}
+
+void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap,
+                                      const PlacedGlyph_pr &pg)
 {
     const Pixel32 bottomLeftColor = 0x55000088;
     const Pixel32 topRightColor = 0x55880000;
@@ -853,12 +868,13 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
                                  const PlacedGlyphs_pr &placedGlyphs) {
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
+    debug_drawBitmapBoundaries(output, width, height);
+
     const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? outerRect(viewArea) : compat::INFINITE_BOUNDS;
 
     for (const PlacedGlyph_pr &pg : placedGlyphs) {
         const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(pg.fontFaceId);
         if (!faceItem) {
-    //        log_.warn("[Textify / ParagraphShape::draw] Line drawing error: Missing font face \"{}\"", placedGlyph.fontFaceId);
             continue;
         }
         const FacePtr face = faceItem->face;
@@ -873,7 +889,7 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
 
         if (renderedGlyph != nullptr) {
             drawGlyph(output, *renderedGlyph, viewAreaBounds);
-            drawDecorations(output, pg, *renderedGlyph, scale, face);
+            debug_drawGlyphBoundingRectangle(output, pg);
         }
     }
 
