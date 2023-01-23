@@ -615,12 +615,12 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
                 const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
 
-                placedGlyph.quadCorners.bottomLeft = compat::Vector2f {
+                placedGlyph.quadCorners.topLeft = compat::Vector2f {
                     static_cast<float>(glyphDestination.x) + offset.x,
                     static_cast<float>(glyphDestination.y) + offset.y };
-                placedGlyph.quadCorners.bottomRight = placedGlyph.quadCorners.bottomLeft + compat::Vector2f { bitmapWidthF, 0.0f };
-                placedGlyph.quadCorners.topLeft = placedGlyph.quadCorners.bottomLeft + compat::Vector2f { 0.0f, bitmapHeightF };
-                placedGlyph.quadCorners.topRight = placedGlyph.quadCorners.bottomLeft + compat::Vector2f { bitmapWidthF, bitmapHeightF };
+                placedGlyph.quadCorners.topRight = placedGlyph.quadCorners.topLeft + compat::Vector2f { bitmapWidthF, 0.0f };
+                placedGlyph.quadCorners.bottomLeft = placedGlyph.quadCorners.topLeft + compat::Vector2f { 0.0f, bitmapHeightF };
+                placedGlyph.quadCorners.bottomRight = placedGlyph.quadCorners.topLeft + compat::Vector2f { bitmapWidthF, bitmapHeightF };
 
                 // TODO: Matus: This should not be here at all
                 placedGlyph.temp.size = glyphShape.format.size;
@@ -667,8 +667,8 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
     }
 
     const compat::Vector2f offset {
-        static_cast<float>(placedGlyph.quadCorners.bottomLeft.x - floor(placedGlyph.quadCorners.bottomLeft.x)),
-        static_cast<float>(placedGlyph.quadCorners.bottomLeft.y - floor(placedGlyph.quadCorners.bottomLeft.y)),
+        static_cast<float>(placedGlyph.quadCorners.topLeft.x - floor(placedGlyph.quadCorners.topLeft.x)),
+        static_cast<float>(placedGlyph.quadCorners.topLeft.y - floor(placedGlyph.quadCorners.topLeft.y)),
     };
     const ScaleParams glyphScaleParams { scale, glyphScale };
 
@@ -677,7 +677,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
         return nullptr;
     }
 
-    const compat::Vector2f &placedGlyphPosition = placedGlyph.quadCorners.bottomLeft;
+    const compat::Vector2f &placedGlyphPosition = placedGlyph.quadCorners.topLeft;
 
     glyph->setDestination({static_cast<int>(floor(placedGlyphPosition.x)), static_cast<int>(floor(placedGlyphPosition.y))});
     glyph->setColor(placedGlyph.color);
@@ -712,9 +712,9 @@ void drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap,
         w.write(x, pg.quadCorners.bottomLeft.y, bottomLeftColor);
         w.write(x, pg.quadCorners.topRight.y, topRightColor);
     }
-    for (int y = pg.quadCorners.bottomLeft.y; y < pg.quadCorners.topLeft.y; y += 2) {
-        w.write(pg.quadCorners.bottomLeft.x, y, bottomLeftColor);
-        w.write(pg.quadCorners.topRight.x, y, topRightColor);
+    for (int y = pg.quadCorners.topLeft.y; y < pg.quadCorners.bottomLeft.y; y += 2) {
+        w.write(pg.quadCorners.topLeft.x, y, bottomLeftColor);
+        w.write(pg.quadCorners.bottomRight.x, y, topRightColor);
     }
 }
 
