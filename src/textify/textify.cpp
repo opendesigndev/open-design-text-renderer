@@ -730,6 +730,23 @@ void debug_drawBitmapBoundaries(compat::BitmapRGBA &bitmap, int width, int heigh
     }
 }
 
+void debug_drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height) {
+    const Pixel32 color = 0x11888888;
+
+    BmpWriter w = BmpWriter(bitmap);
+
+    for (int x = 10; x < width; x += 10) {
+        for (int y = 0; y < height; y++) {
+            w.write(x, y, color);
+        }
+    }
+    for (int y = 10; y < height; y += 10) {
+        for (int x = 0; x < width; x++) {
+            w.write(x, y, color);
+        }
+    }
+}
+
 void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap,
                                       const PlacedGlyph_pr &pg)
 {
@@ -872,6 +889,7 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
     debug_drawBitmapBoundaries(output, width, height);
+    debug_drawBitmapGrid(output, width, height);
 
     const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? outerRect(viewArea) : compat::INFINITE_BOUNDS;
 
