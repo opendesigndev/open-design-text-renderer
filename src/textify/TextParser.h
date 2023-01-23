@@ -50,6 +50,7 @@ private:
     OverflowPolicy parseOverflowPolicy() const;
     compat::Matrix3f parseTransformation() const;
     Decoration parseUnderline(const octopus::TextStyle& style) const;
+    std::vector<Decoration> parseDecorations(const octopus::TextStyle& style) const;
     GlyphFormat::Ligatures parseLigatures(const octopus::TextStyle& style) const;
     compat::Pixel32 parseColor(const octopus::TextStyle& style) const;
     void parseStyles(ParseResult* result) const;
