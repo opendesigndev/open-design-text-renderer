@@ -209,7 +209,9 @@ void FormattedText::generateFormat(std::vector<ImmediateFormat>& format) const
                 format[pos].color = modifier.color;
             }
             if (modifier.types & FormatModifier::DECORATION) {
-                format[pos].decorations.emplace_back(modifier.decoration);
+                if (modifier.decoration != Decoration::NONE) {
+                    format[pos].decorations.emplace_back(modifier.decoration);
+                }
             }
             if (modifier.types & FormatModifier::ALIGN) {
                 format[pos].align = modifier.align;
