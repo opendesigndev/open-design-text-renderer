@@ -24,18 +24,6 @@ compat::FRectangle convertRect(const FRectangle &r) {
 }
 }
 
-PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
-    PlacedGlyph result;
-
-    result.glyphCodepoint = glyph.codepoint;
-    result.quadCorners = {};
-    result.color = glyph.format.color;
-    result.fontSize = glyph.format.size;
-    result.fontFaceId = glyph.format.faceId;
-
-    return result;
-}
-
 
 TextShapeHandle shapeText_NEW(ContextHandle ctx,
                               const octopus::Text& text)
@@ -75,39 +63,8 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
         return result;
     }
 
-    const auto ConvertQuad = [](const priv::PlacedGlyph_pr::QuadCorners &qc)->PlacedGlyph::QuadCorners {
-        const auto ConvertVec = [](const compat::Vector2f &vf)->Vector2f { return Vector2f { vf.x, vf.y }; };
-        return PlacedGlyph::QuadCorners {
-        ConvertVec(qc.topLeft),
-        ConvertVec(qc.topRight),
-        ConvertVec(qc.bottomLeft),
-        ConvertVec(qc.bottomRight),
-    }; };
-
-    for (const priv::PlacedGlyph_pr &pg : textShapeData->placedGlyphs) {
-        PlacedGlyph pgn;
-
-        pgn.glyphCodepoint = pg.glyphCodepoint;
-        pgn.quadCorners = ConvertQuad(pg.quadCorners);
-        pgn.color = pg.color;
-        pgn.fontSize = pg.fontSize;
-        pgn.fontFaceId = pg.fontFaceId;
-
-        result.placedGlyphs.emplace_back(pgn);
-    }
-
-    for (const priv::PlacedDecoration_pr &pd : textShapeData->placedDecorations) {
-        PlacedDecoration pdn;
-
-        pdn.type = static_cast<PlacedDecoration::Type>(pd.type);
-        pdn.color = pd.color;
-        pdn.thickness = pd.thickness;
-        pdn.yOffset = pd.yOffset;
-        pdn.xRange.first = pd.xRange.first;
-        pdn.xRange.last = pd.xRange.last;
-
-        result.placedDecorations.emplace_back(pdn);
-    }
+    result.placedGlyphs = textShapeData->placedGlyphs;
+    result.placedDecorations = textShapeData->placedDecorations;
 
     result.textBounds = convertRect(textShapeData->unstretchedTextBounds);
 
@@ -134,41 +91,6 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
         ? convertRect(drawOptions.viewArea.value())
         : compat::INFINITE_BOUNDS;
 
-    priv::PlacedGlyphs_pr pgs;
-    const auto ConvertQuad = [](const PlacedGlyph::QuadCorners &qc)->priv::PlacedGlyph_pr::QuadCorners {
-        const auto ConvertVec = [](const Vector2f &v)->compat::Vector2f { return compat::Vector2f { (float)v.x, (float)v.y }; };
-        return priv::PlacedGlyph_pr::QuadCorners {
-            ConvertVec(qc.topLeft),
-            ConvertVec(qc.topRight),
-            ConvertVec(qc.bottomLeft),
-            ConvertVec(qc.bottomRight),
-    }; };
-    for (const PlacedGlyph &pg : textShape_NEW.placedGlyphs) {
-        priv::PlacedGlyph_pr pgn;
-
-        pgn.glyphCodepoint = pg.glyphCodepoint;
-        pgn.quadCorners = ConvertQuad(pg.quadCorners);
-        pgn.color = pg.color;
-        pgn.fontSize = pg.fontSize;
-        pgn.fontFaceId = pg.fontFaceId;
-
-        pgs.emplace_back(pgn);
-    }
-
-    priv::PlacedDecorations_pr pds;
-    for (const PlacedDecoration &pd : textShape_NEW.placedDecorations) {
-        priv::PlacedDecoration_pr pdn;
-
-        pdn.type = static_cast<priv::PlacedDecoration_pr::Type>(pd.type);
-        pdn.color = pd.color;
-        pdn.thickness = pd.thickness;
-        pdn.yOffset = pd.yOffset;
-        pdn.xRange.first = pd.xRange.first;
-        pdn.xRange.last = pd.xRange.last;
-
-        pds.emplace_back(pdn);
-    }
-
     const compat::FRectangle textBounds = convertRect(textShape_NEW.textBounds);
     const compat::FRectangle stretchedTextBounds = textBounds * drawOptions.scale;
 
@@ -177,7 +99,7 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
                                                            outputBuffer, width, height,
                                                            drawOptions.scale,
                                                            viewArea,
-                                                           pgs, pds);
+                                                           textShape_NEW.placedGlyphs, textShape_NEW.placedDecorations);
 
     if (result) {
         const auto& drawOutput = result.value();

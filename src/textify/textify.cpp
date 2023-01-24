@@ -587,8 +587,8 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
     const float baseline = resolveBaselinePosition(p0, text.baselinePolicy(), text.verticalAlign());
 
-    PlacedGlyphs_pr placedGlyphs;
-    PlacedDecorations_pr placedDecorations;
+    PlacedGlyphs placedGlyphs;
+    PlacedDecorations placedDecorations;
 
     for (size_t i = 0; i < paragraphResults.size(); i++) {
         const ParagraphShapePtr &paragraphShape = shapes[i];
@@ -605,7 +605,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
                 const IPoint2 &glyphDestination = glyph->getDestination();
 
-                PlacedGlyph_pr placedGlyph;
+                PlacedGlyph placedGlyph;
 
                 placedGlyph.glyphCodepoint = glyphShape.codepoint;
                 placedGlyph.color = glyphShape.format.color;
@@ -615,12 +615,19 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
                 const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
 
-                placedGlyph.quadCorners.topLeft = compat::Vector2f {
+                placedGlyph.quadCorners.topLeft = Vector2f {
                     static_cast<float>(glyphDestination.x) + offset.x,
                     static_cast<float>(glyphDestination.y) + offset.y };
-                placedGlyph.quadCorners.topRight = placedGlyph.quadCorners.topLeft + compat::Vector2f { bitmapWidthF, 0.0f };
-                placedGlyph.quadCorners.bottomLeft = placedGlyph.quadCorners.topLeft + compat::Vector2f { 0.0f, bitmapHeightF };
-                placedGlyph.quadCorners.bottomRight = placedGlyph.quadCorners.topLeft + compat::Vector2f { bitmapWidthF, bitmapHeightF };
+                const Vector2f &tl = placedGlyph.quadCorners.topLeft;
+                placedGlyph.quadCorners.topRight = Vector2f {
+                    tl.x + bitmapWidthF,
+                    tl.y };
+                placedGlyph.quadCorners.bottomLeft = Vector2f {
+                    tl.x,
+                    tl.y + bitmapHeightF };
+                placedGlyph.quadCorners.bottomRight = Vector2f {
+                    tl.x + bitmapWidthF,
+                    tl.y + bitmapHeightF };
 
                 placedGlyphs.emplace_back(placedGlyph);
 
@@ -630,8 +637,8 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
             for (size_t l = 0; l < lineRecord.decorationJournal_.size(); l++) {
                 const TypesetJournal::DecorationRecord &decoration = lineRecord.decorationJournal_[l];
 
-                PlacedDecoration_pr placedDecoration;
-                placedDecoration.type = static_cast<PlacedDecoration_pr::Type>(decoration.type);
+                PlacedDecoration placedDecoration;
+                placedDecoration.type = static_cast<PlacedDecoration::Type>(decoration.type);
                 placedDecoration.color = decoration.color;
                 placedDecoration.xRange.first = decoration.range.first;
                 placedDecoration.xRange.last = decoration.range.last;
@@ -665,7 +672,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
 
 // TODO: Matus: NEW function
-GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
+GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
                            const FacePtr &face,
                            RenderScale scale,
                            bool internalDisableHinting) {
@@ -692,7 +699,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
         return nullptr;
     }
 
-    const compat::Vector2f &placedGlyphPosition = placedGlyph.quadCorners.topLeft;
+    const Vector2f &placedGlyphPosition = placedGlyph.quadCorners.topLeft;
 
     glyph->setDestination({static_cast<int>(floor(placedGlyphPosition.x)), static_cast<int>(floor(placedGlyphPosition.y))});
     glyph->setColor(placedGlyph.color);
@@ -765,7 +772,7 @@ void debug_drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height) {
 }
 
 void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap,
-                                      const PlacedGlyph_pr &pg)
+                                      const PlacedGlyph &pg)
 {
     const Pixel32 bottomLeftColor = 0x55000088;
     const Pixel32 topRightColor = 0x55880000;
@@ -783,10 +790,10 @@ void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap,
 
 // TODO: Matus: NEW function
 void drawDecoration(compat::BitmapRGBA &bitmap,
-                    const PlacedDecoration_pr &pd,
+                    const PlacedDecoration &pd,
                     RenderScale scale,
                     const FacePtr &face) {
-    if (pd.type == PlacedDecoration_pr::Type::NONE) {
+    if (pd.type == PlacedDecoration::Type::NONE) {
         return;
     }
 
@@ -803,7 +810,7 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
             continue;
         }
 
-        if (pd.type == PlacedDecoration_pr::Type::DOUBLE_UNDERLINE) {
+        if (pd.type == PlacedDecoration::Type::DOUBLE_UNDERLINE) {
             const int thickness = static_cast<int>(ceil(decorationThickness * 2.0 / 3.0));
             const int vOffset = static_cast<int>(thickness * 0.5);
 
@@ -874,8 +881,8 @@ TextDrawResult drawText_NEW(Context &ctx,
                             void *pixels, int width, int height,
                             float scale,
                             const compat::Rectangle &viewArea,
-                            const PlacedGlyphs_pr &placedGlyphs,
-                            const PlacedDecorations_pr &placedDecorations) {
+                            const PlacedGlyphs &placedGlyphs,
+                            const PlacedDecorations &placedDecorations) {
     const compat::FRectangle viewAreaTextSpace = scaleRect(toFRectangle(viewArea), scale);
 
     TextDrawResult drawResult = drawTextInner_NEW(
@@ -900,8 +907,8 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
                                  RenderScale scale,
                                  const compat::FRectangle& viewArea,
                                  Pixel32* pixels, int width, int height,
-                                 const PlacedGlyphs_pr &placedGlyphs,
-                                 const PlacedDecorations_pr &placedDecorations) {
+                                 const PlacedGlyphs &placedGlyphs,
+                                 const PlacedDecorations &placedDecorations) {
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
     debug_drawBitmapBoundaries(output, width, height);
@@ -909,7 +916,7 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
 
     const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? outerRect(viewArea) : compat::INFINITE_BOUNDS;
 
-    for (const PlacedGlyph_pr &pg : placedGlyphs) {
+    for (const PlacedGlyph &pg : placedGlyphs) {
         const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(pg.fontFaceId);
         if (!faceItem) {
             continue;
@@ -930,7 +937,7 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
         }
     }
 
-    for (const PlacedDecoration_pr& pd : placedDecorations) {
+    for (const PlacedDecoration& pd : placedDecorations) {
         const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(placedGlyphs.front().fontFaceId);
         if (!faceItem) {
             continue;
