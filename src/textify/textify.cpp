@@ -10,7 +10,7 @@
 #include "text-format.h"
 #include "TextParser.h"
 #include "types.h"
-#include "BmpWriter.h"
+#include "BitmapWriter.h"
 
 #include "compat/affine-transform.h"
 #include "compat/basic-types.h"
@@ -703,7 +703,7 @@ void debug_drawRectangle(compat::BitmapRGBA &bitmap, const compat::FRectangle &r
 
     const Pixel32 color = 0x55008888;
 
-    BmpWriter w = BmpWriter(bitmap);
+    BitmapWriter w = BitmapWriter(bitmap);
 
     for (int x = r.l; x < r.w; x += 1) {
         w.write(x, r.t, color);
@@ -718,7 +718,7 @@ void debug_drawRectangle(compat::BitmapRGBA &bitmap, const compat::FRectangle &r
 void debug_drawBitmapBoundaries(compat::BitmapRGBA &bitmap, int width, int height) {
     const Pixel32 color = 0x55008800;
 
-    BmpWriter w = BmpWriter(bitmap);
+    BitmapWriter w = BitmapWriter(bitmap);
 
     for (int x = 0; x < width; x += 2) {
         w.write(x, 0, color);
@@ -733,7 +733,7 @@ void debug_drawBitmapBoundaries(compat::BitmapRGBA &bitmap, int width, int heigh
 void debug_drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height) {
     const Pixel32 color = 0x11888888;
 
-    BmpWriter w = BmpWriter(bitmap);
+    BitmapWriter w = BitmapWriter(bitmap);
 
     for (int x = 10; x < width; x += 10) {
         for (int y = 0; y < height; y++) {
@@ -752,7 +752,7 @@ void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap,
 {
     const Pixel32 bottomLeftColor = 0x55000088;
     const Pixel32 topRightColor = 0x55880000;
-    BmpWriter w = BmpWriter(bitmap);
+    BitmapWriter w = BitmapWriter(bitmap);
 
     for (int x = pg.quadCorners.bottomLeft.x; x < pg.quadCorners.bottomRight.x; x += 2) {
         w.write(x, pg.quadCorners.bottomLeft.y, bottomLeftColor);
@@ -778,7 +778,7 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
 
     const float decorationThickness = pd.thickness * scale;
 
-    BmpWriter w = BmpWriter(bitmap);
+    BitmapWriter w = BitmapWriter(bitmap);
 
     for (int j = 0; j < end.x - start.x; j++) {
         const int penX = start.x + j;

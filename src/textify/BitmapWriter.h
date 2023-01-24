@@ -6,10 +6,10 @@
 namespace textify {
 namespace priv {
 
-class BmpWriter
+class BitmapWriter
 {
 public:
-    explicit BmpWriter(compat::BitmapRGBA &bitmap);
+    explicit BitmapWriter(compat::BitmapRGBA &bitmap);
 
     bool checkV(int y);
     bool checkH(int x);

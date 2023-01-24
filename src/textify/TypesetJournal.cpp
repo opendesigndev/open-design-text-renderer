@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "BmpWriter.h"
+#include "BitmapWriter.h"
 
 namespace textify {
 namespace priv {
@@ -157,7 +157,7 @@ TypesetJournal::DrawResult TypesetJournal::drawGlyphs(BitmapRGBA& bitmap, const 
 
 void TypesetJournal::drawDecorations(BitmapRGBA& bitmap, const Vector2i& offset) const
 {
-    BmpWriter w = BmpWriter(bitmap);
+    BitmapWriter w = BitmapWriter(bitmap);
 
     for (const LineRecord &line : lineJournal_) {
         for (const DecorationRecord &decoration : line.decorationJournal_) {
