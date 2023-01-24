@@ -9,10 +9,6 @@
 // TODO: Matus: Remove this include and unify
 #include "textify-api.h"
 
-#include "PlacedGlyph.h"
-#include "PlacedDecoration.h"
-
-
 namespace octopus {
     struct Text;
 }
