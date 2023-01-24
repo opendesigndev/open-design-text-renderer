@@ -36,16 +36,10 @@ struct ShapeTextResult_NEW {
 /// Shape text.
 TextShapeHandle shapeText_NEW(ContextHandle ctx,
                               const octopus::Text& text);
-ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
-                                        const octopus::Text &text);
 
 /// Draw text.
 DrawTextResult drawText_NEW(ContextHandle ctx,
                             TextShapeHandle textShape,
                             void* pixels, int width, int height,
                             const DrawOptions& drawOptions = {});
-DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
-                                  const ShapeTextResult_NEW &textShape_NEW,
-                                  void *outputBuffer, int width, int height,
-                                  const DrawOptions &drawOptions);
 }

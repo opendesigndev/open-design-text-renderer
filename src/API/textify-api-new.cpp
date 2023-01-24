@@ -25,26 +25,6 @@ compat::FRectangle convertRect(const FRectangle &r) {
 }
 
 
-TextShapeHandle shapeText_NEW(ContextHandle ctx,
-                              const octopus::Text& text)
-{
-    if (ctx == nullptr) {
-        return nullptr;
-    }
-
-    priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
-    if (!textShapeResult) {
-        ctx->getLogger().error("shaping of a text failed with error: {}", (int)textShapeResult.error());
-        return nullptr;
-    }
-
-    ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue()));
-
-    results_NEW[ctx->shapes.back().get()] = shapeText_NEW_Inner(ctx, text);
-
-    return ctx->shapes.back().get();
-}
-
 ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
                                         const octopus::Text &text) {
     ShapeTextResult_NEW result;
@@ -71,11 +51,24 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
     return result;
 }
 
-DrawTextResult drawText_NEW(ContextHandle ctx,
-                            TextShapeHandle textShape,
-                            void* pixels, int width, int height,
-                            const DrawOptions& drawOptions) {
-    return drawText_NEW_Inner(ctx, results_NEW[textShape], pixels, width, height, drawOptions);
+TextShapeHandle shapeText_NEW(ContextHandle ctx,
+                              const octopus::Text& text)
+{
+    if (ctx == nullptr) {
+        return nullptr;
+    }
+
+    priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
+    if (!textShapeResult) {
+        ctx->getLogger().error("shaping of a text failed with error: {}", (int)textShapeResult.error());
+        return nullptr;
+    }
+
+    ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue()));
+
+    results_NEW[ctx->shapes.back().get()] = shapeText_NEW_Inner(ctx, text);
+
+    return ctx->shapes.back().get();
 }
 
 DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
@@ -110,6 +103,13 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
     }
 
     return DrawTextResult {};
+}
+
+DrawTextResult drawText_NEW(ContextHandle ctx,
+                            TextShapeHandle textShape,
+                            void* pixels, int width, int height,
+                            const DrawOptions& drawOptions) {
+    return drawText_NEW_Inner(ctx, results_NEW[textShape], pixels, width, height, drawOptions);
 }
 
 } // namespace textify
