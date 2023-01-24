@@ -791,7 +791,7 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
 
         if (renderedGlyph != nullptr) {
             drawGlyph(output, *renderedGlyph, viewAreaBounds);
-            debug_drawGlyphBoundingRectangle(output, pg);
+            debug_drawGlyphBoundingRectangle(output, *pg);
         }
     }
 
