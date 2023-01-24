@@ -74,5 +74,16 @@ compat::Rectangle outerRect(const compat::FRectangle& rect)
     return result;
 }
 
+compat::FRectangle scaleRect(const compat::FRectangle& rect, float scale)
+{
+    if (scale == 1.f)
+        return rect;
+    const float l = scale*rect.l;
+    const float t = scale*rect.t;
+    const float r = scale*(rect.l+rect.w);
+    const float b = scale*(rect.t+rect.h);
+    return {l, t, r-l, b-t};
+}
+
 } // namespace utils
 } // namespace textify

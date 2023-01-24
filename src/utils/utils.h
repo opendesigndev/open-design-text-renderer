@@ -16,6 +16,7 @@ compat::FRectangle transform(const compat::FRectangle& rect, const compat::Matri
 
 compat::Rectangle outerRect(const compat::FRectangle& rect);
 
+compat::FRectangle scaleRect(const compat::FRectangle& rect, float scale);
 
 } // namespace utils
 } // namespace textify

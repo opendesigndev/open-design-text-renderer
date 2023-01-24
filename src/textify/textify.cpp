@@ -30,19 +30,6 @@ namespace priv {
 
 namespace {
 
-compat::Rectangle outerRect(const compat::FRectangle& rect) {
-    compat::Rectangle result;
-    result.l = (int) floorf(rect.l);
-    result.t = (int) floorf(rect.t);
-    result.w = (int) ceilf(rect.l+rect.w)-result.l;
-    result.h = (int) ceilf(rect.t+rect.h)-result.t;
-    return result;
-}
-
-compat::FRectangle toFRectangle(const compat::Rectangle& r) {
-    return {(float)r.l, (float)r.t, (float)r.w, (float)r.h};
-}
-
 /**
  * Returns stretched bounds containing bitmap bounds of all the glyphs
  * within typeset journal in @a paragraphResults.
@@ -73,17 +60,6 @@ compat::FRectangle stretchBounds(const compat::FRectangle& baseBounds, const com
     // bounds.w = std::max(baseBounds.w, stretchRect.w);
     bounds.w = baseBounds.w;
     return bounds;
-}
-
-compat::FRectangle scaleRect(const compat::FRectangle& rect, const RenderScale& scale)
-{
-    if (scale == 1.f)
-        return rect;
-    const float l = scale*rect.l;
-    const float t = scale*rect.t;
-    const float r = scale*(rect.l+rect.w);
-    const float b = scale*(rect.t+rect.h);
-    return {l, t, r-l, b-t};
 }
 
 /**
@@ -359,8 +335,8 @@ TextDrawResult drawText(Context &ctx,
                         bool dry,
                         const compat::Rectangle &viewArea) {
     const compat::Matrix3f inverseTransform = inverse(textTransform);
-    const compat::FRectangle viewAreaTextSpaceUnscaled = utils::transform(toFRectangle(viewArea), inverseTransform);
-    const compat::FRectangle viewAreaTextSpace = scaleRect(viewAreaTextSpaceUnscaled, scale);
+    const compat::FRectangle viewAreaTextSpaceUnscaled = utils::transform(utils::toFRectangle(viewArea), inverseTransform);
+    const compat::FRectangle viewAreaTextSpace = utils::scaleRect(viewAreaTextSpaceUnscaled, scale);
 
     TextDrawResult drawResult = drawTextInner(
             ctx,
@@ -396,7 +372,7 @@ TextDrawResult drawTextInner(Context &ctx,
                              int height) {
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
-    const compat::FRectangle textBounds = scaleRect(unscaledTextBounds, scale);
+    const compat::FRectangle textBounds = utils::scaleRect(unscaledTextBounds, scale);
     if (!textBounds) {
         return TextDrawError::INVALID_SCALE;
     }
@@ -426,14 +402,14 @@ TextDrawResult drawTextInner(Context &ctx,
     }
     const compat::FRectangle stretchedTextBounds = stretchBounds(textBounds, stretchedGlyphsBounds);
 
-    compat::Rectangle bitmapBounds = outerRect(stretchedTextBounds);
+    compat::Rectangle bitmapBounds = utils::outerRect(stretchedTextBounds);
 
     if (!bitmapBounds) {
         return TextDrawError::DRAW_BOUNDS_ERROR;
     }
 
     if (ctx.config.enableViewAreaCutout) {
-        bitmapBounds = outerRect(viewArea & stretchedTextBounds);
+        bitmapBounds = utils::outerRect(viewArea & stretchedTextBounds);
     }
 
     if (dry) {
@@ -444,9 +420,9 @@ TextDrawResult drawTextInner(Context &ctx,
     compat::Rectangle viewAreaBounds = compat::INFINITE_BOUNDS;
 
     if (ctx.config.enableViewAreaCutout) {
-        const compat::Rectangle offsetBounds = outerRect(stretchedTextBounds) - bitmapBounds;
+        const compat::Rectangle offsetBounds = utils::outerRect(stretchedTextBounds) - bitmapBounds;
 
-        viewAreaBounds = outerRect(viewArea);
+        viewAreaBounds = utils::outerRect(viewArea);
         offset = compat::Vector2i{offsetBounds.l, offsetBounds.t};
     }
 
@@ -833,7 +809,7 @@ compat::FRectangle getStretchedTextBounds(Context &ctx,
                                           const FormattedText::FormattingParams &textParams,
                                           float baseline,
                                           float scale) {
-    const compat::FRectangle textBounds = scaleRect(unscaledTextBounds, scale);
+    const compat::FRectangle textBounds = utils::scaleRect(unscaledTextBounds, scale);
     if (!textBounds) {
         return compat::FRectangle{};
     }
@@ -870,8 +846,8 @@ compat::Rectangle computeDrawBounds(Context &ctx,
                                     const compat::FRectangle &stretchedTextBounds,
                                     const compat::FRectangle& viewAreaTextSpace) {
     return ctx.config.enableViewAreaCutout
-        ? outerRect(viewAreaTextSpace & stretchedTextBounds)
-        : outerRect(stretchedTextBounds);
+        ? utils::outerRect(viewAreaTextSpace & stretchedTextBounds)
+        : utils::outerRect(stretchedTextBounds);
 }
 
 
@@ -883,7 +859,7 @@ TextDrawResult drawText_NEW(Context &ctx,
                             const compat::Rectangle &viewArea,
                             const PlacedGlyphs &placedGlyphs,
                             const PlacedDecorations &placedDecorations) {
-    const compat::FRectangle viewAreaTextSpace = scaleRect(toFRectangle(viewArea), scale);
+    const compat::FRectangle viewAreaTextSpace = utils::scaleRect(utils::toFRectangle(viewArea), scale);
 
     TextDrawResult drawResult = drawTextInner_NEW(
         ctx,
@@ -914,7 +890,7 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
     debug_drawBitmapBoundaries(output, width, height);
     debug_drawBitmapGrid(output, width, height);
 
-    const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? outerRect(viewArea) : compat::INFINITE_BOUNDS;
+    const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? utils::outerRect(viewArea) : compat::INFINITE_BOUNDS;
 
     for (const PlacedGlyph &pg : placedGlyphs) {
         const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(pg.fontFaceId);
