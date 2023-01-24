@@ -109,9 +109,13 @@ void destroyContext(ContextHandle ctx);
  * @param postScriptName    PostScript name as occurring in `octopus::Text`, required to be non-empty
  * @param inFontFaceName    actual (PostScript) name of a face selected from the font, can be empty, then @a postScriptName is used
  * @param filename          path to a font file
- * @param override          if true, previously loaded data in @a filename is replaced
+ * @param overwrite          if true, previously loaded data in @a filename is replaced
  */
-bool addFontFile(ContextHandle ctx, const std::string& postScriptName, const std::string& inFontFaceName, const std::string& filename, bool override);
+bool addFontFile(ContextHandle ctx,
+                 const std::string& postScriptName,
+                 const std::string& inFontFaceName,
+                 const std::string& filename,
+                 bool overwrite);
 
 
 /**
@@ -128,9 +132,14 @@ bool addFontFile(ContextHandle ctx, const std::string& postScriptName, const std
  * @param inFontFaceName    actual (PostScript) name of a face selected from the font, can be empty, then @a postScriptName is used
  * @param data              pointer to font data buffer
  * @param length            length of the @a data buffer
- * @param override          if true, previously loaded data in @a is replaced
+ * @param overwrite          if true, previously loaded data in @a is replaced
  */
-bool addFontBytes(ContextHandle ctx, const std::string& postScriptName, const std::string& inFontFaceName, const std::uint8_t* data, size_t length, bool override);
+bool addFontBytes(ContextHandle ctx,
+                  const std::string& postScriptName,
+                  const std::string& inFontFaceName,
+                  const std::uint8_t* data,
+                  size_t length,
+                  bool overwrite);
 
 /**
  * @brief For a given Octopus text returns a list of fonts that are used within the text and not yet loaded to the context.
@@ -142,7 +151,8 @@ bool addFontBytes(ContextHandle ctx, const std::string& postScriptName, const st
  *
  * @returns list of PostScript names
  */
-std::vector<std::string> listMissingFonts(ContextHandle ctx, const octopus::Text& text);
+std::vector<std::string> listMissingFonts(ContextHandle ctx,
+                                          const octopus::Text& text);
 
 
 /**
@@ -153,7 +163,8 @@ std::vector<std::string> listMissingFonts(ContextHandle ctx, const octopus::Text
  *
  * @returns shaped text handle to be used in draw calls
  */
-TextShapeHandle shapeText(ContextHandle ctx, const octopus::Text& text);
+TextShapeHandle shapeText(ContextHandle ctx,
+                          const octopus::Text& text);
 
 
 /**
@@ -165,7 +176,9 @@ TextShapeHandle shapeText(ContextHandle ctx, const octopus::Text& text);
  * @param textShapes list of shape handles to be destroyed
  * @param count      number of shapes
  */
-void destroyTextShapes(ContextHandle ctx, TextShapeHandle* textShapes, size_t count);
+void destroyTextShapes(ContextHandle ctx,
+                       TextShapeHandle* textShapes,
+                       size_t count);
 
 
 /**
@@ -177,7 +190,9 @@ void destroyTextShapes(ContextHandle ctx, TextShapeHandle* textShapes, size_t co
  *
  * @returns     boolean value indicating success of the call
  */
-bool reshapeText(ContextHandle ctx, TextShapeHandle textShape, const octopus::Text& text);
+bool reshapeText(ContextHandle ctx,
+                 TextShapeHandle textShape,
+                 const octopus::Text& text);
 
 
 /**
@@ -190,7 +205,8 @@ bool reshapeText(ContextHandle ctx, TextShapeHandle textShape, const octopus::Te
  *
  * @returns     transformed logical bounds
  */
-FRectangle getBounds(ContextHandle ctx, TextShapeHandle textShape);
+FRectangle getBounds(ContextHandle ctx,
+                     TextShapeHandle textShape);
 
 
 /**
@@ -206,7 +222,11 @@ FRectangle getBounds(ContextHandle ctx, TextShapeHandle textShape);
  *
  * @returns     true if a point is inside of the given text
  **/
-bool intersect(ContextHandle ctx, TextShapeHandle textShape, float x, float y, float radius);
+bool intersect(ContextHandle ctx,
+               TextShapeHandle textShape,
+               float x,
+               float y,
+               float radius);
 
 
 /**
@@ -220,7 +240,9 @@ bool intersect(ContextHandle ctx, TextShapeHandle textShape, float x, float y, f
  *
  * @returns     width and height of the buffer
  **/
-Dimensions getDrawBufferDimensions(ContextHandle ctx, TextShapeHandle textShape, const DrawOptions& drawOptions = {});
+Dimensions getDrawBufferDimensions(ContextHandle ctx,
+                                   TextShapeHandle textShape,
+                                   const DrawOptions& drawOptions = {});
 
 
 /**
@@ -241,6 +263,9 @@ Dimensions getDrawBufferDimensions(ContextHandle ctx, TextShapeHandle textShape,
  *
  * @returns   result of the draw call
  **/
-DrawTextResult drawText(ContextHandle ctx, TextShapeHandle textShape, void* pixels, int width, int height, const DrawOptions& drawOptions = {});
+DrawTextResult drawText(ContextHandle ctx,
+                        TextShapeHandle textShape,
+                        void* pixels, int width, int height,
+                        const DrawOptions& drawOptions = {});
 
 }

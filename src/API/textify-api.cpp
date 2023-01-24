@@ -33,7 +33,8 @@ compat::Rectangle convertRect(const textify::Rectangle& r) {
     return compat::Rectangle{r.l, r.t, r.w, r.h};
 }
 
-bool sanitizeShape(ContextHandle ctx, TextShapeHandle textShape)
+bool sanitizeShape(ContextHandle ctx,
+                   TextShapeHandle textShape)
 {
     if (textShape->dirty) {
         priv::TextShapeResult textShapeResult = priv::reshapeText(*ctx, std::move(textShape->data));
@@ -68,13 +69,17 @@ void destroyContext(ContextHandle ctx)
     }
 }
 
-bool addFontFile(ContextHandle ctx, const std::string& postScriptName, const std::string& inFontFaceName, const std::string& filename, bool override)
+bool addFontFile(ContextHandle ctx,
+                 const std::string& postScriptName,
+                 const std::string& inFontFaceName,
+                 const std::string& filename,
+                 bool overwrite)
 {
     if (ctx == nullptr) {
         return false;
     }
 
-    auto facesToUpdate = override ? ctx->fontManager->listFacesInStorage(filename) : FacesNames{};
+    auto facesToUpdate = overwrite ? ctx->fontManager->listFacesInStorage(filename) : FacesNames{};
     if (ctx->fontManager->faceExists(postScriptName)) {
         facesToUpdate.push_back(postScriptName);
     }
@@ -90,13 +95,18 @@ bool addFontFile(ContextHandle ctx, const std::string& postScriptName, const std
     return result;
 }
 
-bool addFontBytes(ContextHandle ctx, const std::string& postScriptName, const std::string& inFontFaceName, const std::uint8_t* data, size_t length, bool override)
+bool addFontBytes(ContextHandle ctx,
+                  const std::string& postScriptName,
+                  const std::string& inFontFaceName,
+                  const std::uint8_t* data,
+                  size_t length,
+                  bool overwrite)
 {
     if (ctx == nullptr) {
         return false;
     }
 
-    auto facesToUpdate = FacesNames{}; // TODO override?
+    auto facesToUpdate = FacesNames{}; // TODO overwrite?
     if (ctx->fontManager->faceExists(postScriptName)) {
         facesToUpdate.push_back(postScriptName);
     }
@@ -113,7 +123,8 @@ bool addFontBytes(ContextHandle ctx, const std::string& postScriptName, const st
     return result;
 }
 
-std::vector<std::string> listMissingFonts(ContextHandle ctx, const octopus::Text& text)
+std::vector<std::string> listMissingFonts(ContextHandle ctx,
+                                          const octopus::Text& text)
 {
     if (ctx == nullptr) {
         return {};
@@ -121,7 +132,8 @@ std::vector<std::string> listMissingFonts(ContextHandle ctx, const octopus::Text
     return priv::listMissingFonts(*ctx, text);
 }
 
-TextShapeHandle shapeText(ContextHandle ctx, const octopus::Text& text)
+TextShapeHandle shapeText(ContextHandle ctx,
+                          const octopus::Text& text)
 {
     if (ctx == nullptr) {
         return nullptr;
@@ -138,7 +150,9 @@ TextShapeHandle shapeText(ContextHandle ctx, const octopus::Text& text)
     return ctx->shapes.back().get();
 }
 
-void destroyTextShapes(ContextHandle ctx, TextShapeHandle* textShapes, size_t count)
+void destroyTextShapes(ContextHandle ctx,
+                       TextShapeHandle* textShapes,
+                       size_t count)
 {
     if (ctx == nullptr) {
         return;
@@ -151,7 +165,9 @@ void destroyTextShapes(ContextHandle ctx, TextShapeHandle* textShapes, size_t co
     ctx->removeInactiveShapes();
 }
 
-bool reshapeText(ContextHandle ctx, TextShapeHandle textShape, const octopus::Text& text)
+bool reshapeText(ContextHandle ctx,
+                 TextShapeHandle textShape,
+                 const octopus::Text& text)
 {
     if (ctx == nullptr) {
         return false;
@@ -167,7 +183,8 @@ bool reshapeText(ContextHandle ctx, TextShapeHandle textShape, const octopus::Te
     return true;
 }
 
-FRectangle getBounds(ContextHandle ctx, TextShapeHandle textShape)
+FRectangle getBounds(ContextHandle ctx,
+                     TextShapeHandle textShape)
 {
     if (ctx == nullptr) {
         return {};
@@ -179,7 +196,11 @@ FRectangle getBounds(ContextHandle ctx, TextShapeHandle textShape)
     return {};
 }
 
-bool intersect(ContextHandle ctx, TextShapeHandle textShape, float x, float y, float radius)
+bool intersect(ContextHandle ctx,
+               TextShapeHandle textShape,
+               float x,
+               float y,
+               float radius)
 {
     if (ctx == nullptr) {
         return false;
@@ -188,7 +209,9 @@ bool intersect(ContextHandle ctx, TextShapeHandle textShape, float x, float y, f
     return textShape && textShape->getData().textBoundsTransformed.contains(x, y);
 }
 
-Dimensions getDrawBufferDimensions(ContextHandle ctx, TextShapeHandle textShape, const DrawOptions& drawOptions)
+Dimensions getDrawBufferDimensions(ContextHandle ctx,
+                                   TextShapeHandle textShape,
+                                   const DrawOptions& drawOptions)
 {
     if (ctx == nullptr) {
         return {};
@@ -207,7 +230,10 @@ Dimensions getDrawBufferDimensions(ContextHandle ctx, TextShapeHandle textShape,
     return {};
 }
 
-DrawTextResult drawText(ContextHandle ctx, TextShapeHandle textShape, void* pixels, int width, int height, const DrawOptions& drawOptions)
+DrawTextResult drawText(ContextHandle ctx,
+                        TextShapeHandle textShape,
+                        void* pixels, int width, int height,
+                        const DrawOptions& drawOptions)
 {
     if (ctx == nullptr) {
         return {{}, {}, true};
