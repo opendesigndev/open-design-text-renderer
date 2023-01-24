@@ -862,7 +862,6 @@ compat::FRectangle getStretchedTextBounds(Context &ctx,
 
 compat::Rectangle computeDrawBounds(Context &ctx,
                                     const compat::FRectangle &stretchedTextBounds,
-                                    float scale,
                                     const compat::FRectangle& viewAreaTextSpace) {
     return ctx.config.enableViewAreaCutout
         ? outerRect(viewAreaTextSpace & stretchedTextBounds)
@@ -890,7 +889,7 @@ TextDrawResult drawText_NEW(Context &ctx,
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
         value.transform = compat::Matrix3f::identity;
-        value.drawBounds = computeDrawBounds(ctx, stretchedTextBounds, scale, viewAreaTextSpace);
+        value.drawBounds = computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
         return value;
     } else {
         return drawResult.error();
