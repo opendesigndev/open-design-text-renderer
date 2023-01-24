@@ -24,15 +24,6 @@ struct TextShape;
 typedef Context* ContextHandle;
 typedef TextShape* TextShapeHandle;
 
-struct ShapeTextResult_NEW {
-    PlacedGlyphs placedGlyphs;
-    PlacedDecorations placedDecorations;
-
-    // TODO: Matus: Remove and replace -> this should be just PlacedGlyphs
-    FRectangle textBounds;
-};
-
-
 /// Shape text.
 TextShapeHandle shapeText_NEW(ContextHandle ctx,
                               const octopus::Text& text);

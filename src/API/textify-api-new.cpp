@@ -8,6 +8,14 @@
 
 
 namespace textify {
+struct ShapeTextResult_NEW {
+    PlacedGlyphs placedGlyphs;
+    PlacedDecorations placedDecorations;
+
+    // TODO: Matus: Remove and replace -> this should be just PlacedGlyphs
+    FRectangle textBounds;
+};
+
 static std::map<TextShapeHandle, ShapeTextResult_NEW> results_NEW;
 }
 
