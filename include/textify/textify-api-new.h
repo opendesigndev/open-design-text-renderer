@@ -33,15 +33,11 @@ struct PlacedGlyph {
     } quadCorners;
     /// Glyph color
     uint32_t color;
+    /// Font size
+    float fontSize = 0.0f;
     // TODO: Matus: This font face Id should be moved to some other place
     //   Maybe the glyphs should be groupped by face Ids
     std::string fontFaceId;
-
-    // TODO: Matus: Temporary data
-    // TODO: Matus: Remove and replace
-    struct Temporary {
-        float size = 0.0f;
-    } temp;
 };
 using PlacedGlyphs = std::vector<PlacedGlyph>;
 
@@ -54,8 +50,7 @@ struct PlacedDecoration {
         STRIKE_THROUGH,
     } type;
 
-    struct
-    {
+    struct {
         int first, last;
     } xRange; ///< horizontal range in pixels
 

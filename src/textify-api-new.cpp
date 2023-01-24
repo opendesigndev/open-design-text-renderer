@@ -22,26 +22,16 @@ FRectangle convertRect(const compat::FRectangle &r) {
 compat::FRectangle convertRect(const FRectangle &r) {
     return compat::FRectangle{r.l, r.t, r.w, r.h};
 }
-Matrix3f convertMatrix(const compat::Matrix3f &m) {
-    return Matrix3f { m.m[0][0], m.m[0][1], m.m[0][2], m.m[1][0], m.m[1][1], m.m[1][2], m.m[2][0], m.m[2][1], m.m[2][2] };
-}
-compat::Matrix3f convertMatrix(const Matrix3f &m) {
-    return compat::Matrix3f { m.m[0][0], m.m[0][1], m.m[0][2], m.m[1][0], m.m[1][1], m.m[1][2], m.m[2][0], m.m[2][1], m.m[2][2] };
-}
 }
 
 PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
-    PlacedGlyph::Temporary temp;
-
-    temp.size = glyph.format.size;
-
     PlacedGlyph result;
 
     result.glyphCodepoint = glyph.codepoint;
     result.quadCorners = {};
     result.color = glyph.format.color;
+    result.fontSize = glyph.format.size;
     result.fontFaceId = glyph.format.faceId;
-    result.temp = temp;
 
     return result;
 }
@@ -100,9 +90,8 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
         pgn.glyphCodepoint = pg.glyphCodepoint;
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
         pgn.color = pg.color;
+        pgn.fontSize = pg.fontSize;
         pgn.fontFaceId = pg.fontFaceId;
-        // TODO: Matus: This should not be here at all
-        pgn.temp.size = pg.temp.size;
 
         result.placedGlyphs.emplace_back(pgn);
     }
@@ -160,10 +149,8 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
         pgn.glyphCodepoint = pg.glyphCodepoint;
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
         pgn.color = pg.color;
+        pgn.fontSize = pg.fontSize;
         pgn.fontFaceId = pg.fontFaceId;
-
-        // TODO: Matus: This should not be here at all
-        pgn.temp.size = pg.temp.size;
 
         pgs.emplace_back(pgn);
     }

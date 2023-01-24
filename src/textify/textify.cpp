@@ -609,6 +609,7 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
                 placedGlyph.glyphCodepoint = glyphShape.codepoint;
                 placedGlyph.color = glyphShape.format.color;
+                placedGlyph.fontSize = glyphShape.format.size;
                 placedGlyph.fontFaceId = glyphShape.format.faceId;
 
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
@@ -620,9 +621,6 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
                 placedGlyph.quadCorners.topRight = placedGlyph.quadCorners.topLeft + compat::Vector2f { bitmapWidthF, 0.0f };
                 placedGlyph.quadCorners.bottomLeft = placedGlyph.quadCorners.topLeft + compat::Vector2f { 0.0f, bitmapHeightF };
                 placedGlyph.quadCorners.bottomRight = placedGlyph.quadCorners.topLeft + compat::Vector2f { bitmapWidthF, bitmapHeightF };
-
-                // TODO: Matus: This should not be here at all
-                placedGlyph.temp.size = glyphShape.format.size;
 
                 placedGlyphs.emplace_back(placedGlyph);
 
@@ -673,7 +671,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
                            bool internalDisableHinting) {
     // TODO: Matus: Here I need `format.size`
     float glyphScale = 1.0f;
-    const font_size desiredSize = face->isScalable() ? (placedGlyph.temp.size * scale) : placedGlyph.temp.size;
+    const font_size desiredSize = face->isScalable() ? (placedGlyph.fontSize * scale) : placedGlyph.fontSize;
     const Result<font_size,bool> setSizeRes = face->setSize(desiredSize);
 
     if (setSizeRes && !face->isScalable()) {
