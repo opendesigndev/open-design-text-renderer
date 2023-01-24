@@ -14,9 +14,9 @@ namespace priv {
 struct PlacedTextData
 {
     PlacedTextData() = default;
-    PlacedTextData(const PlacedGlyphs glyphs_,
-                   const PlacedDecorations decorations_,
-                   const compat::FRectangle textBounds_);
+    PlacedTextData(const PlacedGlyphs &glyphs_,
+                   const PlacedDecorations &decorations_,
+                   const compat::FRectangle &textBounds_);
 
     PlacedGlyphs glyphs;
     PlacedDecorations decorations;
