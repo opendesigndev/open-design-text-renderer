@@ -33,7 +33,6 @@ public:
 protected:
     IPoint2 destPos_; /// Position in the destination bitmap, computed using #bitmapBearing.
 };
-
 using GlyphPtr = std::unique_ptr<Glyph>;
 
 //! Contains single grayscale glyph bitmap

@@ -132,6 +132,7 @@ set(TEXTIFY_PRIVATE_HEADERS
     ${TEXTIFY_SOURCE_DIR}/textify/VisualRun.h
     ${TEXTIFY_SOURCE_DIR}/textify/LineSpan.h
     ${TEXTIFY_SOURCE_DIR}/textify/BitmapWriter.h
+    ${TEXTIFY_SOURCE_DIR}/textify/BitmapDraw.h
 
     ${TEXTIFY_SOURCE_DIR}/utils/utils.h
     ${TEXTIFY_SOURCE_DIR}/utils/Log.h
@@ -200,6 +201,7 @@ set(TEXTIFY_SOURCES
     ${TEXTIFY_SOURCE_DIR}/textify/VisualRun.cpp
     ${TEXTIFY_SOURCE_DIR}/textify/LineSpan.cpp
     ${TEXTIFY_SOURCE_DIR}/textify/BitmapWriter.cpp
+    ${TEXTIFY_SOURCE_DIR}/textify/BitmapDraw.cpp
 
     ${TEXTIFY_SOURCE_DIR}/utils/utils.cpp
     ${TEXTIFY_SOURCE_DIR}/utils/Log.cpp
