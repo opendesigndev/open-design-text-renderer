@@ -116,7 +116,7 @@ public:
     ParagraphShape(const ParagraphShape&) = delete;
     ParagraphShape& operator=(const ParagraphShape&) = delete;
 
-    // TODO: Matus: Skip the shaping phase and initialize with Glyphs and Lines.
+    /// Initialize with Glyphs and Lines - skips the shaping phase.
     void initialize(const GlyphShapes &glyphs,
                     const LineSpans &lineSpans);
 
