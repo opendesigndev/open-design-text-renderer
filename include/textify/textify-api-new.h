@@ -6,7 +6,11 @@
 #include <string>
 #include <vector>
 
+// TODO: Matus: Remove this include and unify
 #include "textify-api.h"
+
+#include "PlacedGlyph.h"
+#include "PlacedDecoration.h"
 
 
 namespace octopus {
@@ -19,46 +23,6 @@ struct Context;
 struct TextShape;
 typedef Context* ContextHandle;
 typedef TextShape* TextShapeHandle;
-
-struct Vector2f {
-    float x, y;
-};
-
-struct PlacedGlyph {
-    /// Glyph codepoint - index within the loaded font file
-    uint32_t glyphCodepoint;
-    /// Glyph position, specified by its four quad corners.
-    struct QuadCorners {
-        Vector2f topLeft, topRight, bottomLeft, bottomRight;
-    } quadCorners;
-    /// Glyph color
-    uint32_t color;
-    /// Font size
-    float fontSize = 0.0f;
-    // TODO: Matus: This font face Id should be moved to some other place
-    //   Maybe the glyphs should be groupped by face Ids
-    std::string fontFaceId;
-};
-using PlacedGlyphs = std::vector<PlacedGlyph>;
-
-struct PlacedDecoration {
-    /// Decoration - underline, strikethrough etc.
-    enum class Type {
-        NONE = 0,
-        UNDERLINE,
-        DOUBLE_UNDERLINE,
-        STRIKE_THROUGH,
-    } type;
-
-    struct {
-        int first, last;
-    } xRange; ///< horizontal range in pixels
-
-    uint32_t color;
-    int yOffset;
-    float thickness;
-};
-using PlacedDecorations = std::vector<PlacedDecoration>;
 
 struct ShapeTextResult_NEW {
     PlacedGlyphs placedGlyphs;

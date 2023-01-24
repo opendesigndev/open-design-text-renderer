@@ -700,15 +700,14 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
     return glyph;
 }
 
-// TODO: Matus: NEW function
 void drawGlyph(compat::BitmapRGBA &bitmap,
                const Glyph &glyph,
                const compat::Rectangle &viewArea)
 {
     const compat::Rectangle placedGlyphBounds = glyph.getBitmapBounds();
 
+    // skips glyphs outside of view area
     if (!(placedGlyphBounds & viewArea)) {
-        // skips glyphs outside of view area
         return;
     }
 

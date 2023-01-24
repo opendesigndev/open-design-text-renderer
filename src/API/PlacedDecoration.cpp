@@ -1,0 +1,2 @@
+
+#include <textify/PlacedDecoration.h>
