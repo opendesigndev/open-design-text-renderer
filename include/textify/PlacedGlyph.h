@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -25,6 +26,7 @@ struct PlacedGlyph {
     //   Maybe the glyphs should be groupped by face Ids
     std::string fontFaceId;
 };
-using PlacedGlyphs = std::vector<PlacedGlyph>;
+using PlacedGlyphPtr = std::unique_ptr<PlacedGlyph>;
+using PlacedGlyphs = std::vector<PlacedGlyphPtr>;
 
 } // namespace textify

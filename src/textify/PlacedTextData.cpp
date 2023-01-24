@@ -4,11 +4,11 @@
 namespace textify {
 namespace priv {
 
-PlacedTextData::PlacedTextData(const PlacedGlyphs &glyphs_,
-                               const PlacedDecorations &decorations_,
+PlacedTextData::PlacedTextData(PlacedGlyphs &&glyphs_,
+                               PlacedDecorations &&decorations_,
                                const compat::FRectangle &textBounds_) :
-    glyphs(glyphs_),
-    decorations(decorations_),
+    glyphs(std::move(glyphs_)),
+    decorations(std::move(decorations_)),
     textBounds(textBounds_) {
 }
 

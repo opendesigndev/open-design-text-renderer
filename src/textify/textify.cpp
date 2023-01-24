@@ -581,31 +581,31 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
                 const IPoint2 &glyphDestination = glyph->getDestination();
 
-                PlacedGlyph placedGlyph;
+                PlacedGlyphPtr placedGlyph = std::make_unique<PlacedGlyph>();
 
-                placedGlyph.glyphCodepoint = glyphShape.codepoint;
-                placedGlyph.color = glyphShape.format.color;
-                placedGlyph.fontSize = glyphShape.format.size;
-                placedGlyph.fontFaceId = glyphShape.format.faceId;
+                placedGlyph->glyphCodepoint = glyphShape.codepoint;
+                placedGlyph->color = glyphShape.format.color;
+                placedGlyph->fontSize = glyphShape.format.size;
+                placedGlyph->fontFaceId = glyphShape.format.faceId;
 
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
                 const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
 
-                placedGlyph.quadCorners.topLeft = Vector2f {
+                placedGlyph->quadCorners.topLeft = Vector2f {
                     static_cast<float>(glyphDestination.x) + offset.x,
                     static_cast<float>(glyphDestination.y) + offset.y };
-                const Vector2f &tl = placedGlyph.quadCorners.topLeft;
-                placedGlyph.quadCorners.topRight = Vector2f {
+                const Vector2f &tl = placedGlyph->quadCorners.topLeft;
+                placedGlyph->quadCorners.topRight = Vector2f {
                     tl.x + bitmapWidthF,
                     tl.y };
-                placedGlyph.quadCorners.bottomLeft = Vector2f {
+                placedGlyph->quadCorners.bottomLeft = Vector2f {
                     tl.x,
                     tl.y + bitmapHeightF };
-                placedGlyph.quadCorners.bottomRight = Vector2f {
+                placedGlyph->quadCorners.bottomRight = Vector2f {
                     tl.x + bitmapWidthF,
                     tl.y + bitmapHeightF };
 
-                placedGlyphs.emplace_back(placedGlyph);
+                placedGlyphs.emplace_back(std::move(placedGlyph));
 
                 j++;
             }
@@ -613,15 +613,16 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
             for (size_t l = 0; l < lineRecord.decorationJournal_.size(); l++) {
                 const TypesetJournal::DecorationRecord &decoration = lineRecord.decorationJournal_[l];
 
-                PlacedDecoration placedDecoration;
-                placedDecoration.type = static_cast<PlacedDecoration::Type>(decoration.type);
-                placedDecoration.color = decoration.color;
-                placedDecoration.xRange.first = decoration.range.first;
-                placedDecoration.xRange.last = decoration.range.last;
-                placedDecoration.yOffset = decoration.offset;
-                placedDecoration.thickness = decoration.thickness;
+                PlacedDecorationPtr placedDecoration = std::make_unique<PlacedDecoration>();
 
-                placedDecorations.emplace_back(placedDecoration);
+                placedDecoration->type = static_cast<PlacedDecoration::Type>(decoration.type);
+                placedDecoration->color = decoration.color;
+                placedDecoration->xRange.first = decoration.range.first;
+                placedDecoration->xRange.last = decoration.range.last;
+                placedDecoration->yOffset = decoration.offset;
+                placedDecoration->thickness = decoration.thickness;
+
+                placedDecorations.emplace_back(std::move(placedDecoration));
             }
         }
     }
@@ -640,8 +641,8 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
         textBoundsNoTransform,
         textBoundsTransformed,
         baseline,
-        placedGlyphs,
-        placedDecorations,
+        std::move(placedGlyphs),
+        std::move(placedDecorations),
         unstretchedTextBounds
     );
 }
@@ -773,8 +774,8 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
 
     const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? utils::outerRect(viewArea) : compat::INFINITE_BOUNDS;
 
-    for (const PlacedGlyph &pg : placedGlyphs) {
-        const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(pg.fontFaceId);
+    for (const PlacedGlyphPtr &pg : placedGlyphs) {
+        const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(pg->fontFaceId);
         if (!faceItem) {
             continue;
         }
@@ -783,7 +784,7 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
             continue;
         }
 
-        const GlyphPtr renderedGlyph = renderPlacedGlyph(pg,
+        const GlyphPtr renderedGlyph = renderPlacedGlyph(*pg,
                                                          face,
                                                          scale,
                                                          ctx.config.internalDisableHinting);
@@ -794,8 +795,9 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
         }
     }
 
-    for (const PlacedDecoration& pd : placedDecorations) {
-        const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(placedGlyphs.front().fontFaceId);
+    for (const PlacedDecorationPtr& pd : placedDecorations) {
+        // TODO: Matus: take the correct font face
+        const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(placedGlyphs.front()->fontFaceId);
         if (!faceItem) {
             continue;
         }
@@ -804,7 +806,7 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
             continue;
         }
 
-        drawDecoration(output, pd, scale, face);
+        drawDecoration(output, *pd, scale, face);
     }
 
     return TextDrawOutput{};

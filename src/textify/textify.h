@@ -116,8 +116,8 @@ struct TextShapeData_NEW
                       const compat::FRectangle& boundsNoTransform,
                       const compat::FRectangle& boundsTransformed,
                       float baseline,
-                      const PlacedGlyphs &placedGlyphs,
-                      const PlacedDecorations &placedDecorations,
+                      PlacedGlyphs &&placedGlyphs,
+                      PlacedDecorations &&placedDecorations,
                       const compat::FRectangle unstretchedTextBounds)
         : formattedText(std::move(text)),
           frameSize(frameSize),
@@ -127,8 +127,8 @@ struct TextShapeData_NEW
           textBoundsNoTransform(boundsNoTransform),
           textBoundsTransformed(boundsTransformed),
           baseline(baseline),
-          placedGlyphs(placedGlyphs),
-          placedDecorations(placedDecorations),
+          placedGlyphs(std::move(placedGlyphs)),
+          placedDecorations(std::move(placedDecorations)),
           unstretchedTextBounds(unstretchedTextBounds)
     {
     }

@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
 
 namespace textify {
@@ -22,6 +23,7 @@ struct PlacedDecoration {
     int yOffset;
     float thickness;
 };
-using PlacedDecorations = std::vector<PlacedDecoration>;
+using PlacedDecorationPtr = std::unique_ptr<PlacedDecoration>;
+using PlacedDecorations = std::vector<PlacedDecorationPtr>;
 
 } // namespace textify

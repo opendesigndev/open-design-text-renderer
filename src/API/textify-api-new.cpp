@@ -37,7 +37,9 @@ priv::PlacedTextDataPtr shapeText_NEW_Inner(ContextHandle ctx,
         return nullptr;
     }
 
-    return std::make_unique<priv::PlacedTextData>(textShapeData->placedGlyphs, textShapeData->placedDecorations, textShapeData->unstretchedTextBounds);
+    return std::make_unique<priv::PlacedTextData>(std::move(textShapeData->placedGlyphs),
+                                                  std::move(textShapeData->placedDecorations),
+                                                  textShapeData->unstretchedTextBounds);
 }
 
 TextShapeHandle shapeText_NEW(ContextHandle ctx,
