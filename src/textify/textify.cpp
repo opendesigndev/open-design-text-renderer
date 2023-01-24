@@ -469,10 +469,8 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
 
 
 
-
-
-
-TextShapeResult_NEW shapeText_NEW(Context &ctx, const octopus::Text& text)
+PlacedTextResult shapeText_NEW(Context &ctx,
+                               const octopus::Text& text)
 {
     TextParser::ParseResult parsedText = TextParser(text).parseText();
 
@@ -485,10 +483,10 @@ TextShapeResult_NEW shapeText_NEW(Context &ctx, const octopus::Text& text)
 }
 
 // TODO: Matus: This function is the same as the old one, the only difference is it collects the PlacedGlyphs.
-TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
-                                       FormattedTextPtr formattedText,
-                                       const FrameSizeOpt &frameSize,
-                                       const compat::Matrix3f &textTransform)
+PlacedTextResult shapeTextInner_NEW(Context &ctx,
+                                    FormattedTextPtr formattedText,
+                                    const FrameSizeOpt &frameSize,
+                                    const compat::Matrix3f &textTransform)
 {
     const utils::Log &log = ctx.getLogger();
     const FormattedText &text = *formattedText.get();
@@ -633,18 +631,9 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
         getStretchedTextBounds(ctx, shapes, textBoundsNoTransform, formattedText->formattingParams(), baseline, 1.0f) +
         textTranslation;
 
-    return std::make_unique<TextShapeData_NEW>(
-        std::move(formattedText),
-        frameSize,
-        textTransform,
-        std::move(shapes),
-        textBoundsNoTransform,
-        textBoundsTransformed,
-        baseline,
-        std::move(placedGlyphs),
-        std::move(placedDecorations),
-        unstretchedTextBounds
-    );
+    return std::make_unique<PlacedTextData>(std::move(placedGlyphs),
+                                            std::move(placedDecorations),
+                                            unstretchedTextBounds);
 }
 
 

@@ -6,7 +6,10 @@
 #include <textify/PlacedGlyph.h>
 #include <textify/PlacedDecoration.h>
 
+#include "common/result.hpp"
+
 #include "base-types.h"
+#include "errors.h"
 
 namespace textify {
 namespace priv {
@@ -24,6 +27,7 @@ struct PlacedTextData
     compat::FRectangle textBounds;
 };
 using PlacedTextDataPtr = std::unique_ptr<PlacedTextData>;
+using PlacedTextResult = Result<PlacedTextDataPtr, TextShapeError>;
 
 } // namespace priv
 } // namespace textify

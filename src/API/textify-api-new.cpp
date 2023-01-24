@@ -26,20 +26,13 @@ priv::PlacedTextDataPtr shapeText_NEW_Inner(ContextHandle ctx,
         return nullptr;
     }
 
-    priv::TextShapeResult_NEW textShapeResult = priv::shapeText_NEW(*ctx, text);
-    if (!textShapeResult) {
-        ctx->getLogger().error("shaping of a text failed with error: {}", (int)textShapeResult.error());
+    priv::PlacedTextResult result = priv::shapeText_NEW(*ctx, text);
+    if (!result) {
+        ctx->getLogger().error("Text shaping failed with error: {}", (int)result.error());
         return nullptr;
     }
 
-    const priv::TextShapeDataPtr_NEW textShapeData = textShapeResult.moveValue();
-    if (textShapeData == nullptr) {
-        return nullptr;
-    }
-
-    return std::make_unique<priv::PlacedTextData>(std::move(textShapeData->placedGlyphs),
-                                                  std::move(textShapeData->placedDecorations),
-                                                  textShapeData->unstretchedTextBounds);
+    return result.moveValue();
 }
 
 TextShapeHandle shapeText_NEW(ContextHandle ctx,
@@ -51,7 +44,7 @@ TextShapeHandle shapeText_NEW(ContextHandle ctx,
 
     priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
     if (!textShapeResult) {
-        ctx->getLogger().error("shaping of a text failed with error: {}", (int)textShapeResult.error());
+        ctx->getLogger().error("Text shaping failed with error: {}", (int)textShapeResult.error());
         return nullptr;
     }
 

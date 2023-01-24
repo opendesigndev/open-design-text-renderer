@@ -7,6 +7,7 @@
 #include "errors.h"
 #include "text-format.h"
 #include "TextShapeData.h"
+#include "PlacedTextData.h"
 
 #include "common/result.hpp"
 #include "compat/basic-types.h"
@@ -103,64 +104,15 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
 
 
 
-using UsedFaces = std::unordered_set<std::string>;
-using FrameSizeOpt = std::optional<compat::Vector2f>;
 
 
-struct TextShapeData_NEW
-{
-    TextShapeData_NEW(FormattedTextPtr text,
-                      FrameSizeOpt frameSize,
-                      const compat::Matrix3f& textTransform,
-                      ParagraphShapes&& shapes,
-                      const compat::FRectangle& boundsNoTransform,
-                      const compat::FRectangle& boundsTransformed,
-                      float baseline,
-                      PlacedGlyphs &&placedGlyphs,
-                      PlacedDecorations &&placedDecorations,
-                      const compat::FRectangle unstretchedTextBounds)
-        : formattedText(std::move(text)),
-          frameSize(frameSize),
-          textTransform(textTransform),
-          usedFaces(formattedText->collectUsedFaceNames()),
-          paragraphShapes(std::move(shapes)),
-          textBoundsNoTransform(boundsNoTransform),
-          textBoundsTransformed(boundsTransformed),
-          baseline(baseline),
-          placedGlyphs(std::move(placedGlyphs)),
-          placedDecorations(std::move(placedDecorations)),
-          unstretchedTextBounds(unstretchedTextBounds)
-    {
-    }
+PlacedTextResult shapeText_NEW(Context &ctx,
+                               const octopus::Text& text);
 
-    // input properties
-    FormattedTextPtr formattedText;
-    FrameSizeOpt frameSize;
-    compat::Matrix3f textTransform;
-    UsedFaces usedFaces;
-
-    // processed
-    ParagraphShapes paragraphShapes;
-    compat::FRectangle textBoundsNoTransform;
-    compat::FRectangle textBoundsTransformed;
-    float baseline;
-
-    // TODO: Matus
-    PlacedGlyphs placedGlyphs;
-    PlacedDecorations placedDecorations;
-    compat::FRectangle unstretchedTextBounds;
-};
-using TextShapeDataPtr_NEW = std::unique_ptr<TextShapeData_NEW>;
-using TextShapeResult_NEW = Result<TextShapeDataPtr_NEW, TextShapeError>;
-
-
-TextShapeResult_NEW shapeText_NEW(Context &ctx,
-                                  const octopus::Text& text);
-
-TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
-                                       FormattedTextPtr text,
-                                       const FrameSizeOpt &frameSize,
-                                       const compat::Matrix3f &textTransform);
+PlacedTextResult shapeTextInner_NEW(Context &ctx,
+                                    FormattedTextPtr text,
+                                    const FrameSizeOpt &frameSize,
+                                    const compat::Matrix3f &textTransform);
 
 compat::FRectangle getStretchedTextBounds(Context &ctx,
                                           const ParagraphShapes &paragraphShapes,
