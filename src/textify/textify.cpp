@@ -716,6 +716,23 @@ void drawGlyph(compat::BitmapRGBA &bitmap,
     glyph.blit(bitmap.pixels(), destDims, compat::Vector2i{ 0, 0 });
 }
 
+void debug_drawRectangle(compat::BitmapRGBA &bitmap, const compat::FRectangle &rectangle) {
+    const compat::Rectangle r = utils::outerRect(rectangle);
+
+    const Pixel32 color = 0x55008888;
+
+    BmpWriter w = BmpWriter(bitmap);
+
+    for (int x = r.l; x < r.w; x += 1) {
+        w.write(x, r.t, color);
+        w.write(x, r.h - 1, color);
+    }
+    for (int y = r.t; y < r.h; y += 1) {
+        w.write(r.l, y, color);
+        w.write(r.w - 1, y, color);
+    }
+}
+
 void debug_drawBitmapBoundaries(compat::BitmapRGBA &bitmap, int width, int height) {
     const Pixel32 color = 0x55008800;
 
