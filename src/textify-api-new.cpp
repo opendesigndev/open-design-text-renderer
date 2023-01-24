@@ -34,7 +34,6 @@ PlacedGlyph convertToPlacedGlyph(const priv::GlyphShape &glyph) {
     PlacedGlyph::Temporary temp;
 
     temp.size = glyph.format.size;
-    temp.ascender = glyph.ascender;
 
     PlacedGlyph result;
 
@@ -97,13 +96,14 @@ ShapeTextResult_NEW shapeText_NEW_Inner(ContextHandle ctx,
 
     for (const priv::PlacedGlyph_pr &pg : textShapeData->placedGlyphs) {
         PlacedGlyph pgn;
+
         pgn.glyphCodepoint = pg.glyphCodepoint;
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
         pgn.color = pg.color;
         pgn.fontFaceId = pg.fontFaceId;
         // TODO: Matus: This should not be here at all
         pgn.temp.size = pg.temp.size;
-        pgn.temp.ascender = pg.temp.ascender;
+
         result.placedGlyphs.emplace_back(pgn);
     }
 
@@ -156,6 +156,7 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
     }; };
     for (const PlacedGlyph &pg : textShape_NEW.placedGlyphs) {
         priv::PlacedGlyph_pr pgn;
+
         pgn.glyphCodepoint = pg.glyphCodepoint;
         pgn.quadCorners = ConvertQuad(pg.quadCorners);
         pgn.color = pg.color;
@@ -163,7 +164,6 @@ DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
 
         // TODO: Matus: This should not be here at all
         pgn.temp.size = pg.temp.size;
-        pgn.temp.ascender = pg.temp.ascender;
 
         pgs.emplace_back(pgn);
     }

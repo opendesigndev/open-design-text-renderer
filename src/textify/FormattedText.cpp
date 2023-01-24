@@ -178,7 +178,7 @@ void FormattedText::generateFormat(std::vector<ImmediateFormat>& format) const
         cumulativeLengths.push_back(cumulativeLengths[i] + 1);
     }
 
-    const auto textLen = static_cast<unsigned int>(text_.size());
+    const unsigned int textLen = static_cast<unsigned int>(text_.size());
     format.assign(textLen, baseFormat_);
 
     for (const FormatModifier& modifier : formatModifiers_) {

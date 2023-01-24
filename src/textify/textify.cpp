@@ -623,7 +623,6 @@ TextShapeResult_NEW shapeTextInner_NEW(Context &ctx,
 
                 // TODO: Matus: This should not be here at all
                 placedGlyph.temp.size = glyphShape.format.size;
-                placedGlyph.temp.ascender = glyphShape.ascender;
 
                 placedGlyphs.emplace_back(placedGlyph);
 
@@ -672,12 +671,16 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph_pr &placedGlyph,
                            const FacePtr &face,
                            RenderScale scale,
                            bool internalDisableHinting) {
-    // TODO: Matus: Here I need `format.size` and `ascender`
+    // TODO: Matus: Here I need `format.size`
     float glyphScale = 1.0f;
     const font_size desiredSize = face->isScalable() ? (placedGlyph.temp.size * scale) : placedGlyph.temp.size;
     const Result<font_size,bool> setSizeRes = face->setSize(desiredSize);
+
     if (setSizeRes && !face->isScalable()) {
-        glyphScale = (placedGlyph.temp.ascender * scale) / (float)setSizeRes.value();
+        const float resizeFactor = desiredSize / setSizeRes.value();
+        const float ascender = FreetypeHandle::from26_6fixed(face->getFtFace()->size->metrics.ascender) * resizeFactor;
+
+        glyphScale = (ascender * scale) / setSizeRes.value();
     }
 
     const compat::Vector2f offset {

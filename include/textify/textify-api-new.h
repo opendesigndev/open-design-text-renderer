@@ -41,7 +41,6 @@ struct PlacedGlyph {
     // TODO: Matus: Remove and replace
     struct Temporary {
         float size = 0.0f;
-        float ascender = 0.0f;
     } temp;
 };
 using PlacedGlyphs = std::vector<PlacedGlyph>;

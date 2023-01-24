@@ -172,9 +172,9 @@ void FormattedParagraph::applyFormatModifiers(FontManager& fontManager)
 
 void FormattedParagraph::resolveEmoji(std::size_t glyphIndex, FontManager& fontManager, const unicode::EmojiTable& emojiTable)
 {
-    auto faceItem = fontManager.facesTable().getFaceItem(format_[glyphIndex].faceId);
+    const FaceTable::Item* faceItem = fontManager.facesTable().getFaceItem(format_[glyphIndex].faceId);
 
-    bool hasGlyph = faceItem && faceItem->face->hasGlyph(text_[glyphIndex]);
+    const bool hasGlyph = faceItem && faceItem->face->hasGlyph(text_[glyphIndex]);
 
     if (!hasGlyph && emojiTable.lookup(text_[glyphIndex])) {
         format_[glyphIndex].faceId = FontManager::DEFAULT_EMOJI_FONT;

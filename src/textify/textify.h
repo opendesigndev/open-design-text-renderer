@@ -115,7 +115,6 @@ struct PlacedGlyph_pr {
     // TODO: Matus: This should not be here at all
     struct Temp {
         float size = 0.0f;
-        float ascender = 0.0f;
     } temp;
 };
 using PlacedGlyphs_pr = std::vector<PlacedGlyph_pr>;
