@@ -721,8 +721,8 @@ TextDrawResult drawPlacedTextInner(Context &ctx,
                                    const compat::FRectangle& viewArea) {
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
-    debug_drawBitmapBoundaries(output, width, height);
-    debug_drawBitmapGrid(output, width, height);
+//    debug_drawBitmapBoundaries(output, width, height);
+//    debug_drawBitmapGrid(output, width, height);
 
     const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? utils::outerRect(viewArea) : compat::INFINITE_BOUNDS;
 
@@ -743,7 +743,7 @@ TextDrawResult drawPlacedTextInner(Context &ctx,
 
         if (renderedGlyph != nullptr) {
             drawGlyph(output, *renderedGlyph, viewAreaBounds);
-            debug_drawGlyphBoundingRectangle(output, *pg);
+//            debug_drawGlyphBoundingRectangle(output, *pg);
         }
     }
 
