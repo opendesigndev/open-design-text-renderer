@@ -1,10 +1,13 @@
 #pragma once
 
-#include "compat/basic-types.h"
-#include "text-format.h"
+#include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
+
+#include "compat/basic-types.h"
+
+#include "text-format.h"
 
 
 namespace textify {
