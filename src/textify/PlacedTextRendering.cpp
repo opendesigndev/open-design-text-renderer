@@ -1,6 +1,8 @@
 
 #include "PlacedTextRendering.h"
 
+#include <cmath>
+
 #include <textify/PlacedGlyph.h>
 #include <textify/PlacedDecoration.h>
 
@@ -29,8 +31,8 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
     }
 
     const compat::Vector2f offset {
-        static_cast<float>(placedGlyph.quadCorners.topLeft.x - floor(placedGlyph.quadCorners.topLeft.x)),
-        static_cast<float>(placedGlyph.quadCorners.topLeft.y - floor(placedGlyph.quadCorners.topLeft.y)),
+        static_cast<float>(placedGlyph.quadCorners.topLeft.x - std::floor(placedGlyph.quadCorners.topLeft.x)),
+        static_cast<float>(placedGlyph.quadCorners.topLeft.y - std::floor(placedGlyph.quadCorners.topLeft.y)),
     };
     const ScaleParams glyphScaleParams { scale, glyphScale };
 
@@ -41,7 +43,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
 
     const Vector2f &placedGlyphPosition = placedGlyph.quadCorners.topLeft;
 
-    glyph->setDestination({static_cast<int>(floor(placedGlyphPosition.x)), static_cast<int>(floor(placedGlyphPosition.y))});
+    glyph->setDestination({static_cast<int>(std::floor(placedGlyphPosition.x)), static_cast<int>(std::floor(placedGlyphPosition.y))});
     glyph->setColor(placedGlyph.color);
 
     return glyph;
@@ -70,8 +72,8 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
         return;
     }
 
-    const IPoint2 start { static_cast<int>(floor(pd.xRange.first)), static_cast<int>(floor(pd.yOffset)) };
-    const IPoint2 end { static_cast<int>(round(pd.xRange.last)), static_cast<int>(floor(pd.yOffset)) };
+    const IPoint2 start { static_cast<int>(std::floor(pd.xRange.first)), static_cast<int>(std::floor(pd.yOffset)) };
+    const IPoint2 end { static_cast<int>(std::round(pd.xRange.last)), static_cast<int>(std::floor(pd.yOffset)) };
 
     const float decorationThickness = pd.thickness * scale;
 
