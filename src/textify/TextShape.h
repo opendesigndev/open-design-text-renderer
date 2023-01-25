@@ -7,16 +7,21 @@ namespace textify {
 
 namespace priv {
 struct TextShapeData;
+struct PlacedTextData;
 }
 
 struct TextShape
 {
     using DataPtr = std::unique_ptr<priv::TextShapeData>;
+    using PlacedDataPtr = std::unique_ptr<priv::PlacedTextData>;
 
     /* implicit */ TextShape(DataPtr&& data);
+    /* implicit */ TextShape(PlacedDataPtr&& data);
+    /* implicit */ TextShape(DataPtr&& data, PlacedDataPtr&& placedData);
 
     /// The data.
-    std::unique_ptr<priv::TextShapeData> data;
+    DataPtr data;
+    PlacedDataPtr placedData;
 
     bool active = true;
     /// Gets labeled as "dirty" on font face change. Shaping needs to be called again.
@@ -25,6 +30,7 @@ struct TextShape
     void deactivate();
 
     const priv::TextShapeData& getData() const;
+    const priv::PlacedTextData& getPlacedData() const;
 
     void onFontFaceChanged(const std::string& postScriptName);
 };

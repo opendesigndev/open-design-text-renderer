@@ -251,4 +251,60 @@ DrawTextResult drawText(ContextHandle ctx,
     return {{}, {}, true};
 }
 
+TextShapeHandle shapePlacedText(ContextHandle ctx,
+                                const octopus::Text& text)
+{
+    if (ctx == nullptr) {
+        return nullptr;
+    }
+
+    // TODO: Matus: Return just placed text?
+    priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
+    if (!textShapeResult) {
+        ctx->getLogger().error("Text shaping failed with error: {}", (int)textShapeResult.error());
+        return nullptr;
+    }
+
+    priv::PlacedTextResult placedShapeResult = priv::shapePlacedText(*ctx, text);
+    if (!placedShapeResult) {
+        ctx->getLogger().error("Text shaping failed with error: {}", (int)placedShapeResult.error());
+        return nullptr;
+    }
+
+    ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue(), placedShapeResult.moveValue()));
+
+    return ctx->shapes.back().get();
+}
+
+DrawTextResult drawPlacedText(ContextHandle ctx,
+                              TextShapeHandle textShape,
+                              void* pixels, int width, int height,
+                              const DrawOptions& drawOptions) {
+    if (ctx == nullptr) {
+        return {};
+    }
+
+    const priv::PlacedTextData &placedTextData = textShape->getPlacedData();
+
+    const compat::Rectangle viewArea = drawOptions.viewArea.has_value()
+        ? convertRect(drawOptions.viewArea.value())
+        : compat::INFINITE_BOUNDS;
+
+    const priv::TextDrawResult result = priv::drawPlacedText(*ctx,
+                                                             placedTextData,
+                                                             pixels, width, height,
+                                                             drawOptions.scale,
+                                                             viewArea);
+
+    if (result) {
+        const auto& drawOutput = result.value();
+        return {
+            utils::castRectangle(drawOutput.drawBounds), utils::castMatrix(drawOutput.transform),
+            false
+        };
+    }
+
+    return {};
+}
+
 } // namespace textify

@@ -76,7 +76,6 @@ endif()
 
 set(TEXTIFY_PUBLIC_HEADERS
     ${TEXTIFY_INCLUDE_DIR}/textify/textify-api.h
-    ${TEXTIFY_INCLUDE_DIR}/textify/textify-api-new.h
     ${TEXTIFY_INCLUDE_DIR}/textify/PlacedGlyph.h
     ${TEXTIFY_INCLUDE_DIR}/textify/PlacedDecoration.h
 )
@@ -159,7 +158,6 @@ set(TEXTIFY_PRIVATE_HEADERS
 )
 set(TEXTIFY_SOURCES
     ${TEXTIFY_SOURCE_DIR}/API/textify-api.cpp
-    ${TEXTIFY_SOURCE_DIR}/API/textify-api-new.cpp
     ${TEXTIFY_SOURCE_DIR}/API/PlacedGlyph.cpp
     ${TEXTIFY_SOURCE_DIR}/API/PlacedDecoration.cpp
 

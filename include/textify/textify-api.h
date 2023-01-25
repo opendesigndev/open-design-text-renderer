@@ -268,4 +268,16 @@ DrawTextResult drawText(ContextHandle ctx,
                         void* pixels, int width, int height,
                         const DrawOptions& drawOptions = {});
 
+/// Shape text.
+// TODO: Matus: New textify functionality. Cleanup.
+TextShapeHandle shapePlacedText(ContextHandle ctx,
+                                const octopus::Text& text);
+
+/// Draw text.
+// TODO: Matus: New textify functionality. Cleanup.
+DrawTextResult drawPlacedText(ContextHandle ctx,
+                              TextShapeHandle textShape,
+                              void* pixels, int width, int height,
+                              const DrawOptions& drawOptions = {});
+
 }
