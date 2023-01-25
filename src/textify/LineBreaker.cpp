@@ -1,10 +1,12 @@
+
 #include "LineBreaker.h"
+
+#include <cmath>
+#include <unicode/brkiter.h>
 
 #include "tabstops.h"
 
 #include "utils/Log.h"
-
-#include <unicode/brkiter.h>
 
 namespace textify {
 namespace priv {
