@@ -9,9 +9,7 @@
 namespace textify {
 
 TextShape::TextShape(DataPtr&& data)
-    : data(std::move(data))
-{
-
+    : data(std::move(data)) {
 }
 
 void TextShape::deactivate()

@@ -21,12 +21,13 @@ typedef Context* ContextHandle;
 typedef TextShape* TextShapeHandle;
 
 /// Shape text.
-TextShapeHandle shapeText_NEW(ContextHandle ctx,
-                              const octopus::Text& text);
+TextShapeHandle shapePlacedText(ContextHandle ctx,
+                                const octopus::Text& text);
 
 /// Draw text.
-DrawTextResult drawText_NEW(ContextHandle ctx,
-                            TextShapeHandle textShape,
-                            void* pixels, int width, int height,
-                            const DrawOptions& drawOptions = {});
+// TODO: Matus: Make this function accept PlacedTextData instead of TextShapeHandle
+DrawTextResult drawPlacedText(ContextHandle ctx,
+                              TextShapeHandle textShape,
+                              void* pixels, int width, int height,
+                              const DrawOptions& drawOptions = {});
 }

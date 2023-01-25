@@ -1,5 +1,5 @@
 
-#include "BitmapDraw.h"
+#include "PlacedTextRendering.h"
 
 #include <textify/PlacedGlyph.h>
 #include <textify/PlacedDecoration.h>
@@ -12,6 +12,40 @@
 
 namespace textify {
 namespace priv {
+
+GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
+                           const FacePtr &face,
+                           RenderScale scale,
+                           bool internalDisableHinting) {
+    float glyphScale = 1.0f;
+    const font_size desiredSize = face->isScalable() ? (placedGlyph.fontSize * scale) : placedGlyph.fontSize;
+    const Result<font_size,bool> setSizeRes = face->setSize(desiredSize);
+
+    if (setSizeRes && !face->isScalable()) {
+        const float resizeFactor = desiredSize / setSizeRes.value();
+        const float ascender = FreetypeHandle::from26_6fixed(face->getFtFace()->size->metrics.ascender) * resizeFactor;
+
+        glyphScale = (ascender * scale) / setSizeRes.value();
+    }
+
+    const compat::Vector2f offset {
+        static_cast<float>(placedGlyph.quadCorners.topLeft.x - floor(placedGlyph.quadCorners.topLeft.x)),
+        static_cast<float>(placedGlyph.quadCorners.topLeft.y - floor(placedGlyph.quadCorners.topLeft.y)),
+    };
+    const ScaleParams glyphScaleParams { scale, glyphScale };
+
+    GlyphPtr glyph = face->acquireGlyph(placedGlyph.glyphCodepoint, offset, glyphScaleParams, true, internalDisableHinting);
+    if (!glyph) {
+        return nullptr;
+    }
+
+    const Vector2f &placedGlyphPosition = placedGlyph.quadCorners.topLeft;
+
+    glyph->setDestination({static_cast<int>(floor(placedGlyphPosition.x)), static_cast<int>(floor(placedGlyphPosition.y))});
+    glyph->setColor(placedGlyph.color);
+
+    return glyph;
+}
 
 void drawGlyph(compat::BitmapRGBA &bitmap,
                const Glyph &glyph,

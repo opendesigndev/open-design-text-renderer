@@ -20,23 +20,8 @@ compat::Rectangle convertRect(const textify::Rectangle &r) {
 }
 
 
-priv::PlacedTextDataPtr shapeText_NEW_Inner(ContextHandle ctx,
-                                            const octopus::Text &text) {
-    if (ctx == nullptr) {
-        return nullptr;
-    }
-
-    priv::PlacedTextResult result = priv::shapeText_NEW(*ctx, text);
-    if (!result) {
-        ctx->getLogger().error("Text shaping failed with error: {}", (int)result.error());
-        return nullptr;
-    }
-
-    return result.moveValue();
-}
-
-TextShapeHandle shapeText_NEW(ContextHandle ctx,
-                              const octopus::Text& text)
+TextShapeHandle shapePlacedText(ContextHandle ctx,
+                                const octopus::Text& text)
 {
     if (ctx == nullptr) {
         return nullptr;
@@ -50,50 +35,46 @@ TextShapeHandle shapeText_NEW(ContextHandle ctx,
 
     ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue()));
 
-    tmp_placedData[ctx->shapes.back().get()] = shapeText_NEW_Inner(ctx, text);
+    priv::PlacedTextResult placedShapeResult = priv::shapePlacedText(*ctx, text);
+    if (!placedShapeResult) {
+        ctx->getLogger().error("Text shaping failed with error: {}", (int)placedShapeResult.error());
+        return nullptr;
+    }
+
+    // TODO: Matus: Remove this temporary static container
+    tmp_placedData[ctx->shapes.back().get()] = placedShapeResult.moveValue();
 
     return ctx->shapes.back().get();
 }
 
-DrawTextResult drawText_NEW_Inner(ContextHandle ctx,
-                                  const priv::PlacedTextData &placedTextData,
-                                  void *outputBuffer, int width, int height,
-                                  const DrawOptions &drawOptions)
-{
+DrawTextResult drawPlacedText(ContextHandle ctx,
+                              TextShapeHandle textShape,
+                              void* pixels, int width, int height,
+                              const DrawOptions& drawOptions) {
     if (ctx == nullptr) {
         return {};
     }
 
-    const compat::Rectangle viewArea = drawOptions.viewArea.has_value()
-        ? convertRect(drawOptions.viewArea.value())
-        : compat::INFINITE_BOUNDS;
-
-    const compat::FRectangle stretchedTextBounds = placedTextData.textBounds * drawOptions.scale;
-
-    const priv::TextDrawResult result = priv::drawText_NEW(*ctx,
-                                                           stretchedTextBounds,
-                                                           outputBuffer, width, height,
-                                                           drawOptions.scale,
-                                                           viewArea,
-                                                           placedTextData.glyphs, placedTextData.decorations);
-
-    if (result) {
-        const auto& drawOutput = result.value();
-        return {
-            utils::castRectangle(drawOutput.drawBounds), utils::castMatrix(drawOutput.transform),
-            false
-        };
-    }
-
-    return DrawTextResult {};
-}
-
-DrawTextResult drawText_NEW(ContextHandle ctx,
-                            TextShapeHandle textShape,
-                            void* pixels, int width, int height,
-                            const DrawOptions& drawOptions) {
     if (tmp_placedData.find(textShape) != tmp_placedData.end() && tmp_placedData[textShape] != nullptr) {
-        return drawText_NEW_Inner(ctx, *tmp_placedData[textShape], pixels, width, height, drawOptions);
+        const priv::PlacedTextData &placedTextData = *tmp_placedData[textShape];
+
+        const compat::Rectangle viewArea = drawOptions.viewArea.has_value()
+            ? convertRect(drawOptions.viewArea.value())
+            : compat::INFINITE_BOUNDS;
+
+        const priv::TextDrawResult result = priv::drawPlacedText(*ctx,
+                                                                 placedTextData,
+                                                                 pixels, width, height,
+                                                                 drawOptions.scale,
+                                                                 viewArea);
+
+        if (result) {
+            const auto& drawOutput = result.value();
+            return {
+                utils::castRectangle(drawOutput.drawBounds), utils::castMatrix(drawOutput.transform),
+                false
+            };
+        }
     }
     return DrawTextResult {};
 }

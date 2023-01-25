@@ -103,17 +103,6 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
 
 
 
-
-
-
-PlacedTextResult shapeText_NEW(Context &ctx,
-                               const octopus::Text& text);
-
-PlacedTextResult shapeTextInner_NEW(Context &ctx,
-                                    FormattedTextPtr text,
-                                    const FrameSizeOpt &frameSize,
-                                    const compat::Matrix3f &textTransform);
-
 compat::FRectangle getStretchedTextBounds(Context &ctx,
                                           const ParagraphShapes &paragraphShapes,
                                           const compat::FRectangle &unscaledTextBounds,
@@ -121,27 +110,26 @@ compat::FRectangle getStretchedTextBounds(Context &ctx,
                                           float baseline,
                                           float scale);
 
-compat::Rectangle computeDrawBounds(Context &ctx,
-                                    const compat::Matrix3f &textTransform,
-                                    const compat::FRectangle &stretchedTextBounds,
-                                    float scale,
-                                    const compat::FRectangle& viewAreaTextSpace);
+PlacedTextResult shapePlacedText(Context &ctx,
+                                 const octopus::Text& text);
+
+PlacedTextResult shapePlacedTextInner(Context &ctx,
+                                      FormattedTextPtr text,
+                                      const FrameSizeOpt &frameSize,
+                                      const compat::Matrix3f &textTransform);
 
 // TODO: Matus: Cleanup this function - make sure all the arguments are optimal etc.
-TextDrawResult drawText_NEW(Context &ctx,
-                            const compat::FRectangle &stretchedTextBounds,
-                            void *pixels, int width, int height,
-                            float scale,
-                            const compat::Rectangle &viewArea,
-                            const PlacedGlyphs &placedGlyphs,
-                            const PlacedDecorations &placedDecorations);
+TextDrawResult drawPlacedText(Context &ctx,
+                              const PlacedTextData &placedTextData,
+                              void *pixels, int width, int height,
+                              float scale,
+                              const compat::Rectangle &viewArea);
 
-TextDrawResult drawTextInner_NEW(Context &ctx,
-                                 RenderScale scale,
-                                 const compat::FRectangle& viewArea,
-                                 Pixel32* pixels, int width, int height,
-                                 const PlacedGlyphs &placedGlyphs,
-                                 const PlacedDecorations &placedDecorations);
+TextDrawResult drawPlacedTextInner(Context &ctx,
+                                   const PlacedTextData &placedTextData,
+                                   Pixel32* pixels, int width, int height,
+                                   RenderScale scale,
+                                   const compat::FRectangle& viewArea);
 
 } // namespace priv
 } // namespace textify

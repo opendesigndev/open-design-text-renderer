@@ -10,7 +10,7 @@
 #include "text-format.h"
 #include "TextParser.h"
 #include "types.h"
-#include "BitmapDraw.h"
+#include "PlacedTextRendering.h"
 
 #include "compat/affine-transform.h"
 #include "compat/basic-types.h"
@@ -467,9 +467,62 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
 }
 
 
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
 
-PlacedTextResult shapeText_NEW(Context &ctx,
+compat::FRectangle getStretchedTextBounds(Context &ctx,
+                                          const ParagraphShapes &paragraphShapes,
+                                          const compat::FRectangle &unscaledTextBounds,
+                                          const FormattedText::FormattingParams &textParams,
+                                          float baseline,
+                                          float scale) {
+    const compat::FRectangle textBounds = utils::scaleRect(unscaledTextBounds, scale);
+    if (!textBounds) {
+        return compat::FRectangle{};
+    }
+
+    float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
+
+    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, textParams.overflowPolicy, textBounds.w, scale, VerticalPositioning::BASELINE, caretVerticalPos);
+    if (paragraphResults.empty()) {
+        return compat::FRectangle{};
+    }
+
+    // account for descenders of last paragraph's last line
+    const spacing textBottom = caretVerticalPos - paragraphResults.back().lastlineDescender;
+
+    const spacing baselineOffset = resolveBaselineOffset(paragraphResults.front(), textParams.baselinePolicy, textParams.verticalAlign);
+    const float verticalOffset = resolveVerticalOffset(textParams.boundsMode, textParams.verticalAlign, textBounds, textBottom, baselineOffset * scale);
+
+    const bool unlimitedVerticalStretch =
+        textParams.overflowPolicy == OverflowPolicy::EXTEND_ALL ||
+        textParams.boundsMode == BoundsMode::AUTO_HEIGHT ||
+        textParams.verticalAlign != VerticalAlign::TOP;
+
+    const float verticalStretchLimit = unlimitedVerticalStretch ? 0.0f : textBounds.h;
+    compat::Rectangle stretchedGlyphsBounds {};
+    if (textParams.boundsMode != BoundsMode::FIXED || textParams.overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
+        stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
+    }
+
+    return stretchBounds(textBounds, stretchedGlyphsBounds);
+}
+
+compat::Rectangle computeDrawBounds(Context &ctx,
+                                    const compat::FRectangle &stretchedTextBounds,
+                                    const compat::FRectangle& viewAreaTextSpace) {
+    return ctx.config.enableViewAreaCutout
+        ? utils::outerRect(viewAreaTextSpace & stretchedTextBounds)
+        : utils::outerRect(stretchedTextBounds);
+}
+
+PlacedTextResult shapePlacedText(Context &ctx,
                                const octopus::Text& text)
 {
     TextParser::ParseResult parsedText = TextParser(text).parseText();
@@ -479,14 +532,14 @@ PlacedTextResult shapeText_NEW(Context &ctx,
         const auto [w, h] = text.frame.value().size.value_or(octopus::Dimensions{0.0,0.0});
         frameSize = compat::Vector2f{static_cast<float>(w), static_cast<float>(h)};
     }
-    return shapeTextInner_NEW(ctx, std::move(parsedText.text), frameSize, parsedText.transformation);
+    return shapePlacedTextInner(ctx, std::move(parsedText.text), frameSize, parsedText.transformation);
 }
 
 // TODO: Matus: This function is the same as the old one, the only difference is it collects the PlacedGlyphs.
-PlacedTextResult shapeTextInner_NEW(Context &ctx,
-                                    FormattedTextPtr formattedText,
-                                    const FrameSizeOpt &frameSize,
-                                    const compat::Matrix3f &textTransform)
+PlacedTextResult shapePlacedTextInner(Context &ctx,
+                                      FormattedTextPtr formattedText,
+                                      const FrameSizeOpt &frameSize,
+                                      const compat::Matrix3f &textTransform)
 {
     const utils::Log &log = ctx.getLogger();
     const FormattedText &text = *formattedText.get();
@@ -636,108 +689,20 @@ PlacedTextResult shapeTextInner_NEW(Context &ctx,
                                             unstretchedTextBounds);
 }
 
+TextDrawResult drawPlacedText(Context &ctx,
+                              const PlacedTextData &placedTextData,
+                              void *pixels, int width, int height,
+                              float scale,
+                              const compat::Rectangle &viewArea) {
+    const compat::FRectangle stretchedTextBounds = placedTextData.textBounds * scale;
 
-// TODO: Matus: NEW function
-GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
-                           const FacePtr &face,
-                           RenderScale scale,
-                           bool internalDisableHinting) {
-    // TODO: Matus: Here I need `format.size`
-    float glyphScale = 1.0f;
-    const font_size desiredSize = face->isScalable() ? (placedGlyph.fontSize * scale) : placedGlyph.fontSize;
-    const Result<font_size,bool> setSizeRes = face->setSize(desiredSize);
-
-    if (setSizeRes && !face->isScalable()) {
-        const float resizeFactor = desiredSize / setSizeRes.value();
-        const float ascender = FreetypeHandle::from26_6fixed(face->getFtFace()->size->metrics.ascender) * resizeFactor;
-
-        glyphScale = (ascender * scale) / setSizeRes.value();
-    }
-
-    const compat::Vector2f offset {
-        static_cast<float>(placedGlyph.quadCorners.topLeft.x - floor(placedGlyph.quadCorners.topLeft.x)),
-        static_cast<float>(placedGlyph.quadCorners.topLeft.y - floor(placedGlyph.quadCorners.topLeft.y)),
-    };
-    const ScaleParams glyphScaleParams { scale, glyphScale };
-
-    GlyphPtr glyph = face->acquireGlyph(placedGlyph.glyphCodepoint, offset, glyphScaleParams, true, internalDisableHinting);
-    if (!glyph) {
-        return nullptr;
-    }
-
-    const Vector2f &placedGlyphPosition = placedGlyph.quadCorners.topLeft;
-
-    glyph->setDestination({static_cast<int>(floor(placedGlyphPosition.x)), static_cast<int>(floor(placedGlyphPosition.y))});
-    glyph->setColor(placedGlyph.color);
-
-    return glyph;
-}
-
-
-compat::FRectangle getStretchedTextBounds(Context &ctx,
-                                          const ParagraphShapes &paragraphShapes,
-                                          const compat::FRectangle &unscaledTextBounds,
-                                          const FormattedText::FormattingParams &textParams,
-                                          float baseline,
-                                          float scale) {
-    const compat::FRectangle textBounds = utils::scaleRect(unscaledTextBounds, scale);
-    if (!textBounds) {
-        return compat::FRectangle{};
-    }
-
-    float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
-
-    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, textParams.overflowPolicy, textBounds.w, scale, VerticalPositioning::BASELINE, caretVerticalPos);
-    if (paragraphResults.empty()) {
-        return compat::FRectangle{};
-    }
-
-    // account for descenders of last paragraph's last line
-    const spacing textBottom = caretVerticalPos - paragraphResults.back().lastlineDescender;
-
-    const spacing baselineOffset = resolveBaselineOffset(paragraphResults.front(), textParams.baselinePolicy, textParams.verticalAlign);
-    const float verticalOffset = resolveVerticalOffset(textParams.boundsMode, textParams.verticalAlign, textBounds, textBottom, baselineOffset * scale);
-
-    const bool unlimitedVerticalStretch =
-        textParams.overflowPolicy == OverflowPolicy::EXTEND_ALL ||
-        textParams.boundsMode == BoundsMode::AUTO_HEIGHT ||
-        textParams.verticalAlign != VerticalAlign::TOP;
-
-    const float verticalStretchLimit = unlimitedVerticalStretch ? 0.0f : textBounds.h;
-    compat::Rectangle stretchedGlyphsBounds {};
-    if (textParams.boundsMode != BoundsMode::FIXED || textParams.overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
-        stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
-    }
-
-    return stretchBounds(textBounds, stretchedGlyphsBounds);
-}
-
-
-compat::Rectangle computeDrawBounds(Context &ctx,
-                                    const compat::FRectangle &stretchedTextBounds,
-                                    const compat::FRectangle& viewAreaTextSpace) {
-    return ctx.config.enableViewAreaCutout
-        ? utils::outerRect(viewAreaTextSpace & stretchedTextBounds)
-        : utils::outerRect(stretchedTextBounds);
-}
-
-
-// TODO: Matus: this function just calls the INNER function.
-TextDrawResult drawText_NEW(Context &ctx,
-                            const compat::FRectangle &stretchedTextBounds,
-                            void *pixels, int width, int height,
-                            float scale,
-                            const compat::Rectangle &viewArea,
-                            const PlacedGlyphs &placedGlyphs,
-                            const PlacedDecorations &placedDecorations) {
     const compat::FRectangle viewAreaTextSpace = utils::scaleRect(utils::toFRectangle(viewArea), scale);
 
-    TextDrawResult drawResult = drawTextInner_NEW(
-        ctx,
-        scale,
-        viewAreaTextSpace,
-        static_cast<Pixel32*>(pixels), width, height,
-        placedGlyphs, placedDecorations);
+    TextDrawResult drawResult = drawPlacedTextInner(ctx,
+                                                    placedTextData,
+                                                    static_cast<Pixel32*>(pixels), width, height,
+                                                    scale,
+                                                    viewAreaTextSpace);
 
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
@@ -749,13 +714,11 @@ TextDrawResult drawText_NEW(Context &ctx,
     }
 }
 
-// TODO: Matus: This function is IMPORTANT.
-TextDrawResult drawTextInner_NEW(Context &ctx,
-                                 RenderScale scale,
-                                 const compat::FRectangle& viewArea,
-                                 Pixel32* pixels, int width, int height,
-                                 const PlacedGlyphs &placedGlyphs,
-                                 const PlacedDecorations &placedDecorations) {
+TextDrawResult drawPlacedTextInner(Context &ctx,
+                                   const PlacedTextData &placedTextData,
+                                   Pixel32* pixels, int width, int height,
+                                   RenderScale scale,
+                                   const compat::FRectangle& viewArea) {
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
     debug_drawBitmapBoundaries(output, width, height);
@@ -763,7 +726,7 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
 
     const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? utils::outerRect(viewArea) : compat::INFINITE_BOUNDS;
 
-    for (const PlacedGlyphPtr &pg : placedGlyphs) {
+    for (const PlacedGlyphPtr &pg : placedTextData.glyphs) {
         const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(pg->fontFaceId);
         if (!faceItem) {
             continue;
@@ -784,9 +747,9 @@ TextDrawResult drawTextInner_NEW(Context &ctx,
         }
     }
 
-    for (const PlacedDecorationPtr& pd : placedDecorations) {
+    for (const PlacedDecorationPtr& pd : placedTextData.decorations) {
         // TODO: Matus: take the correct font face
-        const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(placedGlyphs.front()->fontFaceId);
+        const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(placedTextData.glyphs.front()->fontFaceId);
         if (!faceItem) {
             continue;
         }
