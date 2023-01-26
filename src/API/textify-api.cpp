@@ -219,7 +219,7 @@ Dimensions getDrawBufferDimensions(ContextHandle ctx,
 
     if (textShape && sanitizeShape(ctx, textShape)) {
         const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
-        const priv::TextDrawResult result = priv::drawText(*ctx, textShape->getData(), nullptr, 0, 0, drawOptions.scale, true, viewArea);
+        const priv::TextDrawResult result = priv::drawText(*ctx, textShape->getData(), drawOptions.scale, viewArea, nullptr, 0, 0, true);
         if (result) {
             const int w = result.value().drawBounds.w;
             const int h = result.value().drawBounds.h;
@@ -240,8 +240,8 @@ DrawTextResult drawText(ContextHandle ctx,
     }
 
     if (textShape && sanitizeShape(ctx, textShape)) {
-        auto viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
-        auto result = priv::drawText(*ctx, textShape->getData(), pixels, width, height, drawOptions.scale, false, viewArea);
+        const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
+        const priv::TextDrawResult result = priv::drawText(*ctx, textShape->getData(), drawOptions.scale, viewArea, pixels, width, height, false);
         if (result) {
             const auto& drawOutput = result.value();
 

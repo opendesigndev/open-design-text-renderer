@@ -300,57 +300,31 @@ TextShapeResult shapeTextInner(Context &ctx,
 
 TextDrawResult drawText(Context &ctx,
                         const TextShapeData& shapeData,
-                        void* pixels,
-                        int width,
-                        int height,
                         float scale,
-                        bool dry,
-                        const compat::Rectangle& viewArea) {
+                        const compat::Rectangle& viewArea,
+                        void* pixels, int width, int height,
+                        bool dry) {
      if (shapeData.formattedText == nullptr || shapeData.formattedText->getLength() == 0) {
          return TextDrawOutput{{}};
      }
 
-    return drawText(ctx,
-                    shapeData.paragraphShapes,
-                    shapeData.textTransform,
-                    shapeData.textBoundsNoTransform,
-                    shapeData.formattedText->formattingParams(),
-                    shapeData.baseline,
-                    pixels, width, height,
-                    scale,
-                    dry,
-                    viewArea);
-}
-
-TextDrawResult drawText(Context &ctx,
-                        const ParagraphShapes &paragraphShapes,
-                        const compat::Matrix3f &textTransform,
-                        const compat::FRectangle &unscaledTextBounds,
-                        const FormattedText::FormattingParams &textParams,
-                        float baseline,
-                        void *pixels,
-                        int width,
-                        int height,
-                        float scale,
-                        bool dry,
-                        const compat::Rectangle &viewArea) {
-    const compat::Matrix3f inverseTransform = inverse(textTransform);
+    const compat::Matrix3f inverseTransform = inverse(shapeData.textTransform);
     const compat::FRectangle viewAreaTextSpaceUnscaled = utils::transform(utils::toFRectangle(viewArea), inverseTransform);
     const compat::FRectangle viewAreaTextSpace = utils::scaleRect(viewAreaTextSpaceUnscaled, scale);
 
-    TextDrawResult drawResult = drawTextInner(
-            ctx,
-            dry,
-            textParams,
-            unscaledTextBounds,
-            baseline,
-            scale, viewAreaTextSpace,
-            paragraphShapes,
-            static_cast<Pixel32*>(pixels), width, height);
+    TextDrawResult drawResult = drawTextInner(ctx,
+                                              shapeData.paragraphShapes,
+                                              shapeData.formattedText->formattingParams(),
+                                              shapeData.textBoundsNoTransform,
+                                              shapeData.baseline,
+                                              scale,
+                                              viewAreaTextSpace,
+                                              static_cast<Pixel32*>(pixels), width, height,
+                                              dry);
 
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
-        value.transform = textTransform;
+        value.transform = shapeData.textTransform;
         value.transform[2][0] *= scale;
         value.transform[2][1] *= scale;
         return value;
@@ -360,18 +334,13 @@ TextDrawResult drawText(Context &ctx,
 }
 
 TextDrawResult drawTextInner(Context &ctx,
-                             bool dry,
+                             const ParagraphShapes& paragraphShapes,
                              const FormattedText::FormattingParams &textParams,
                              const compat::FRectangle& unscaledTextBounds,
                              float baseline,
-                             RenderScale scale,
-                             const compat::FRectangle& viewArea,
-                             const ParagraphShapes& paragraphShapes,
-                             compat::Pixel32* pixels,
-                             int width,
-                             int height) {
-    compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
-
+                             RenderScale scale, const compat::FRectangle& viewArea,
+                             Pixel32* pixels, int width, int height,
+                             bool dry) {
     const compat::FRectangle textBounds = utils::scaleRect(unscaledTextBounds, scale);
     if (!textBounds) {
         return TextDrawError::INVALID_SCALE;
@@ -428,6 +397,8 @@ TextDrawResult drawTextInner(Context &ctx,
 
     // vertical align offset
     offset.y += int(verticalOffset - stretchedGlyphsBounds.t);
+
+    compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
     for (const ParagraphShape::DrawResult &paragraphResult : paragraphResults) {
         const TypesetJournal::DrawResult journalDrawResult = paragraphResult.journal.draw(output, bitmapBounds, stretchedTextBounds.h, viewAreaBounds, offset);
