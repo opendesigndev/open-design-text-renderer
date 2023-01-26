@@ -748,17 +748,7 @@ TextDrawResult drawPlacedTextInner(Context &ctx,
     }
 
     for (const PlacedDecorationPtr& pd : placedTextData.decorations) {
-        // TODO: Matus: take the correct font face
-        const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(placedTextData.glyphs.front()->fontFaceId);
-        if (!faceItem) {
-            continue;
-        }
-        const FacePtr face = faceItem->face;
-        if (face == nullptr) {
-            continue;
-        }
-
-        drawDecoration(output, *pd, scale, face);
+        drawDecoration(output, *pd, scale);
     }
 
     return TextDrawOutput{};

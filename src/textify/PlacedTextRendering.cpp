@@ -51,8 +51,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
 
 void drawGlyph(compat::BitmapRGBA &bitmap,
                const Glyph &glyph,
-               const compat::Rectangle &viewArea)
-{
+               const compat::Rectangle &viewArea) {
     const compat::Rectangle placedGlyphBounds = glyph.getBitmapBounds();
 
     // skips glyphs outside of view area
@@ -66,8 +65,7 @@ void drawGlyph(compat::BitmapRGBA &bitmap,
 
 void drawDecoration(compat::BitmapRGBA &bitmap,
                     const PlacedDecoration &pd,
-                    RenderScale scale,
-                    const FacePtr &face) {
+                    RenderScale scale) {
     if (pd.type == PlacedDecoration::Type::NONE) {
         return;
     }
@@ -150,9 +148,7 @@ void debug_drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height) {
     }
 }
 
-void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap,
-                                      const PlacedGlyph &pg)
-{
+void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGlyph &pg) {
     const Pixel32 bottomLeftColor = 0x55000088;
     const Pixel32 topRightColor = 0x55880000;
     BitmapWriter w = BitmapWriter(bitmap);

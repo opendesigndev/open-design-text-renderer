@@ -27,8 +27,7 @@ void drawGlyph(compat::BitmapRGBA &bitmap,
 
 void drawDecoration(compat::BitmapRGBA &bitmap,
                     const PlacedDecoration &pd,
-                    RenderScale scale,
-                    const FacePtr &face);
+                    RenderScale scale);
 
 void debug_drawRectangle(compat::BitmapRGBA &bitmap, const compat::FRectangle &rectangle);
 void debug_drawBitmapBoundaries(compat::BitmapRGBA &bitmap, int width, int height);
