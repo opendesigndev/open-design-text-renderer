@@ -613,17 +613,17 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
                 const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
 
-                placedGlyph->quadCorners.topLeft = Vector2f {
+                placedGlyph->placement.topLeft = Vector2f {
                     static_cast<float>(glyphDestination.x) + offset.x,
                     static_cast<float>(glyphDestination.y) + offset.y };
-                const Vector2f &tl = placedGlyph->quadCorners.topLeft;
-                placedGlyph->quadCorners.topRight = Vector2f {
+                const Vector2f &tl = placedGlyph->placement.topLeft;
+                placedGlyph->placement.topRight = Vector2f {
                     tl.x + bitmapWidthF,
                     tl.y };
-                placedGlyph->quadCorners.bottomLeft = Vector2f {
+                placedGlyph->placement.bottomLeft = Vector2f {
                     tl.x,
                     tl.y + bitmapHeightF };
-                placedGlyph->quadCorners.bottomRight = Vector2f {
+                placedGlyph->placement.bottomRight = Vector2f {
                     tl.x + bitmapWidthF,
                     tl.y + bitmapHeightF };
 
@@ -639,9 +639,9 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
 
                 placedDecoration->type = static_cast<PlacedDecoration::Type>(decoration.type);
                 placedDecoration->color = decoration.color;
-                placedDecoration->xRange.first = decoration.range.first;
-                placedDecoration->xRange.last = decoration.range.last;
-                placedDecoration->yOffset = decoration.offset;
+                placedDecoration->placement.xFirst = decoration.range.first;
+                placedDecoration->placement.xLast = decoration.range.last;
+                placedDecoration->placement.y = decoration.offset;
                 placedDecoration->thickness = decoration.thickness;
 
                 placedDecorations.emplace_back(std::move(placedDecoration));

@@ -31,8 +31,8 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
     }
 
     const compat::Vector2f offset {
-        static_cast<float>(placedGlyph.quadCorners.topLeft.x - std::floor(placedGlyph.quadCorners.topLeft.x)),
-        static_cast<float>(placedGlyph.quadCorners.topLeft.y - std::floor(placedGlyph.quadCorners.topLeft.y)),
+        static_cast<float>(placedGlyph.placement.topLeft.x - std::floor(placedGlyph.placement.topLeft.x)),
+        static_cast<float>(placedGlyph.placement.topLeft.y - std::floor(placedGlyph.placement.topLeft.y)),
     };
     const ScaleParams glyphScaleParams { scale, glyphScale };
 
@@ -41,7 +41,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
         return nullptr;
     }
 
-    const Vector2f &placedGlyphPosition = placedGlyph.quadCorners.topLeft;
+    const Vector2f &placedGlyphPosition = placedGlyph.placement.topLeft;
 
     glyph->setDestination({static_cast<int>(std::floor(placedGlyphPosition.x)), static_cast<int>(std::floor(placedGlyphPosition.y))});
     glyph->setColor(placedGlyph.color);
@@ -70,8 +70,8 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
         return;
     }
 
-    const IPoint2 start { static_cast<int>(std::floor(pd.xRange.first)), static_cast<int>(std::floor(pd.yOffset)) };
-    const IPoint2 end { static_cast<int>(std::round(pd.xRange.last)), static_cast<int>(std::floor(pd.yOffset)) };
+    const IPoint2 start { static_cast<int>(std::floor(pd.placement.xFirst)), static_cast<int>(std::floor(pd.placement.y)) };
+    const IPoint2 end { static_cast<int>(std::round(pd.placement.xLast)), static_cast<int>(std::floor(pd.placement.y)) };
 
     const float decorationThickness = pd.thickness * scale;
 
@@ -153,13 +153,13 @@ void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGl
     const Pixel32 topRightColor = 0x55880000;
     BitmapWriter w = BitmapWriter(bitmap);
 
-    for (int x = pg.quadCorners.bottomLeft.x; x < pg.quadCorners.bottomRight.x; x += 2) {
-        w.write(x, pg.quadCorners.bottomLeft.y, bottomLeftColor);
-        w.write(x, pg.quadCorners.topRight.y, topRightColor);
+    for (int x = pg.placement.bottomLeft.x; x < pg.placement.bottomRight.x; x += 2) {
+        w.write(x, pg.placement.bottomLeft.y, bottomLeftColor);
+        w.write(x, pg.placement.topRight.y, topRightColor);
     }
-    for (int y = pg.quadCorners.topLeft.y; y < pg.quadCorners.bottomLeft.y; y += 2) {
-        w.write(pg.quadCorners.topLeft.x, y, bottomLeftColor);
-        w.write(pg.quadCorners.bottomRight.x, y, topRightColor);
+    for (int y = pg.placement.topLeft.y; y < pg.placement.bottomLeft.y; y += 2) {
+        w.write(pg.placement.topLeft.x, y, bottomLeftColor);
+        w.write(pg.placement.bottomRight.x, y, topRightColor);
     }
 }
 
