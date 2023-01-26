@@ -100,18 +100,17 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                                       const FrameSizeOpt &frameSize,
                                       const compat::Matrix3f &textTransform);
 
-// TODO: Matus: Cleanup this function - make sure all the arguments are optimal etc.
 TextDrawResult drawPlacedText(Context &ctx,
                               const PlacedTextData &placedTextData,
-                              void *pixels, int width, int height,
                               float scale,
-                              const compat::Rectangle &viewArea);
+                              const compat::Rectangle &viewArea,
+                              void *pixels, int width, int height);
 
 TextDrawResult drawPlacedTextInner(Context &ctx,
                                    const PlacedTextData &placedTextData,
-                                   Pixel32* pixels, int width, int height,
                                    RenderScale scale,
-                                   const compat::FRectangle& viewArea);
+                                   const compat::FRectangle& viewArea,
+                                   Pixel32* pixels, int width, int height);
 
 } // namespace priv
 } // namespace textify

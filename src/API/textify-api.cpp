@@ -292,9 +292,9 @@ DrawTextResult drawPlacedText(ContextHandle ctx,
 
     const priv::TextDrawResult result = priv::drawPlacedText(*ctx,
                                                              placedTextData,
-                                                             pixels, width, height,
                                                              drawOptions.scale,
-                                                             viewArea);
+                                                             viewArea,
+                                                             pixels, width, height);
 
     if (result) {
         const auto& drawOutput = result.value();

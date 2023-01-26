@@ -662,18 +662,18 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
 
 TextDrawResult drawPlacedText(Context &ctx,
                               const PlacedTextData &placedTextData,
-                              void *pixels, int width, int height,
                               float scale,
-                              const compat::Rectangle &viewArea) {
+                              const compat::Rectangle &viewArea,
+                              void *pixels, int width, int height) {
     const compat::FRectangle stretchedTextBounds = placedTextData.textBounds * scale;
 
     const compat::FRectangle viewAreaTextSpace = utils::scaleRect(utils::toFRectangle(viewArea), scale);
 
     TextDrawResult drawResult = drawPlacedTextInner(ctx,
                                                     placedTextData,
-                                                    static_cast<Pixel32*>(pixels), width, height,
                                                     scale,
-                                                    viewAreaTextSpace);
+                                                    viewAreaTextSpace,
+                                                    static_cast<Pixel32*>(pixels), width, height);
 
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
@@ -687,9 +687,9 @@ TextDrawResult drawPlacedText(Context &ctx,
 
 TextDrawResult drawPlacedTextInner(Context &ctx,
                                    const PlacedTextData &placedTextData,
-                                   Pixel32* pixels, int width, int height,
                                    RenderScale scale,
-                                   const compat::FRectangle& viewArea) {
+                                   const compat::FRectangle& viewArea,
+                                   Pixel32* pixels, int width, int height) {
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
 //    debug_drawBitmapBoundaries(output, width, height);
