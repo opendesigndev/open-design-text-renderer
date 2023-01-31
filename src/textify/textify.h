@@ -92,6 +92,15 @@ compat::FRectangle getStretchedTextBounds(Context &ctx,
                                           float baseline,
                                           float scale);
 
+compat::Rectangle computeDrawBounds(Context &ctx,
+                                    const compat::FRectangle &stretchedTextBounds,
+                                    const compat::FRectangle& viewAreaTextSpace);
+
+compat::Rectangle computeDrawBounds(Context &ctx,
+                                    const PlacedTextData &placedTextData,
+                                    float scale,
+                                    const compat::Rectangle &viewArea);
+
 PlacedTextResult shapePlacedText(Context &ctx,
                                  const octopus::Text& text);
 

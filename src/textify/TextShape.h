@@ -17,6 +17,7 @@ struct TextShape
 
     /* implicit */ TextShape(DataPtr&& data);
     /* implicit */ TextShape(PlacedDataPtr&& data);
+    // TODO: Matus: Remove
     /* implicit */ TextShape(DataPtr&& data, PlacedDataPtr&& placedData);
 
     /// The data.
@@ -33,6 +34,8 @@ struct TextShape
     const priv::PlacedTextData& getPlacedData() const;
 
     void onFontFaceChanged(const std::string& postScriptName);
+
+    bool isPlaced() const;
 };
 
 }

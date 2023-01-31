@@ -19,6 +19,7 @@ TextShape::TextShape(PlacedDataPtr&& data) :
     placedData(std::move(data)) {
 }
 
+// TODO: Matus: Remove
 TextShape::TextShape(DataPtr&& data, PlacedDataPtr&& placedData) :
     data(std::move(data)),
     placedData(std::move(placedData)) {
@@ -44,6 +45,10 @@ void TextShape::onFontFaceChanged(const std::string& postScriptName)
     if (data->usedFaces.find(postScriptName) != std::end(data->usedFaces)) {
         dirty = true;
     }
+}
+
+bool TextShape::isPlaced() const {
+    return placedData != nullptr;
 }
 
 }

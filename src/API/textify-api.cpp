@@ -191,7 +191,9 @@ FRectangle getBounds(ContextHandle ctx,
     }
 
     if (textShape && sanitizeShape(ctx, textShape)) {
-        return utils::castFRectangle(textShape->getData().textBoundsTransformed);
+        return utils::castFRectangle(textShape->isPlaced()
+                                     ? textShape->getPlacedData().textBounds
+                                     : textShape->getData().textBoundsTransformed);
     }
     return {};
 }
@@ -218,13 +220,21 @@ Dimensions getDrawBufferDimensions(ContextHandle ctx,
     }
 
     if (textShape && sanitizeShape(ctx, textShape)) {
-        const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
-        const priv::TextDrawResult result = priv::drawText(*ctx, textShape->getData(), drawOptions.scale, viewArea, nullptr, 0, 0, true);
-        if (result) {
-            const int w = result.value().drawBounds.w;
-            const int h = result.value().drawBounds.h;
+        if (textShape->isPlaced()) {
+            const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
+            const compat::Rectangle drawBounds = priv::computeDrawBounds(*ctx, textShape->getPlacedData(), drawOptions.scale, viewArea);
 
-            return {w, h};
+            return { drawBounds.w, drawBounds.h };
+        } else {
+            const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
+            const priv::TextDrawResult result = priv::drawText(*ctx, textShape->getData(), drawOptions.scale, viewArea, nullptr, 0, 0, true);
+
+            if (result) {
+                const int w = result.value().drawBounds.w;
+                const int h = result.value().drawBounds.h;
+
+                return {w, h};
+            }
         }
     }
     return {};
