@@ -155,10 +155,9 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
         // Resolve justification
         const JustifyParams justifyParams {
-                (width > 0.0 ? width : lineSpan.lineWidth) / scale,
-                ctx.config.justifyAmbiguous,
-                ctx.config.limitJustifySpaceWidth
-            };
+            (width > 0.0 ? width : lineSpan.lineWidth) / scale,
+            ctx.config.justifyAmbiguous,
+            ctx.config.limitJustifySpaceWidth };
 
         const JustifyResult justification = justify(lineSpan, justifyParams);
         if (!justification.success) {
