@@ -252,12 +252,13 @@ DrawTextResult drawText(ContextHandle ctx,
     if (textShape && sanitizeShape(ctx, textShape)) {
         const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
         const priv::TextDrawResult result = priv::drawText(*ctx, textShape->getData(), drawOptions.scale, viewArea, pixels, width, height, false);
+
         if (result) {
             const auto& drawOutput = result.value();
-
             return {utils::castRectangle(drawOutput.drawBounds), utils::castMatrix(drawOutput.transform), false};
         }
     }
+
     return {{}, {}, true};
 }
 
@@ -270,18 +271,24 @@ TextShapeHandle shapePlacedText(ContextHandle ctx,
 
     // TODO: Matus: Return just placed text?
     priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
+    priv::PlacedTextResult placedShapeResult = priv::shapePlacedText(*ctx, text);
+
     if (!textShapeResult) {
         ctx->getLogger().error("Text shaping failed with error: {}", (int)textShapeResult.error());
-        return nullptr;
     }
-
-    priv::PlacedTextResult placedShapeResult = priv::shapePlacedText(*ctx, text);
     if (!placedShapeResult) {
         ctx->getLogger().error("Text shaping failed with error: {}", (int)placedShapeResult.error());
-        return nullptr;
     }
 
-    ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue(), placedShapeResult.moveValue()));
+    if (!textShapeResult && !placedShapeResult) {
+        return nullptr;
+    } else if (!textShapeResult) {
+        ctx->shapes.emplace_back(std::make_unique<TextShape>(placedShapeResult.moveValue()));
+    } else if (!placedShapeResult) {
+        ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue()));
+    } else {
+        ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue(), placedShapeResult.moveValue()));
+    }
 
     return ctx->shapes.back().get();
 }
@@ -291,30 +298,32 @@ DrawTextResult drawPlacedText(ContextHandle ctx,
                               void* pixels, int width, int height,
                               const DrawOptions& drawOptions) {
     if (ctx == nullptr) {
-        return {};
+        return {{}, {}, true};
     }
 
-    const priv::PlacedTextData &placedTextData = textShape->getPlacedData();
+    if (textShape) {
+        const priv::PlacedTextData &placedTextData = textShape->getPlacedData();
 
-    const compat::Rectangle viewArea = drawOptions.viewArea.has_value()
-        ? convertRect(drawOptions.viewArea.value())
-        : compat::INFINITE_BOUNDS;
+        const compat::Rectangle viewArea = drawOptions.viewArea.has_value()
+            ? convertRect(drawOptions.viewArea.value())
+            : compat::INFINITE_BOUNDS;
 
-    const priv::TextDrawResult result = priv::drawPlacedText(*ctx,
-                                                             placedTextData,
-                                                             drawOptions.scale,
-                                                             viewArea,
-                                                             pixels, width, height);
+        const priv::TextDrawResult result = priv::drawPlacedText(*ctx,
+                                                                 placedTextData,
+                                                                 drawOptions.scale,
+                                                                 viewArea,
+                                                                 pixels, width, height);
 
-    if (result) {
-        const auto& drawOutput = result.value();
-        return {
-            utils::castRectangle(drawOutput.drawBounds), utils::castMatrix(drawOutput.transform),
-            false
-        };
+        if (result) {
+            const auto& drawOutput = result.value();
+            return {
+                utils::castRectangle(drawOutput.drawBounds), utils::castMatrix(drawOutput.transform),
+                false
+            };
+        }
     }
 
-    return {};
+    return {{}, {}, true};
 }
 
 } // namespace textify
