@@ -242,7 +242,14 @@ TextShapeResult shapeTextInner(Context &ctx,
 
     float y = 0.0f;
 
-    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, VerticalPositioning::TOP_BOUND, y);
+    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx,
+                                                                       shapes,
+                                                                       text.overflowPolicy(),
+                                                                       static_cast<int>(std::floor(maxWidth)),
+                                                                       1.0f,
+                                                                       VerticalPositioning::TOP_BOUND,
+                                                                       text.baselinePolicy(),
+                                                                       y);
 
     // Rerun glyph bitmaps if previous justification was nonsense (zero width for auto-width bounds)
     if (text.boundsMode() == BoundsMode::AUTO_WIDTH) {
@@ -254,7 +261,14 @@ TextShapeResult shapeTextInner(Context &ctx,
             maxWidth = std::max(maxWidth, paragraphResult.maxLineWidth);
         }
 
-        paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, VerticalPositioning::TOP_BOUND, y);
+        paragraphResults = drawParagraphsInner(ctx,
+                                               shapes,
+                                               text.overflowPolicy(),
+                                               static_cast<int>(std::floor(maxWidth)),
+                                               1.0f,
+                                               VerticalPositioning::TOP_BOUND,
+                                               text.baselinePolicy(),
+                                               y);
     }
 
     if (paragraphResults.empty()) {
@@ -348,7 +362,14 @@ TextDrawResult drawTextInner(Context &ctx,
 
     float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
 
-    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, textParams.overflowPolicy, textBounds.w, scale, VerticalPositioning::BASELINE, caretVerticalPos);
+    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx,
+                                                                             paragraphShapes,
+                                                                             textParams.overflowPolicy,
+                                                                             textBounds.w,
+                                                                             scale,
+                                                                             VerticalPositioning::BASELINE,
+                                                                             textParams.baselinePolicy,
+                                                                             caretVerticalPos);
     if (paragraphResults.empty()) {
         return TextDrawError::PARAGRAPHS_TYPESETING_ERROR;
     }
@@ -418,12 +439,21 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
                                                 int textWidth,
                                                 RenderScale scale,
                                                 VerticalPositioning positioning,
+                                                BaselinePolicy baselinePolicy,
                                                 float &caretVerticalPos) {
     ParagraphShape::DrawResults drawResults;
 
     for (const ParagraphShapePtr& paragraphShape : shapes) {
         const bool isLast = (paragraphShape == shapes.back());
-        ParagraphShape::DrawResult drawResult = paragraphShape->draw(ctx, 0, textWidth, caretVerticalPos, positioning, scale, isLast, false);
+        ParagraphShape::DrawResult drawResult = paragraphShape->draw(ctx,
+                                                                     0,
+                                                                     textWidth,
+                                                                     caretVerticalPos,
+                                                                     positioning,
+                                                                     baselinePolicy,
+                                                                     scale,
+                                                                     isLast,
+                                                                     false);
 
         const LastLinePolicy lastLinePolicy =
             (overflowPolicy == OverflowPolicy::CLIP_LINE && drawResult.journal.size() > 1)
@@ -460,7 +490,14 @@ compat::FRectangle getStretchedTextBounds(Context &ctx,
 
     float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
 
-    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, paragraphShapes, textParams.overflowPolicy, textBounds.w, scale, VerticalPositioning::BASELINE, caretVerticalPos);
+    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx,
+                                                                             paragraphShapes,
+                                                                             textParams.overflowPolicy,
+                                                                             textBounds.w,
+                                                                             scale,
+                                                                             VerticalPositioning::BASELINE,
+                                                                             textParams.baselinePolicy,
+                                                                             caretVerticalPos);
     if (paragraphResults.empty()) {
         return compat::FRectangle{};
     }
@@ -549,7 +586,14 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
     }
 
     float y = 0.0f;
-    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, VerticalPositioning::TOP_BOUND, y);
+    ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx,
+                                                                       shapes,
+                                                                       text.overflowPolicy(),
+                                                                       static_cast<int>(std::floor(maxWidth)),
+                                                                       1.0f,
+                                                                       VerticalPositioning::TOP_BOUND,
+                                                                       text.baselinePolicy(),
+                                                                       y);
 
     // Rerun glyph bitmaps if previous justification was nonsense (zero width for auto-width bounds)
     if (text.boundsMode() == BoundsMode::AUTO_WIDTH) {
@@ -561,7 +605,14 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
             maxWidth = std::max(maxWidth, paragraphResult.maxLineWidth);
         }
 
-        paragraphResults = drawParagraphsInner(ctx, shapes, text.overflowPolicy(), static_cast<int>(std::floor(maxWidth)), 1.0f, VerticalPositioning::TOP_BOUND, y);
+        paragraphResults = drawParagraphsInner(ctx,
+                                               shapes,
+                                               text.overflowPolicy(),
+                                               static_cast<int>(std::floor(maxWidth)),
+                                               1.0f,
+                                               VerticalPositioning::TOP_BOUND,
+                                               text.baselinePolicy(),
+                                               y);
     }
 
     if (paragraphResults.empty()) {

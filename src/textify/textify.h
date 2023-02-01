@@ -79,6 +79,7 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
                                                 int textWidth,
                                                 RenderScale scale,
                                                 VerticalPositioning positioning,
+                                                BaselinePolicy baselinePolicy,
                                                 float &caretVerticalPos);
 
 

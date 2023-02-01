@@ -133,6 +133,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                                                 int width,
                                                 float& y,
                                                 VerticalPositioning& positioning,
+                                                BaselinePolicy baselinePolicy,
                                                 float scale,
                                                 bool last,
                                                 bool alphaMask) const
@@ -150,7 +151,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
     for (const LineSpan &lineSpan : shapingPhaseOutput_.lineSpans_) {
         result.journal.startLine(caret.y);
 
-        startCaret(lineSpan, caret.y, positioning, scale);
+        startCaret(lineSpan, caret.y, positioning, baselinePolicy, scale);
 
         // Resolve justification
         const JustifyParams justifyParams {
@@ -369,7 +370,7 @@ const LineSpans& ParagraphShape::lineSpans() const
     return shapingPhaseOutput_.lineSpans_;
 }
 
-void ParagraphShape::startCaret(const LineSpan& lineSpan, float& y, VerticalPositioning& positioning, float scale) const
+void ParagraphShape::startCaret(const LineSpan& lineSpan, float& y, VerticalPositioning& positioning, BaselinePolicy baselinePolicy, float scale) const
 {
     float yShift = 0;
     switch (positioning) {
@@ -380,7 +381,11 @@ void ParagraphShape::startCaret(const LineSpan& lineSpan, float& y, VerticalPosi
             break;
         case VerticalPositioning::TOP_BOUND:
             // TODO: Matus: Is this rounding correct?
-            yShift = std::round(maxAscender(lineSpan, scale));
+            if (baselinePolicy == BaselinePolicy::OFFSET_BEARING) {
+                yShift = std::round(maxBearing(lineSpan, scale));
+            } else {
+                yShift = std::round(maxAscender(lineSpan, scale));
+            }
             break;
     }
 

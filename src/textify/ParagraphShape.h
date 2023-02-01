@@ -146,6 +146,7 @@ public:
                     int width,
                     float& y,
                     VerticalPositioning& positioning,
+                    BaselinePolicy baselinePolicy,
                     float scale,
                     bool last,
                     bool alphaMask) const;
@@ -167,7 +168,7 @@ public:
 
 private:
     /// Get caret position at the start of a line
-    void startCaret(const LineSpan& lineSpan, float& y, VerticalPositioning& positioning, float scale) const;
+    void startCaret(const LineSpan& lineSpan, float& y, VerticalPositioning& positioning, BaselinePolicy baselinePolicy, float scale) const;
     spacing evalLineHeight(const uint32_t codepoint, const ImmediateFormat& fmt, const FacePtr face) const;
 
     // return {spaceCoef, nonSpaceCoef, lineWidth};
