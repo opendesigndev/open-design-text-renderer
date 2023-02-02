@@ -4,17 +4,23 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 
 namespace textify {
 
 struct Vector2f {
     float x, y;
 };
+struct FontSpecifier {
+    std::string faceId;
 
+    bool operator<(const FontSpecifier& other) const {
+        return faceId < other.faceId;
+    }
+};
+
+/// A single glyph which is a result of the shaping phase, placed into its containing layer.
 struct PlacedGlyph {
-    // TODO: Matus: This font face Id should be moved to some other place
-    //   Maybe the glyphs should be groupped by face Ids
-    std::string fontFaceId;
     /// Font size
     float fontSize = 0.0f;
     /// Glyph codepoint - index within the loaded font file
@@ -31,5 +37,6 @@ struct PlacedGlyph {
 };
 using PlacedGlyphPtr = std::unique_ptr<PlacedGlyph>;
 using PlacedGlyphs = std::vector<PlacedGlyphPtr>;
+using PlacedGlyphsPerFont = std::map<FontSpecifier, PlacedGlyphs>;
 
 } // namespace textify

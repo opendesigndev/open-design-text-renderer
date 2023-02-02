@@ -645,7 +645,7 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
 
     const float baseline = resolveBaselinePosition(p0, text.baselinePolicy(), text.verticalAlign());
 
-    PlacedGlyphs placedGlyphs;
+    PlacedGlyphsPerFont placedGlyphs;
     PlacedDecorations placedDecorations;
 
     for (size_t i = 0; i < paragraphResults.size(); i++) {
@@ -668,7 +668,6 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                 placedGlyph->glyphCodepoint = glyphShape.codepoint;
                 placedGlyph->color = glyphShape.format.color;
                 placedGlyph->fontSize = glyphShape.format.size;
-                placedGlyph->fontFaceId = glyphShape.format.faceId;
 
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
                 const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
@@ -687,7 +686,7 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                     tl.x + bitmapWidthF,
                     tl.y + bitmapHeightF };
 
-                placedGlyphs.emplace_back(std::move(placedGlyph));
+                placedGlyphs[FontSpecifier { glyphShape.format.faceId }].emplace_back(std::move(placedGlyph));
 
                 j++;
             }
@@ -757,24 +756,23 @@ TextDrawResult drawPlacedTextInner(Context &ctx,
 
     const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? utils::outerRect(viewArea) : compat::INFINITE_BOUNDS;
 
-    for (const PlacedGlyphPtr &pg : placedTextData.glyphs) {
-        const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(pg->fontFaceId);
-        if (!faceItem) {
-            continue;
-        }
-        const FacePtr face = faceItem->face;
-        if (face == nullptr) {
-            continue;
-        }
+    for (const auto &pgIt : placedTextData.glyphs) {
+        const FontSpecifier &fontSpecifier = pgIt.first;
+        const PlacedGlyphs &placedGlyphs = pgIt.second;
 
-        const GlyphPtr renderedGlyph = renderPlacedGlyph(*pg,
-                                                         face,
-                                                         scale,
-                                                         ctx.config.internalDisableHinting);
+        const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(fontSpecifier.faceId);
+        if (faceItem != nullptr && faceItem->face != nullptr) {
+            for (const PlacedGlyphPtr &pg : placedGlyphs) {
+                const GlyphPtr renderedGlyph = renderPlacedGlyph(*pg,
+                                                                 faceItem->face,
+                                                                 scale,
+                                                                 ctx.config.internalDisableHinting);
 
-        if (renderedGlyph != nullptr) {
-            drawGlyph(output, *renderedGlyph, viewAreaBounds);
-//            debug_drawGlyphBoundingRectangle(output, *pg);
+                if (renderedGlyph != nullptr) {
+                    drawGlyph(output, *renderedGlyph, viewAreaBounds);
+        //            debug_drawGlyphBoundingRectangle(output, *pg);
+                }
+            }
         }
     }
 

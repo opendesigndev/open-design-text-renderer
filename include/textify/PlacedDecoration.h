@@ -6,6 +6,7 @@
 
 namespace textify {
 
+/// A single glyph decoration (underline / strikethrough) which is a result of the shaping phase, placed into its containing layer.
 struct PlacedDecoration {
     /// Decoration type - underline, double underline or strikethrough
     enum class Type {

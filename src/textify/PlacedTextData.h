@@ -14,14 +14,15 @@
 namespace textify {
 namespace priv {
 
+/// The result of the shaping phase (glyphs and decorations), placed into their containing layer.
 struct PlacedTextData
 {
     PlacedTextData() = default;
-    PlacedTextData(PlacedGlyphs &&glyphs_,
+    PlacedTextData(PlacedGlyphsPerFont &&glyphs_,
                    PlacedDecorations &&decorations_,
                    const compat::FRectangle &textBounds_);
 
-    PlacedGlyphs glyphs;
+    PlacedGlyphsPerFont glyphs;
     PlacedDecorations decorations;
     // TODO: Matus: Remove
     compat::FRectangle textBounds;
