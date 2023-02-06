@@ -339,8 +339,6 @@ TextDrawResult drawText(Context &ctx,
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
         value.transform = shapeData.textTransform;
-        value.transform[2][0] *= scale;
-        value.transform[2][1] *= scale;
         return value;
     } else {
         return drawResult.error();
@@ -537,7 +535,11 @@ compat::Rectangle computeDrawBounds(Context &ctx,
                                     const PlacedTextData &placedTextData,
                                     float scale,
                                     const compat::Rectangle &viewArea) {
-    const compat::FRectangle stretchedTextBounds = placedTextData.textBounds * scale;
+    const compat::FRectangle stretchedTextBounds { placedTextData.textBounds.l,
+        placedTextData.textBounds.t,
+        placedTextData.textBounds.w * scale,
+        placedTextData.textBounds.h * scale};
+
     const compat::FRectangle viewAreaTextSpace = utils::scaleRect(utils::toFRectangle(viewArea), scale);
     return computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
 }
@@ -727,7 +729,10 @@ TextDrawResult drawPlacedText(Context &ctx,
                               float scale,
                               const compat::Rectangle &viewArea,
                               void *pixels, int width, int height) {
-    const compat::FRectangle stretchedTextBounds = placedTextData.textBounds * scale;
+    const compat::FRectangle stretchedTextBounds { placedTextData.textBounds.l,
+        placedTextData.textBounds.t,
+        placedTextData.textBounds.w * scale,
+        placedTextData.textBounds.h * scale};
 
     const compat::FRectangle viewAreaTextSpace = utils::scaleRect(utils::toFRectangle(viewArea), scale);
 
