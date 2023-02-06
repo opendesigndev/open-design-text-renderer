@@ -148,18 +148,23 @@ void debug_drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height) {
     }
 }
 
-void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGlyph &pg) {
+void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGlyph &pg, RenderScale scale) {
     const Pixel32 bottomLeftColor = 0x55000088;
     const Pixel32 topRightColor = 0x55880000;
     BitmapWriter w = BitmapWriter(bitmap);
 
-    for (int x = pg.placement.bottomLeft.x; x < pg.placement.bottomRight.x; x += 2) {
-        w.write(x, pg.placement.bottomLeft.y, bottomLeftColor);
-        w.write(x, pg.placement.topRight.y, topRightColor);
+    const PlacedGlyph::QuadCorners &placement = pg.placement;
+
+    const float width = (pg.placement.topRight.x - pg.placement.topLeft.x) * scale;
+    const float height = (pg.placement.bottomLeft.y - pg.placement.topLeft.y) * scale;
+
+    for (int x = pg.placement.topLeft.x; x < pg.placement.topLeft.x + width; x += 2) {
+        w.write(x, pg.placement.topLeft.y + height, bottomLeftColor);
+        w.write(x, pg.placement.topLeft.y, topRightColor);
     }
-    for (int y = pg.placement.topLeft.y; y < pg.placement.bottomLeft.y; y += 2) {
+    for (int y = pg.placement.topLeft.y; y < pg.placement.topLeft.y + height; y += 2) {
         w.write(pg.placement.topLeft.x, y, bottomLeftColor);
-        w.write(pg.placement.bottomRight.x, y, topRightColor);
+        w.write(pg.placement.topLeft.x + width, y, topRightColor);
     }
 }
 

@@ -32,7 +32,7 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
 void debug_drawRectangle(compat::BitmapRGBA &bitmap, const compat::FRectangle &rectangle);
 void debug_drawBitmapBoundaries(compat::BitmapRGBA &bitmap, int width, int height);
 void debug_drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height);
-void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGlyph &pg);
+void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGlyph &pg, RenderScale scale);
 
 } // namespace priv
 } // namespace textify
