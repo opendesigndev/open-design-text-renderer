@@ -421,6 +421,9 @@ TextDrawResult drawTextInner(Context &ctx,
 
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
+//    debug_drawBitmapBoundaries(output, width, height);
+//    debug_drawBitmapGrid(output, width, height);
+
     for (const ParagraphShape::DrawResult &paragraphResult : paragraphResults) {
         const TypesetJournal::DrawResult journalDrawResult = paragraphResult.journal.draw(output, bitmapBounds, stretchedTextBounds.h, viewAreaBounds, offset);
 
