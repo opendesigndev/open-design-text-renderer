@@ -34,7 +34,10 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
         static_cast<float>(placedGlyph.placement.topLeft.x - std::floor(placedGlyph.placement.topLeft.x)),
         static_cast<float>(placedGlyph.placement.topLeft.y - std::floor(placedGlyph.placement.topLeft.y)),
     };
-    const ScaleParams glyphScaleParams { scale, glyphScale };
+    // If the face is scalable, scaling has already been applied in the setSize step.
+    const ScaleParams glyphScaleParams = face->isScalable()
+        ? ScaleParams { 1.0f, 1.0f }
+        : ScaleParams { scale, glyphScale };
 
     GlyphPtr glyph = face->acquireGlyph(placedGlyph.glyphCodepoint, offset, glyphScaleParams, true, internalDisableHinting);
     if (!glyph) {
