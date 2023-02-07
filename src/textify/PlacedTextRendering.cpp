@@ -167,13 +167,17 @@ void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGl
     const float width = (pg.placement.topRight.x - pg.placement.topLeft.x) * scale;
     const float height = (pg.placement.bottomLeft.y - pg.placement.topLeft.y) * scale;
 
-    for (int x = pg.placement.topLeft.x; x < pg.placement.topLeft.x + width; x += 2) {
-        w.write(x, pg.placement.topLeft.y + height, bottomLeftColor);
-        w.write(x, pg.placement.topLeft.y, topRightColor);
+    const Vector2f tl {
+        pg.placement.topLeft.x * scale,
+        pg.placement.topLeft.y * scale,
+    };
+    for (int x = tl.x; x < tl.x + width; x += 2) {
+        w.write(x, tl.y + height, bottomLeftColor);
+        w.write(x, tl.y, topRightColor);
     }
-    for (int y = pg.placement.topLeft.y; y < pg.placement.topLeft.y + height; y += 2) {
-        w.write(pg.placement.topLeft.x, y, bottomLeftColor);
-        w.write(pg.placement.topLeft.x + width, y, topRightColor);
+    for (int y = tl.y; y < tl.y + height; y += 2) {
+        w.write(tl.x, y, bottomLeftColor);
+        w.write(tl.x + width, y, topRightColor);
     }
 }
 
