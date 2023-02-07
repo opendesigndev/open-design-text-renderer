@@ -46,7 +46,9 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
 
     const Vector2f &placedGlyphPosition = placedGlyph.placement.topLeft;
 
-    glyph->setDestination({static_cast<int>(std::floor(placedGlyphPosition.x)), static_cast<int>(std::floor(placedGlyphPosition.y))});
+    glyph->setDestination({
+        static_cast<int>(std::floor(placedGlyphPosition.x * scale)),
+        static_cast<int>(std::floor(placedGlyphPosition.y * scale))});
     glyph->setColor(placedGlyph.color);
 
     return glyph;
@@ -73,8 +75,12 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
         return;
     }
 
-    const IPoint2 start { static_cast<int>(std::floor(pd.placement.xFirst)), static_cast<int>(std::floor(pd.placement.y)) };
-    const IPoint2 end { static_cast<int>(std::round(pd.placement.xLast)), static_cast<int>(std::floor(pd.placement.y)) };
+    const IPoint2 start {
+        static_cast<int>(std::floor(pd.placement.xFirst * scale)),
+        static_cast<int>(std::floor(pd.placement.y * scale)) };
+    const IPoint2 end {
+        static_cast<int>(std::round(pd.placement.xLast * scale)),
+        static_cast<int>(std::floor(pd.placement.y * scale)) };
 
     const float decorationThickness = pd.thickness * scale;
 
