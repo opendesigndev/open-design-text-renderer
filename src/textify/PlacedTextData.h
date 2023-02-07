@@ -20,12 +20,17 @@ struct PlacedTextData
     PlacedTextData() = default;
     PlacedTextData(PlacedGlyphsPerFont &&glyphs_,
                    PlacedDecorations &&decorations_,
-                   const compat::FRectangle &textBounds_);
+                   const compat::FRectangle &textBounds_,
+                   float firstBaseline_);
 
+    /// Glyphs and their placements.
     PlacedGlyphsPerFont glyphs;
+    /// Decorations and their placements.
     PlacedDecorations decorations;
-    // TODO: Matus: Remove
+    /// Text bounds within the layer.
     compat::FRectangle textBounds;
+    /// First line baseline - used for text scaling, the text should be scaled so that the first baseline is preserved.
+    float firstBaseline = 0.0f;
 };
 using PlacedTextDataPtr = std::unique_ptr<PlacedTextData>;
 using PlacedTextResult = Result<PlacedTextDataPtr, TextShapeError>;
