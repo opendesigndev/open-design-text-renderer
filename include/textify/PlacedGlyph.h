@@ -12,8 +12,10 @@ struct Vector2f {
     float x, y;
 };
 struct FontSpecifier {
+    /// Font face Id.
     std::string faceId;
 
+    /// Comparison operator - used to make this struct a map key.
     bool operator<(const FontSpecifier& other) const {
         return faceId < other.faceId;
     }
@@ -21,9 +23,9 @@ struct FontSpecifier {
 
 /// A single glyph which is a result of the shaping phase, placed into its containing layer.
 struct PlacedGlyph {
-    /// Font size
+    /// Font size.
     float fontSize = 0.0f;
-    /// Glyph codepoint - index within the loaded font file
+    /// Glyph codepoint - index within the loaded font file.
     uint32_t glyphCodepoint;
     /// Glyph placement, specified by its four quad corners.
     struct QuadCorners {
@@ -32,7 +34,7 @@ struct PlacedGlyph {
         Vector2f bottomLeft;
         Vector2f bottomRight;
     } placement;
-    /// Glyph color (incl. alpha)
+    /// Glyph color (incl. alpha).
     uint32_t color;
 };
 using PlacedGlyphPtr = std::unique_ptr<PlacedGlyph>;
