@@ -56,6 +56,8 @@ public:
 
     struct LineRecord
     {
+        bool empty() const;
+
         int lowPoint() const;
 
         /**
@@ -98,6 +100,7 @@ public:
 
 
     size_t size() const { return lineJournal_.size(); }
+    bool empty() const { return lineJournal_.empty(); }
     const auto& getLines() const { return lineJournal_; }
 
     compat::Rectangle stretchedBounds(int yOffset, int yMax) const;

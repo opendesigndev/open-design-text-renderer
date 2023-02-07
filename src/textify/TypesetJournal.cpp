@@ -192,6 +192,11 @@ bool TypesetJournal::LowHighPair::partialOverflow(int limit) const
     return high <= limit && low > limit;
 }
 
+bool TypesetJournal::LineRecord::empty() const
+{
+    return glyphJournal_.empty() || offsets_.empty();
+}
+
 int TypesetJournal::LineRecord::lowPoint() const
 {
     int low = 0;
