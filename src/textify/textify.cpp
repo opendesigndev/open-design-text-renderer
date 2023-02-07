@@ -722,7 +722,7 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
     return std::make_unique<PlacedTextData>(std::move(placedGlyphs),
                                             std::move(placedDecorations),
                                             unstretchedTextBounds,
-                                            baseline);
+                                            text.baselinePolicy() == BaselinePolicy::SET ? std::make_optional(baseline) : std::nullopt);
 }
 
 TextDrawResult drawPlacedText(Context &ctx,
@@ -747,7 +747,9 @@ TextDrawResult drawPlacedText(Context &ctx,
         TextDrawOutput value = drawResult.moveValue();
         value.transform = compat::Matrix3f::identity;
         value.drawBounds = computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
-        value.drawBounds.t += placedTextData.firstBaseline * (1.0f - scale);
+        if (placedTextData.firstBaseline.has_value()) {
+            value.drawBounds.t += *placedTextData.firstBaseline * (1.0f - scale);
+        }
         return value;
     } else {
         return drawResult.error();

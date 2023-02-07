@@ -2,6 +2,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include <textify/PlacedGlyph.h>
 #include <textify/PlacedDecoration.h>
@@ -21,7 +22,7 @@ struct PlacedTextData
     PlacedTextData(PlacedGlyphsPerFont &&glyphs_,
                    PlacedDecorations &&decorations_,
                    const compat::FRectangle &textBounds_,
-                   float firstBaseline_);
+                   std::optional<float> firstBaseline_);
 
     /// Glyphs and their placements.
     PlacedGlyphsPerFont glyphs;
@@ -29,8 +30,8 @@ struct PlacedTextData
     PlacedDecorations decorations;
     /// Text bounds within the layer.
     compat::FRectangle textBounds;
-    /// First line baseline - used for text scaling, the text should be scaled so that the first baseline is preserved.
-    float firstBaseline = 0.0f;
+    /// First line baseline - optionally used for text scaling, the text should be scaled so that the first baseline is preserved.
+    std::optional<float> firstBaseline = std::nullopt;
 };
 using PlacedTextDataPtr = std::unique_ptr<PlacedTextData>;
 using PlacedTextResult = Result<PlacedTextDataPtr, TextShapeError>;
