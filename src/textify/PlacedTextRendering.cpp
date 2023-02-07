@@ -76,13 +76,17 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
     }
 
     const IPoint2 start {
-        static_cast<int>(std::floor(pd.placement.xFirst * scale)),
-        static_cast<int>(std::floor(pd.placement.y * scale)) };
+        static_cast<int>(std::floor(pd.placement.topLeft.x * scale)),
+        static_cast<int>(std::floor(pd.placement.topLeft.y * scale)) };
     const IPoint2 end {
-        static_cast<int>(std::round(pd.placement.xLast * scale)),
-        static_cast<int>(std::floor(pd.placement.y * scale)) };
+        static_cast<int>(std::round(pd.placement.bottomRight.x * scale)),
+        static_cast<int>(std::floor(pd.placement.bottomRight.y * scale)) };
 
-    const float decorationThickness = pd.thickness * scale;
+    const float dt = (pd.placement.bottomLeft.y - pd.placement.topLeft.y) * scale;
+    const int decorationThickness = (pd.type == PlacedDecoration::Type::DOUBLE_UNDERLINE)
+        ? static_cast<int>(std::ceil(dt / 2.5f * (2.0f / 3.0f)))
+        : static_cast<int>(std::ceil(dt));
+    const int vOffset = static_cast<int>(decorationThickness * 0.5);
 
     BitmapWriter w = BitmapWriter(bitmap);
 
@@ -93,10 +97,7 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
         }
 
         if (pd.type == PlacedDecoration::Type::DOUBLE_UNDERLINE) {
-            const int thickness = static_cast<int>(ceil(decorationThickness * 2.0 / 3.0));
-            const int vOffset = static_cast<int>(thickness * 0.5);
-
-            for (int k = 0; k < thickness; k++) {
+            for (int k = 0; k < decorationThickness; k++) {
                 w.write(penX, start.y - vOffset - k, pd.color);
                 w.write(penX, start.y + vOffset + k, pd.color);
             }
