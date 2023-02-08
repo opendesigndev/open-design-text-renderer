@@ -160,6 +160,7 @@ set(TEXTIFY_SOURCES
     ${TEXTIFY_SOURCE_DIR}/API/textify-api.cpp
     ${TEXTIFY_SOURCE_DIR}/API/PlacedGlyph.cpp
     ${TEXTIFY_SOURCE_DIR}/API/PlacedDecoration.cpp
+    ${TEXTIFY_SOURCE_DIR}/API/PlacedTextData.cpp
 
     ${TEXTIFY_SOURCE_DIR}/common/buffer_view.cpp
 
@@ -201,7 +202,6 @@ set(TEXTIFY_SOURCES
     ${TEXTIFY_SOURCE_DIR}/textify/LineSpan.cpp
     ${TEXTIFY_SOURCE_DIR}/textify/BitmapWriter.cpp
     ${TEXTIFY_SOURCE_DIR}/textify/PlacedTextRendering.cpp
-    ${TEXTIFY_SOURCE_DIR}/textify/PlacedTextData.cpp
 
     ${TEXTIFY_SOURCE_DIR}/utils/utils.cpp
     ${TEXTIFY_SOURCE_DIR}/utils/Log.cpp
