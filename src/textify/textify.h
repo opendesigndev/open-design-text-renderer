@@ -1,13 +1,11 @@
 
 #pragma once
 
-#include <textify/PlacedGlyph.h>
-#include <textify/PlacedDecoration.h>
+#include <textify/PlacedTextData.h>
 
 #include "errors.h"
 #include "text-format.h"
 #include "TextShapeData.h"
-#include "PlacedTextData.h"
 
 #include "common/result.hpp"
 #include "compat/basic-types.h"
@@ -39,6 +37,7 @@ enum class TextDrawError
 
 using TextShapeResult = Result<TextShapeDataPtr, TextShapeError>;
 using TextDrawResult = Result<TextDrawOutput, TextDrawError>;
+using PlacedTextResult = Result<PlacedTextDataPtr, TextShapeError>;
 
 /// List all font face names that have not been loaded to the context's FontManager.
 FacesNames listMissingFonts(Context &ctx,

@@ -26,6 +26,13 @@
 #include <optional>
 
 namespace textify {
+
+namespace {
+FRectangle convertRect(const compat::FRectangle& r) {
+    return FRectangle{r.l, r.t, r.w, r.h};
+}
+}
+
 namespace priv {
 
 namespace {
@@ -704,19 +711,19 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                 placedDecoration->type = static_cast<PlacedDecoration::Type>(decoration.type);
                 placedDecoration->color = decoration.color;
 
-                placedDecoration->placement.topLeft = Vector2f_ {
+                placedDecoration->placement.topLeft = Vector2f {
                     static_cast<float>(decoration.range.first),
                     static_cast<float>(decoration.offset),
                 };
-                placedDecoration->placement.topRight = Vector2f_ {
+                placedDecoration->placement.topRight = Vector2f {
                     static_cast<float>(decoration.range.last),
                     static_cast<float>(decoration.offset),
                 };
-                placedDecoration->placement.bottomLeft = Vector2f_ {
+                placedDecoration->placement.bottomLeft = Vector2f {
                     static_cast<float>(decoration.range.first),
                     static_cast<float>(decoration.offset) + decoration.thickness * (decoration.type == Decoration::DOUBLE_UNDERLINE ? 2.5f : 1.0f),
                 };
-                placedDecoration->placement.bottomRight = Vector2f_ {
+                placedDecoration->placement.bottomRight = Vector2f {
                     static_cast<float>(decoration.range.last),
                     static_cast<float>(decoration.offset) + decoration.thickness * (decoration.type == Decoration::DOUBLE_UNDERLINE ? 2.5f : 1.0f),
                 };
@@ -734,7 +741,7 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
 
     return std::make_unique<PlacedTextData>(std::move(placedGlyphs),
                                             std::move(placedDecorations),
-                                            unstretchedTextBounds,
+                                            convertRect(unstretchedTextBounds),
                                             text.baselinePolicy() == BaselinePolicy::SET ? std::make_optional(baseline) : std::nullopt);
 }
 

@@ -1,8 +1,9 @@
 
 #include "TextShape.h"
 
+#include <textify/PlacedTextData.h>
+
 #include "textify.h"
-#include "PlacedTextData.h"
 
 #include "vendor/fmt/core.h"
 
@@ -35,7 +36,7 @@ const priv::TextShapeData& TextShape::getData() const
     return *data.get();
 }
 
-const priv::PlacedTextData& TextShape::getPlacedData() const
+const PlacedTextData& TextShape::getPlacedData() const
 {
     return *placedData.get();
 }

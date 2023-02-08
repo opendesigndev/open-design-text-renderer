@@ -32,6 +32,9 @@ namespace {
 compat::Rectangle convertRect(const textify::Rectangle& r) {
     return compat::Rectangle{r.l, r.t, r.w, r.h};
 }
+compat::FRectangle convertRect(const textify::FRectangle& r) {
+    return compat::FRectangle{r.l, r.t, r.w, r.h};
+}
 
 bool sanitizeShape(ContextHandle ctx,
                    TextShapeHandle textShape)
@@ -192,7 +195,7 @@ FRectangle getBounds(ContextHandle ctx,
 
     if (textShape && sanitizeShape(ctx, textShape)) {
         return utils::castFRectangle(textShape->isPlaced()
-                                     ? textShape->getPlacedData().textBounds
+                                     ? convertRect(textShape->getPlacedData().textBounds)
                                      : textShape->getData().textBoundsTransformed);
     }
     return {};
@@ -302,7 +305,7 @@ DrawTextResult drawPlacedText(ContextHandle ctx,
     }
 
     if (textShape) {
-        const priv::PlacedTextData &placedTextData = textShape->getPlacedData();
+        const PlacedTextData &placedTextData = textShape->getPlacedData();
 
         const compat::Rectangle viewArea = drawOptions.viewArea.has_value()
             ? convertRect(drawOptions.viewArea.value())

@@ -7,13 +7,13 @@ namespace textify {
 
 namespace priv {
 struct TextShapeData;
-struct PlacedTextData;
 }
+struct PlacedTextData;
 
 struct TextShape
 {
     using DataPtr = std::unique_ptr<priv::TextShapeData>;
-    using PlacedDataPtr = std::unique_ptr<priv::PlacedTextData>;
+    using PlacedDataPtr = std::unique_ptr<PlacedTextData>;
 
     /* implicit */ TextShape(DataPtr&& data);
     /* implicit */ TextShape(PlacedDataPtr&& data);
@@ -31,7 +31,7 @@ struct TextShape
     void deactivate();
 
     const priv::TextShapeData& getData() const;
-    const priv::PlacedTextData& getPlacedData() const;
+    const PlacedTextData& getPlacedData() const;
 
     void onFontFaceChanged(const std::string& postScriptName);
 

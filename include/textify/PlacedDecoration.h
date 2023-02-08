@@ -4,11 +4,9 @@
 #include <memory>
 #include <vector>
 
-namespace textify {
+#include "textify-api.h"
 
-struct Vector2f_ {
-    float x, y;
-};
+namespace textify {
 
 /// A single glyph decoration (underline / strikethrough) which is a result of the shaping phase, placed into its containing layer.
 struct PlacedDecoration {
@@ -21,10 +19,10 @@ struct PlacedDecoration {
     } type;
     /// Decoration placement in the containing layer, specified by its four quad corners.
     struct QuadCorners {
-        Vector2f_ topLeft;
-        Vector2f_ topRight;
-        Vector2f_ bottomLeft;
-        Vector2f_ bottomRight;
+        Vector2f topLeft;
+        Vector2f topRight;
+        Vector2f bottomLeft;
+        Vector2f bottomRight;
     } placement;
     /// Decoration color (incl. alpha).
     uint32_t color;

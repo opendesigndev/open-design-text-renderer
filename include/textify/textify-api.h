@@ -39,6 +39,10 @@ struct Matrix3f
     float m[3][3];
 };
 
+struct Vector2f {
+    float x, y;
+};
+
 struct DrawOptions
 {
     /**

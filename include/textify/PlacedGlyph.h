@@ -6,11 +6,10 @@
 #include <vector>
 #include <map>
 
+#include "textify-api.h"
+
 namespace textify {
 
-struct Vector2f {
-    float x, y;
-};
 struct FontSpecifier {
     /// Font face Id.
     std::string faceId;

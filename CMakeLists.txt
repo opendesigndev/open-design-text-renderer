@@ -78,6 +78,7 @@ set(TEXTIFY_PUBLIC_HEADERS
     ${TEXTIFY_INCLUDE_DIR}/textify/textify-api.h
     ${TEXTIFY_INCLUDE_DIR}/textify/PlacedGlyph.h
     ${TEXTIFY_INCLUDE_DIR}/textify/PlacedDecoration.h
+    ${TEXTIFY_INCLUDE_DIR}/textify/PlacedTextData.h
 )
 
 set(TEXTIFY_PRIVATE_HEADERS
@@ -132,7 +133,6 @@ set(TEXTIFY_PRIVATE_HEADERS
     ${TEXTIFY_SOURCE_DIR}/textify/LineSpan.h
     ${TEXTIFY_SOURCE_DIR}/textify/BitmapWriter.h
     ${TEXTIFY_SOURCE_DIR}/textify/PlacedTextRendering.h
-    ${TEXTIFY_SOURCE_DIR}/textify/PlacedTextData.h
 
     ${TEXTIFY_SOURCE_DIR}/utils/utils.h
     ${TEXTIFY_SOURCE_DIR}/utils/Log.h
