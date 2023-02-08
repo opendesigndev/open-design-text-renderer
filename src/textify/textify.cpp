@@ -750,10 +750,11 @@ TextDrawResult drawPlacedText(Context &ctx,
                               float scale,
                               const compat::Rectangle &viewArea,
                               void *pixels, int width, int height) {
-    const compat::FRectangle stretchedTextBounds { placedTextData.textBounds.l,
+    const compat::FRectangle stretchedTextBounds {
+        placedTextData.textBounds.l,
         placedTextData.textBounds.t,
         placedTextData.textBounds.w * scale,
-        placedTextData.textBounds.h * scale};
+        placedTextData.textBounds.h * scale };
 
     const compat::FRectangle viewAreaTextSpace = utils::scaleRect(utils::toFRectangle(viewArea), scale);
 
