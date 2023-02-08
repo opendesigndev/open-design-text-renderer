@@ -8,11 +8,14 @@ enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-# Define a value for testing Octopus files directory
-add_definitions(-DTESTING_OCTOPUS_DIR="${CMAKE_SOURCE_DIR}/test-files/")
-
 set(TEXTIFY_DIR ${CMAKE_SOURCE_DIR}/textify/)
 set(TEXTIFY_TEST_DIR ${TEXTIFY_DIR}/test)
+
+# Define a value for testing Octopus files directory
+add_definitions(-DTESTING_OCTOPUS_DIR="${TEXTIFY_DIR}/test/test-files/")
+# Define a value for a directory of fonts
+#     TODO: Matus: Make sure this is an acceptable local directory.
+add_definitions(-DFONTS_DIR="${CMAKE_SOURCE_DIR}/../../Fonts/")
 
 # Test source files
 set(TEST_SOURCE_FILES
@@ -21,18 +24,20 @@ set(TEST_SOURCE_FILES
 )
 
 # Add executables
-add_executable(${TEST_NAME}
-    ${TEST_SOURCE_FILES})
+add_executable(${TEST_NAME} ${TEST_SOURCE_FILES})
+
+# Required Open Design internal libraries
+set(INTERNAL_LIBRARY_DEPENDENCIES
+    textify
+    liboctopus
+    ode-essentials
+    ode-renderer
+)
 
 target_link_libraries(${TEST_NAME} PRIVATE
-    ${GTEST_BOTH_LIBRARIES})
+    ${GTEST_BOTH_LIBRARIES} ${INTERNAL_LIBRARY_DEPENDENCIES})
 
-target_include_directories(${TEST_NAME} PRIVATE
-    ${TEXTIFY_DIR}/include/
-    ${TEXTIFY_DIR}/src/
-    ${TEXTIFY_DIR}/src/vendor/
-    ${TEXTIFY_DIR}/../liboctopus/)
-
+# Add the test
 add_test(${TEST_NAME} ${TEST_NAME})
 
 set_target_properties(${TEST_NAME} PROPERTIES
