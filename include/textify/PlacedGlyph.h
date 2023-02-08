@@ -35,6 +35,9 @@ struct PlacedGlyph {
     } placement;
     /// Glyph color (incl. alpha).
     uint32_t color;
+    /// Glyph index.
+    size_t index = 0;
+
 };
 using PlacedGlyphPtr = std::unique_ptr<PlacedGlyph>;
 using PlacedGlyphs = std::vector<PlacedGlyphPtr>;

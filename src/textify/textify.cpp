@@ -660,6 +660,8 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
     PlacedGlyphsPerFont placedGlyphs;
     PlacedDecorations placedDecorations;
 
+    size_t glyphIndex = 0;
+
     for (size_t i = 0; i < paragraphResults.size(); i++) {
         const ParagraphShapePtr &paragraphShape = shapes[i];
         const ParagraphShape::DrawResult &drawResult = paragraphResults[i];
@@ -680,6 +682,7 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                 placedGlyph->glyphCodepoint = glyphShape.codepoint;
                 placedGlyph->color = glyphShape.format.color;
                 placedGlyph->fontSize = glyphShape.format.size;
+                placedGlyph->index = glyphIndex;
 
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
                 const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
@@ -700,7 +703,8 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
 
                 placedGlyphs[FontSpecifier { glyphShape.format.faceId }].emplace_back(std::move(placedGlyph));
 
-                j++;
+                ++j;
+                ++glyphIndex;
             }
 
             for (size_t l = 0; l < lineRecord.decorationJournal_.size(); l++) {
