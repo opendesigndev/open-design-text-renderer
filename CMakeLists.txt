@@ -58,6 +58,11 @@ if (NOT TEXTIFY_HAVE_LIBOCTOPUS)
     set(LIBOCTOPUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/liboctopus)
 endif()
 
+# Add Textify test project if specified
+if(ODE_TEST_MODULES)
+    add_subdirectory(test)
+endif()
+
 find_package(Threads REQUIRED)
 find_package(PNG REQUIRED)
 find_package(Freetype REQUIRED)
