@@ -214,12 +214,12 @@ set(TEXTIFY_SOURCES
 )
 
 set(TEXTIFY_CLI_HEADERS
-    ${TEXTIFY_SOURCE_DIR}/main.cpp
     ${TEXTIFY_SOURCE_DIR}/cli/Canvas.h
     ${TEXTIFY_SOURCE_DIR}/cli/octopus-utils.h
     ${TEXTIFY_SOURCE_DIR}/cli/SimpleRenderer.h
 )
 set(TEXTIFY_CLI_SOURCES
+    ${TEXTIFY_SOURCE_DIR}/main.cpp
     ${TEXTIFY_SOURCE_DIR}/cli/Canvas.cpp
     ${TEXTIFY_SOURCE_DIR}/cli/octopus-utils.cpp
     ${TEXTIFY_SOURCE_DIR}/cli/SimpleRenderer.cpp
