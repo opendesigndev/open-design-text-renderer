@@ -131,3 +131,66 @@ TEST_F(TextifyApiTests, singleLetter) {
     const DrawTextResult drawResult = drawPlacedText(context, textShape, bitmap->pixels(), bitmap->width(), bitmap->height(), drawOptions);
     ASSERT_FALSE(drawResult.error);
 }
+
+TEST_F(TextifyApiTests, decorations) {
+    using namespace textify;
+
+    octopus::Octopus octopusData;
+    readOctopusFile(decorationsOctopusPath, octopusData);
+
+    const octopus::Layer &textLayer = octopusData.content->layers->front();
+    const nonstd::optional<octopus::Text> &text = textLayer.text;
+
+    ASSERT_TRUE(text.has_value());
+
+    addMissingFonts(*text);
+
+    const TextShapeHandle textShape = shapePlacedText(context, *text);
+    ASSERT_TRUE(textShape != nullptr);
+
+    ASSERT_TRUE(textShape->placedData != nullptr);
+    ASSERT_EQ(textShape->placedData->glyphs.size(), 1);
+    ASSERT_EQ(textShape->placedData->decorations.size(), 7);
+    ASSERT_TRUE(textShape->placedData->firstBaseline.has_value());
+    ASSERT_EQ(*textShape->placedData->firstBaseline, 47.59375);
+    ASSERT_EQ(textShape->placedData->glyphs.count(fontHelveticaNeue), 1);
+
+    const PlacedGlyphs &pgs = textShape->placedData->glyphs.at(fontHelveticaNeue);
+    ASSERT_EQ(pgs.size(), 40);
+
+    const PlacedDecorations &decorations = textShape->placedData->decorations;
+    ASSERT_EQ(decorations[0]->type, PlacedDecoration::Type::UNDERLINE);
+    ASSERT_EQ(decorations[1]->type, PlacedDecoration::Type::STRIKE_THROUGH);
+    ASSERT_EQ(decorations[2]->type, PlacedDecoration::Type::UNDERLINE);
+    ASSERT_EQ(decorations[3]->type, PlacedDecoration::Type::UNDERLINE);
+    ASSERT_EQ(decorations[4]->type, PlacedDecoration::Type::STRIKE_THROUGH);
+    ASSERT_EQ(decorations[5]->type, PlacedDecoration::Type::DOUBLE_UNDERLINE);
+    ASSERT_EQ(decorations[6]->type, PlacedDecoration::Type::UNDERLINE);
+
+    comparePlacement(decorations[4]->placement, QuadCorners{
+        Vector2f{118.0f, 94.0f},
+        Vector2f{208.0f, 94.0f},
+        Vector2f{118.0f, 96.5f},
+        Vector2f{208.0f, 96.5f} });
+    comparePlacement(decorations[5]->placement, QuadCorners{
+        Vector2f{118.0f, 116.0f},
+        Vector2f{152.0f, 116.0f},
+        Vector2f{118.0f, 122.25f},
+        Vector2f{152.0f, 122.25f} });
+    comparePlacement(decorations[6]->placement, QuadCorners{
+        Vector2f{208.0f, 116.0f},
+        Vector2f{428.0f, 116.0f},
+        Vector2f{208.0f, 118.5f},
+        Vector2f{428.0f, 118.5f} });
+
+    ode::BitmapPtr bitmap = nullptr;
+
+    const DrawOptions drawOptions { 1.0f, std::nullopt };
+    const Dimensions dimensions = getDrawBufferDimensions(context, textShape, drawOptions);
+
+    bitmap = std::make_shared<ode::Bitmap>(ode::PixelFormat::RGBA, ode::Vector2i(dimensions.width, dimensions.height));
+    bitmap->clear();
+
+    const DrawTextResult drawResult = drawPlacedText(context, textShape, bitmap->pixels(), bitmap->width(), bitmap->height(), drawOptions);
+    ASSERT_FALSE(drawResult.error);
+}
