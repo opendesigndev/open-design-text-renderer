@@ -64,7 +64,7 @@ protected:
         ASSERT_FALSE(octopusData.content->layers->empty());
     }
 
-    static void compareGlyphsPlacement(const textify::PlacedGlyph::QuadCorners &pg1pos, const textify::PlacedGlyph::QuadCorners &pg2pos) {
+    static void comparePlacement(const textify::QuadCorners &pg1pos, const textify::QuadCorners &pg2pos) {
         ASSERT_EQ(pg1pos.topLeft.x, pg2pos.topLeft.x);
         ASSERT_EQ(pg1pos.topLeft.y, pg2pos.topLeft.y);
         ASSERT_EQ(pg1pos.topRight.x, pg2pos.topRight.x);
@@ -79,11 +79,12 @@ protected:
 
     const std::string fontsDirectory = std::string(FONTS_DIR);
     const std::string singleLetterOctopusPath = std::string(TESTING_OCTOPUS_DIR) + "SingleLetter.json";
+    const std::string decorationsOctopusPath = std::string(TESTING_OCTOPUS_DIR) + "Decorations.json";
     const textify::FontSpecifier fontHelveticaNeue { "HelveticaNeue" };
 };
 
 
-TEST_F(TextifyApiTests, singleLetterShapeAndDraw) {
+TEST_F(TextifyApiTests, singleLetter) {
     using namespace textify;
 
     octopus::Octopus octopusData;
@@ -113,7 +114,7 @@ TEST_F(TextifyApiTests, singleLetterShapeAndDraw) {
     ASSERT_EQ(pg->fontSize, 600);
     ASSERT_EQ(pg->glyphCodepoint, 60);
     ASSERT_EQ(pg->index, 0);
-    compareGlyphsPlacement(pg->placement, PlacedGlyph::QuadCorners{
+    comparePlacement(pg->placement, QuadCorners{
         Vector2f{1.0f, 142.0f},
         Vector2f{344.0f, 142.0f},
         Vector2f{1.0f, 571.0f},

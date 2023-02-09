@@ -62,6 +62,13 @@ struct Dimensions
     int height;
 };
 
+struct QuadCorners {
+    Vector2f topLeft;
+    Vector2f topRight;
+    Vector2f bottomLeft;
+    Vector2f bottomRight;
+};
+
 struct DrawTextResult
 {
     Rectangle bounds;

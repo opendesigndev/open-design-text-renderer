@@ -18,12 +18,7 @@ struct PlacedDecoration {
         STRIKE_THROUGH,
     } type;
     /// Decoration placement in the containing layer, specified by its four quad corners.
-    struct QuadCorners {
-        Vector2f topLeft;
-        Vector2f topRight;
-        Vector2f bottomLeft;
-        Vector2f bottomRight;
-    } placement;
+    QuadCorners placement;
     /// Decoration color (incl. alpha).
     uint32_t color;
 };

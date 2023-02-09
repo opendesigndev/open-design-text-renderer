@@ -163,7 +163,7 @@ void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGl
     const Pixel32 topRightColor = 0x55880000;
     BitmapWriter w = BitmapWriter(bitmap);
 
-    const PlacedGlyph::QuadCorners &placement = pg.placement;
+    const QuadCorners &placement = pg.placement;
 
     const float width = (pg.placement.topRight.x - pg.placement.topLeft.x) * scale;
     const float height = (pg.placement.bottomLeft.y - pg.placement.topLeft.y) * scale;
