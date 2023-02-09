@@ -9,6 +9,9 @@
 #include <ode-renderer.h>
 
 #include <textify/textify-api.h>
+#include <textify/PlacedTextData.h>
+
+#include "textify/TextShape.h"
 
 
 namespace {
@@ -33,55 +36,97 @@ protected:
         context = textify::createContext(textifyContextOptions());
     }
 
+    void addMissingFonts(const octopus::Text &text) {
+        const std::vector<std::string> missingFonts = listMissingFonts(context, text);
+        for (const std::string &missingFont : missingFonts) {
+            const bool isAdded =
+                addFontFile(context, missingFont, std::string(), (std::string) (fontsDirectory+(missingFont+".ttf")), false) ||
+                addFontFile(context, missingFont, std::string(), (std::string) (fontsDirectory+(missingFont+".otf")), false);
+            ASSERT_TRUE(isAdded);
+        }
+    }
+
+    static void readOctopusFile(const std::string &octopusFilePath, octopus::Octopus &octopusData) {
+        std::string octopusJson;
+        ASSERT_TRUE(ode::readFile(octopusFilePath, octopusJson));
+
+        const octopus::Parser::Error parseError = octopus::Parser::parse(octopusData, octopusJson.c_str());
+        ASSERT_FALSE(parseError);
+
+        std::set<std::string> layerIds;
+        std::string validationError;
+        ASSERT_TRUE(octopus::validate(octopusData, layerIds, &validationError));
+
+        ASSERT_EQ(octopusData.type, octopus::Octopus::Type::ARTBOARD);
+        ASSERT_TRUE(octopusData.content.has_value());
+
+        ASSERT_TRUE(octopusData.content->layers.has_value());
+        ASSERT_FALSE(octopusData.content->layers->empty());
+    }
+
+    static void compareGlyphsPlacement(const textify::PlacedGlyph::QuadCorners &pg1pos, const textify::PlacedGlyph::QuadCorners &pg2pos) {
+        ASSERT_EQ(pg1pos.topLeft.x, pg2pos.topLeft.x);
+        ASSERT_EQ(pg1pos.topLeft.y, pg2pos.topLeft.y);
+        ASSERT_EQ(pg1pos.topRight.x, pg2pos.topRight.x);
+        ASSERT_EQ(pg1pos.topRight.y, pg2pos.topRight.y);
+        ASSERT_EQ(pg1pos.bottomLeft.x, pg2pos.bottomLeft.x);
+        ASSERT_EQ(pg1pos.bottomLeft.y, pg2pos.bottomLeft.y);
+        ASSERT_EQ(pg1pos.bottomRight.x, pg2pos.bottomRight.x);
+        ASSERT_EQ(pg1pos.bottomRight.y, pg2pos.bottomRight.y);
+    }
+
     textify::ContextHandle context;
 
     const std::string fontsDirectory = std::string(FONTS_DIR);
     const std::string singleLetterOctopusPath = std::string(TESTING_OCTOPUS_DIR) + "SingleLetter.json";
+    const textify::FontSpecifier fontHelveticaNeue { "HelveticaNeue" };
 };
 
 
-TEST_F(TextifyApiTests, always) {
-    std::string octopusJson;
-    ASSERT_TRUE(ode::readFile(singleLetterOctopusPath, octopusJson));
+TEST_F(TextifyApiTests, singleLetterShapeAndDraw) {
+    using namespace textify;
 
     octopus::Octopus octopusData;
-    const octopus::Parser::Error parseError = octopus::Parser::parse(octopusData, octopusJson.c_str());
-    ASSERT_FALSE(parseError);
-
-    std::set<std::string> layerIds;
-    std::string validationError;
-    ASSERT_TRUE(octopus::validate(octopusData, layerIds, &validationError));
-
-    ASSERT_EQ(octopusData.type, octopus::Octopus::Type::ARTBOARD);
-    ASSERT_TRUE(octopusData.content.has_value());
-
-    ASSERT_TRUE(octopusData.content->layers.has_value());
-    ASSERT_FALSE(octopusData.content->layers->empty());
+    readOctopusFile(singleLetterOctopusPath, octopusData);
 
     const octopus::Layer &textLayer = octopusData.content->layers->front();
     const nonstd::optional<octopus::Text> &text = textLayer.text;
 
     ASSERT_TRUE(text.has_value());
 
-    const std::vector<std::string> missingFonts = textify::listMissingFonts(context, *text);
-    for (const std::string &missingFont : missingFonts) {
-        const bool isAdded =
-            textify::addFontFile(context, missingFont, std::string(), (std::string) (fontsDirectory+(missingFont+".ttf")), false) ||
-            textify::addFontFile(context, missingFont, std::string(), (std::string) (fontsDirectory+(missingFont+".otf")), false);
-        ASSERT_TRUE(isAdded);
-    }
+    addMissingFonts(*text);
 
-    const textify::TextShapeHandle textShape = textify::shapePlacedText(context, *text);
+    const TextShapeHandle textShape = shapePlacedText(context, *text);
     ASSERT_TRUE(textShape != nullptr);
+
+    ASSERT_TRUE(textShape->placedData != nullptr);
+    ASSERT_EQ(textShape->placedData->glyphs.size(), 1);
+    ASSERT_EQ(textShape->placedData->decorations.size(), 0);
+    ASSERT_TRUE(textShape->placedData->firstBaseline.has_value());
+    ASSERT_EQ(*textShape->placedData->firstBaseline, 571.203125);
+    ASSERT_EQ(textShape->placedData->glyphs.count(fontHelveticaNeue), 1);
+
+    const PlacedGlyphs &pgs = textShape->placedData->glyphs.at(fontHelveticaNeue);
+    ASSERT_EQ(pgs.size(), 1);
+
+    const PlacedGlyphPtr &pg = pgs.front();
+    ASSERT_EQ(pg->fontSize, 600);
+    ASSERT_EQ(pg->glyphCodepoint, 60);
+    ASSERT_EQ(pg->index, 0);
+    compareGlyphsPlacement(pg->placement, PlacedGlyph::QuadCorners{
+        Vector2f{1.0f, 142.0f},
+        Vector2f{344.0f, 142.0f},
+        Vector2f{1.0f, 571.0f},
+        Vector2f{344.0f, 571.0f} });
 
     ode::BitmapPtr bitmap = nullptr;
 
-    const textify::DrawOptions drawOptions { 1.0f, std::nullopt };
-    const textify::Dimensions dimensions = textify::getDrawBufferDimensions(context, textShape, drawOptions);
+    const DrawOptions drawOptions { 1.0f, std::nullopt };
+    const Dimensions dimensions = getDrawBufferDimensions(context, textShape, drawOptions);
 
     bitmap = std::make_shared<ode::Bitmap>(ode::PixelFormat::RGBA, ode::Vector2i(dimensions.width, dimensions.height));
     bitmap->clear();
 
-    const textify::DrawTextResult drawResult = textify::drawPlacedText(context, textShape, bitmap->pixels(), bitmap->width(), bitmap->height(), drawOptions);
+    const DrawTextResult drawResult = drawPlacedText(context, textShape, bitmap->pixels(), bitmap->width(), bitmap->height(), drawOptions);
     ASSERT_FALSE(drawResult.error);
 }

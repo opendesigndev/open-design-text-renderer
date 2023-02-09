@@ -37,6 +37,9 @@ set(INTERNAL_LIBRARY_DEPENDENCIES
 target_link_libraries(${TEST_NAME} PRIVATE
     ${GTEST_BOTH_LIBRARIES} ${INTERNAL_LIBRARY_DEPENDENCIES})
 
+target_include_directories(${TEST_NAME} PUBLIC
+    ${TEXTIFY_DIR}/src/)
+
 # Add the test
 add_test(${TEST_NAME} ${TEST_NAME})
 
