@@ -769,10 +769,14 @@ TextDrawResult drawPlacedText(Context &ctx,
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
         value.transform = compat::Matrix3f::identity;
-        value.drawBounds = computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
+        value.transform.m[2][0] = placedTextData.textBounds.l;
+        value.transform.m[2][1] = placedTextData.textBounds.t;
         if (placedTextData.firstBaseline.has_value()) {
-            value.drawBounds.t += *placedTextData.firstBaseline * (1.0f - scale);
+            value.transform.m[2][1] += *placedTextData.firstBaseline * (1.0f - scale);
         }
+        value.drawBounds = computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
+        value.drawBounds.l = 0;
+        value.drawBounds.t = 0;
         return value;
     } else {
         return drawResult.error();
