@@ -771,8 +771,8 @@ TextDrawResult drawPlacedText(Context &ctx,
         value.transform = compat::Matrix3f::identity;
         value.transform.m[2][0] = placedTextData.textBounds.l;
         value.transform.m[2][1] = placedTextData.textBounds.t;
-        if (placedTextData.firstBaseline.has_value()) {
-            value.transform.m[2][1] += *placedTextData.firstBaseline * (1.0f - scale);
+        if (placedTextData.baseline.has_value()) {
+            value.transform.m[2][1] += *placedTextData.baseline * (1.0f - scale);
         }
         value.drawBounds = computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
         value.drawBounds.l = 0;
