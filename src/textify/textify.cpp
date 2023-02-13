@@ -784,10 +784,10 @@ TextDrawResult drawPlacedText(Context &ctx,
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
         value.transform = convertMatrix(placedTextData.textTransform);
-        if (placedTextData.baseline.has_value()) {
-            value.transform.m[2][1] += *placedTextData.baseline * (1.0f - scale);
-        }
         value.drawBounds = computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
+        if (placedTextData.baseline.has_value()) {
+            value.drawBounds.t += *placedTextData.baseline * (1.0f - scale);
+        }
         return value;
     } else {
         return drawResult.error();
