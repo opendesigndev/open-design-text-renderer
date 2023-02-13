@@ -738,10 +738,8 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
     }
 
     // Compute the unscaled stretched bounds
-    const compat::Vector2f textTranslation { textTransform.m[2][0], textTransform.m[2][1] };
-    compat::FRectangle unstretchedTextBounds =
-        getStretchedTextBounds(ctx, shapes, textBoundsNoTransform, formattedText->formattingParams(), baseline, 1.0f) +
-        textTranslation;
+    const compat::FRectangle unstretchedTextBounds =
+        compat::transform(getStretchedTextBounds(ctx, shapes, textBoundsNoTransform, formattedText->formattingParams(), baseline, 1.0f), textTransform);
 
     return std::make_unique<PlacedTextData>(std::move(placedGlyphs),
                                             std::move(placedDecorations),
