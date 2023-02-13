@@ -767,12 +767,6 @@ TextDrawResult drawPlacedText(Context &ctx,
                               float scale,
                               const compat::Rectangle &viewArea,
                               void *pixels, int width, int height) {
-    const compat::FRectangle stretchedTextBounds {
-        placedTextData.textBounds.l,
-        placedTextData.textBounds.t,
-        placedTextData.textBounds.w * scale,
-        placedTextData.textBounds.h * scale };
-
     const compat::FRectangle viewAreaTextSpace = utils::scaleRect(utils::toFRectangle(viewArea), scale);
 
     TextDrawResult drawResult = drawPlacedTextInner(ctx,
@@ -782,12 +776,18 @@ TextDrawResult drawPlacedText(Context &ctx,
                                                     static_cast<Pixel32*>(pixels), width, height);
 
     if (drawResult) {
+        compat::FRectangle stretchedTextBounds {
+            placedTextData.textBounds.l,
+            placedTextData.textBounds.t,
+            placedTextData.textBounds.w * scale,
+            placedTextData.textBounds.h * scale };
+        if (placedTextData.baseline.has_value()) {
+            stretchedTextBounds.t += *placedTextData.baseline * (1.0f - scale);
+        }
+
         TextDrawOutput value = drawResult.moveValue();
         value.transform = convertMatrix(placedTextData.textTransform);
         value.drawBounds = computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
-        if (placedTextData.baseline.has_value()) {
-            value.drawBounds.t += *placedTextData.baseline * (1.0f - scale);
-        }
         return value;
     } else {
         return drawResult.error();
