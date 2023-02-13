@@ -31,6 +31,20 @@ namespace {
 FRectangle convertRect(const compat::FRectangle& r) {
     return FRectangle{r.l, r.t, r.w, r.h};
 }
+Matrix3f convertMatrix(const compat::Matrix3f &m) {
+    return Matrix3f {
+        m.m[0][0], m.m[0][1], m.m[0][2],
+        m.m[1][0], m.m[1][1], m.m[1][2],
+        m.m[2][0], m.m[2][1], m.m[2][2]
+    };
+}
+compat::Matrix3f convertMatrix(const Matrix3f &m) {
+    return compat::Matrix3f {
+        m.m[0][0], m.m[0][1], m.m[0][2],
+        m.m[1][0], m.m[1][1], m.m[1][2],
+        m.m[2][0], m.m[2][1], m.m[2][2]
+    };
+}
 }
 
 namespace priv {
@@ -552,7 +566,7 @@ compat::Rectangle computeDrawBounds(Context &ctx,
 }
 
 PlacedTextResult shapePlacedText(Context &ctx,
-                               const octopus::Text& text)
+                                 const octopus::Text& text)
 {
     TextParser::ParseResult parsedText = TextParser(text).parseText();
 
@@ -738,12 +752,13 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
     }
 
     // Compute the unscaled stretched bounds
-    const compat::FRectangle unstretchedTextBounds =
-        compat::transform(getStretchedTextBounds(ctx, shapes, textBoundsNoTransform, formattedText->formattingParams(), baseline, 1.0f), textTransform);
+    const compat::FRectangle unstretchedTextBounds = getStretchedTextBounds(ctx, shapes, textBoundsNoTransform, formattedText->formattingParams(), baseline, 1.0f);
+    const Matrix3f transformMatrix = convertMatrix(textTransform);
 
     return std::make_unique<PlacedTextData>(std::move(placedGlyphs),
                                             std::move(placedDecorations),
                                             convertRect(unstretchedTextBounds),
+                                            transformMatrix,
                                             text.baselinePolicy() == BaselinePolicy::SET ? std::make_optional(baseline) : std::nullopt);
 }
 
@@ -768,15 +783,11 @@ TextDrawResult drawPlacedText(Context &ctx,
 
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
-        value.transform = compat::Matrix3f::identity;
-        value.transform.m[2][0] = placedTextData.textBounds.l;
-        value.transform.m[2][1] = placedTextData.textBounds.t;
+        value.transform = convertMatrix(placedTextData.textTransform);
         if (placedTextData.baseline.has_value()) {
             value.transform.m[2][1] += *placedTextData.baseline * (1.0f - scale);
         }
         value.drawBounds = computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
-        value.drawBounds.l = 0;
-        value.drawBounds.t = 0;
         return value;
     } else {
         return drawResult.error();
