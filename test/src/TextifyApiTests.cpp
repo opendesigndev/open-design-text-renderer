@@ -103,8 +103,7 @@ TEST_F(TextifyApiTests, singleLetter) {
     ASSERT_TRUE(textShape->placedData != nullptr);
     ASSERT_EQ(textShape->placedData->glyphs.size(), 1);
     ASSERT_EQ(textShape->placedData->decorations.size(), 0);
-    ASSERT_TRUE(textShape->placedData->baseline.has_value());
-    ASSERT_EQ(*textShape->placedData->baseline, 571.203125);
+    ASSERT_EQ(textShape->placedData->baseline, 571.203125);
     ASSERT_EQ(textShape->placedData->glyphs.count(fontHelveticaNeue), 1);
 
     const PlacedGlyphs &pgs = textShape->placedData->glyphs.at(fontHelveticaNeue);
@@ -151,8 +150,7 @@ TEST_F(TextifyApiTests, decorations) {
     ASSERT_TRUE(textShape->placedData != nullptr);
     ASSERT_EQ(textShape->placedData->glyphs.size(), 1);
     ASSERT_EQ(textShape->placedData->decorations.size(), 7);
-    ASSERT_TRUE(textShape->placedData->baseline.has_value());
-    ASSERT_EQ(*textShape->placedData->baseline, 47.59375);
+    ASSERT_EQ(textShape->placedData->baseline, 47.59375);
     ASSERT_EQ(textShape->placedData->glyphs.count(fontHelveticaNeue), 1);
 
     const PlacedGlyphs &pgs = textShape->placedData->glyphs.at(fontHelveticaNeue);

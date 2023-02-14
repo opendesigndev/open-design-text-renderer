@@ -759,7 +759,7 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                                             std::move(placedDecorations),
                                             convertRect(unstretchedTextBounds),
                                             transformMatrix,
-                                            text.baselinePolicy() == BaselinePolicy::SET ? std::make_optional(baseline) : std::nullopt);
+                                            text.baselinePolicy() == BaselinePolicy::SET ? baseline : 0.0f);
 }
 
 TextDrawResult drawPlacedText(Context &ctx,
@@ -778,12 +778,9 @@ TextDrawResult drawPlacedText(Context &ctx,
     if (drawResult) {
         compat::FRectangle stretchedTextBounds {
             placedTextData.textBounds.l,
-            placedTextData.textBounds.t,
+            placedTextData.textBounds.t + placedTextData.baseline * (1.0f - scale),
             placedTextData.textBounds.w * scale,
             placedTextData.textBounds.h * scale };
-        if (placedTextData.baseline.has_value()) {
-            stretchedTextBounds.t += *placedTextData.baseline * (1.0f - scale);
-        }
 
         TextDrawOutput value = drawResult.moveValue();
         value.transform = convertMatrix(placedTextData.textTransform);

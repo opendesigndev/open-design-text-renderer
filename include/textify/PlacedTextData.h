@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include <optional>
-
 #include <textify/PlacedGlyph.h>
 #include <textify/PlacedDecoration.h>
 
@@ -16,7 +14,7 @@ struct PlacedTextData
                    PlacedDecorations &&decorations_,
                    const FRectangle &textBounds_,
                    const Matrix3f &transform_,
-                   std::optional<float> baseline_);
+                   float baseline_);
 
     /// Glyphs and their placements.
     PlacedGlyphsPerFont glyphs;
@@ -27,7 +25,7 @@ struct PlacedTextData
     /// Text transfomation within the layer.
     Matrix3f textTransform;
     /// Baseline - optionally used for text scaling, the text should be scaled so that the first baseline is preserved.
-    std::optional<float> baseline = std::nullopt;
+    float baseline = 0.0f;
 };
 using PlacedTextDataPtr = std::unique_ptr<PlacedTextData>;
 
