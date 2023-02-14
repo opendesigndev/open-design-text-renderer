@@ -304,7 +304,7 @@ DrawTextResult drawPlacedText(ContextHandle ctx,
         return {{}, {}, true};
     }
 
-    if (textShape) {
+    if (textShape && sanitizeShape(ctx, textShape)) {
         const PlacedTextData &placedTextData = textShape->getPlacedData();
 
         const compat::Rectangle viewArea = drawOptions.viewArea.has_value()

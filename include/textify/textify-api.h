@@ -280,7 +280,7 @@ DrawTextResult drawText(ContextHandle ctx,
                         const DrawOptions& drawOptions = {});
 
 
-// TODO: Matus: New textify functionality. Cleanup.s
+// TODO: Matus: New textify functionality. Cleanup.
 /**
  * @brief Shapes a given Octopus text and returns a handle to be used to reference the particular text shape within the context.
  *
