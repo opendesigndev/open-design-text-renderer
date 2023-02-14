@@ -20,11 +20,10 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
                            RenderScale scale,
                            bool internalDisableHinting) {
     float glyphScale = 1.0f;
-    const font_size desiredSize = face->isScalable() ? (placedGlyph.fontSize * scale) : placedGlyph.fontSize;
-    const Result<font_size,bool> setSizeRes = face->setSize(desiredSize);
+    const Result<font_size,bool> setSizeRes = face->setSize(placedGlyph.fontSize);
 
     if (setSizeRes && !face->isScalable()) {
-        const float resizeFactor = desiredSize / setSizeRes.value();
+        const float resizeFactor = placedGlyph.fontSize / setSizeRes.value();
         const float ascender = FreetypeHandle::from26_6fixed(face->getFtFace()->size->metrics.ascender) * resizeFactor;
 
         glyphScale = (ascender * scale) / setSizeRes.value();
@@ -34,10 +33,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
         static_cast<float>(placedGlyph.placement.topLeft.x - std::floor(placedGlyph.placement.topLeft.x)),
         static_cast<float>(placedGlyph.placement.topLeft.y - std::floor(placedGlyph.placement.topLeft.y)),
     };
-    // If the face is scalable, scaling has already been applied in the setSize step.
-    const ScaleParams glyphScaleParams = face->isScalable()
-        ? ScaleParams { 1.0f, 1.0f }
-        : ScaleParams { scale, glyphScale };
+    const ScaleParams glyphScaleParams { scale, glyphScale };
 
     GlyphPtr glyph = face->acquireGlyph(placedGlyph.glyphCodepoint, offset, glyphScaleParams, true, internalDisableHinting);
     if (!glyph) {
