@@ -19,28 +19,28 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
                            const FacePtr &face,
                            RenderScale scale,
                            bool internalDisableHinting) {
-    float glyphScale = 1.0f;
+    float bitmapGlyphScale = 1.0f;
     const Result<font_size,bool> setSizeRes = face->setSize(placedGlyph.fontSize);
 
     if (setSizeRes && !face->isScalable()) {
         const float resizeFactor = placedGlyph.fontSize / setSizeRes.value();
         const float ascender = FreetypeHandle::from26_6fixed(face->getFtFace()->size->metrics.ascender) * resizeFactor;
 
-        glyphScale = (ascender * scale) / setSizeRes.value();
+        bitmapGlyphScale = (ascender * scale) / setSizeRes.value();
     }
 
+    const Vector2f &placedGlyphPosition = placedGlyph.placement.topLeft;
+
     const compat::Vector2f offset {
-        static_cast<float>(placedGlyph.placement.topLeft.x - std::floor(placedGlyph.placement.topLeft.x)),
-        static_cast<float>(placedGlyph.placement.topLeft.y - std::floor(placedGlyph.placement.topLeft.y)),
+        static_cast<float>(placedGlyphPosition.x - std::floor(placedGlyphPosition.x)),
+        static_cast<float>(placedGlyphPosition.y - std::floor(placedGlyphPosition.y)),
     };
-    const ScaleParams glyphScaleParams { scale, glyphScale };
+    const ScaleParams glyphScaleParams { scale, bitmapGlyphScale };
 
     GlyphPtr glyph = face->acquireGlyph(placedGlyph.glyphCodepoint, offset, glyphScaleParams, true, internalDisableHinting);
     if (!glyph) {
         return nullptr;
     }
-
-    const Vector2f &placedGlyphPosition = placedGlyph.placement.topLeft;
 
     glyph->setDestination({
         static_cast<int>(std::floor(placedGlyphPosition.x * scale)),
