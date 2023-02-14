@@ -287,11 +287,11 @@ private:
                        ShapeResult& result);
 
 private:
-    /// Output of the shaping phase and input to the drawing phase.
-    struct ShapingPhaseOutput {
+    /// Result of the shaping phase and input to the drawing phase.
+    struct ShapingResult {
         GlyphShapes glyphs_;
         LineSpans lineSpans_;
-    } shapingPhaseOutput_;
+    } shapingResult_;
 
     // TODO: Matus: Whom are these font faces reported to? It seems like nobody reads this.
     ReportedFaces reportedFaces_;
