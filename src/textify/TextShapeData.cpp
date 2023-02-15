@@ -5,7 +5,7 @@ namespace textify {
 namespace priv {
 
 TextShapeData::TextShapeData(FormattedTextPtr text,
-                             FrameSizeOpt frameSize,
+                             const FrameSizeOpt &frameSize,
                              const compat::Matrix3f& textTransform,
                              ParagraphShapes&& shapes,
                              const compat::FRectangle& boundsNoTransform,
