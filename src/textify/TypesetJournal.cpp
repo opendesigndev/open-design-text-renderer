@@ -25,7 +25,7 @@ void TypesetJournal::addGlyph(GlyphPtr glyph, const Vector2f &offset)
     }
 
     lineJournal_.back().glyphJournal_.emplace_back(std::move(glyph));
-    lineJournal_.back().offsets_.emplace_back(offset);
+    lineJournal_.back().glyphOffsets_.emplace_back(offset);
 }
 
 void TypesetJournal::addDecoration(const DecorationInput& d, float scale, int index)
@@ -194,7 +194,7 @@ bool TypesetJournal::LowHighPair::partialOverflow(int limit) const
 
 bool TypesetJournal::LineRecord::empty() const
 {
-    return glyphJournal_.empty() || offsets_.empty();
+    return glyphJournal_.empty() || glyphOffsets_.empty();
 }
 
 int TypesetJournal::LineRecord::lowPoint() const

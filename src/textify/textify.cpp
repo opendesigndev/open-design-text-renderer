@@ -687,7 +687,7 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
             for (size_t l = 0; l < lineRecord.glyphJournal_.size(); l++) {
                 const GlyphShape &glyphShape = paragraphShape->glyphs()[j];
                 const GlyphPtr &glyph = lineRecord.glyphJournal_[l];
-                const compat::Vector2f &offset = lineRecord.offsets_[l];
+                const compat::Vector2f &offset = lineRecord.glyphOffsets_[l];
 
                 const IPoint2 &glyphDestination = glyph->getDestination();
 

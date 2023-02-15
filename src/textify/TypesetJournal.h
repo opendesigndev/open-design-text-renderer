@@ -68,10 +68,8 @@ public:
         LowHighPair glyphBitmapExtremes() const;
 
         std::vector<GlyphPtr> glyphJournal_;
+        std::vector<compat::Vector2f> glyphOffsets_;
         std::vector<DecorationRecord> decorationJournal_;
-
-        // TODO: Matus: offsets
-        std::vector<compat::Vector2f> offsets_;
     };
 
     struct DrawResultData
