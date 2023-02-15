@@ -249,8 +249,8 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 const float glyphScale = (setSizeRes && !face->isScalable()) ? scaledGlyphShape.ascender / (float)setSizeRes.value() : 1.0f;
 
                 const Vector2f offset {
-                    static_cast<float>(caret.x - floor(caret.x)),
-                    static_cast<float>(caret.y - floor(caret.y)),
+                    caret.x - floor(caret.x),
+                    caret.y - floor(caret.y),
                 };
 
                 GlyphPtr glyph = face->acquireGlyph(unscaledGlyphShape.codepoint, offset, {scale,glyphScale}, true, ctx.config.internalDisableHinting);

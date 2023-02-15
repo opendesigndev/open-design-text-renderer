@@ -32,8 +32,8 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
     const Vector2f &placedGlyphPosition = placedGlyph.placement.topLeft;
 
     const compat::Vector2f offset {
-        static_cast<float>(placedGlyphPosition.x - std::floor(placedGlyphPosition.x)),
-        static_cast<float>(placedGlyphPosition.y - std::floor(placedGlyphPosition.y)),
+        (placedGlyphPosition.x - std::floor(placedGlyphPosition.x)) + (gwScaled - std::floor(gwScaled)),
+        (placedGlyphPosition.y - std::floor(placedGlyphPosition.y)) + (ghScaled - std::floor(ghScaled)),
     };
     const ScaleParams glyphScaleParams { scale, bitmapGlyphScale };
 
