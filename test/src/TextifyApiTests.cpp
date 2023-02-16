@@ -57,7 +57,7 @@ protected:
         std::string validationError;
         ASSERT_TRUE(octopus::validate(octopusData, layerIds, &validationError));
 
-        ASSERT_EQ(octopusData.type, octopus::Octopus::Type::ARTBOARD);
+        ASSERT_EQ(octopusData.type, octopus::Octopus::Type::OCTOPUS_COMPONENT);
         ASSERT_TRUE(octopusData.content.has_value());
 
         ASSERT_TRUE(octopusData.content->layers.has_value());
