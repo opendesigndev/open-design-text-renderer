@@ -101,8 +101,8 @@ GlyphPtr GlyphAcquisitor::acquire(FT_UInt codepoint, const Vector2f& offset, con
     glyph->bitmapBearing.y = int(glyphSlot->bitmap_top * k);
     glyph->lsb_delta = FreetypeHandle::from26_6fixed(FT_F26Dot6(glyphSlot->lsb_delta * k));
     glyph->rsb_delta = FreetypeHandle::from26_6fixed(FT_F26Dot6(glyphSlot->rsb_delta * k));
-    glyph->metricsBearingX = FreetypeHandle::from26_6fixed(FT_F26Dot6(glyphSlot->metrics.horiBearingX));
-    glyph->metricsBearingY = FreetypeHandle::from26_6fixed(FT_F26Dot6(glyphSlot->metrics.horiBearingY));
+    glyph->metricsBearing.x = FreetypeHandle::from26_6fixed(FT_F26Dot6(glyphSlot->metrics.horiBearingX));
+    glyph->metricsBearing.y = FreetypeHandle::from26_6fixed(FT_F26Dot6(glyphSlot->metrics.horiBearingY));
 
     return glyph;
 }

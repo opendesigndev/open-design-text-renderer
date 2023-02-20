@@ -24,11 +24,9 @@ public:
     compat::Rectangle getBitmapBounds() const;
     const IPoint2 &getDestination() const { return destPos_; }
 
-    IPoint2 bitmapBearing;        /// Position of bitmap relative to baseline
+    IVec2 bitmapBearing;          /// Position of bitmap relative to origin (and to baseline)
     spacing lsb_delta, rsb_delta; /// left / right side bearing delta, see FT_GlyphSlotRec_ for details
-
-    spacing metricsBearingX;
-    spacing metricsBearingY;
+    FVec2 metricsBearing;         /// Position of the real glyph relative to origin (and to baseline)
 
 protected:
     IPoint2 destPos_; /// Position in the destination bitmap, computed using #bitmapBearing.

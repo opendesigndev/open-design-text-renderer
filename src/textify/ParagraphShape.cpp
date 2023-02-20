@@ -717,8 +717,8 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
 
         if (loadGlyphsBearings) {
             const GlyphPtr loadedGlyph = face->acquireGlyph(glyph.codepoint, {}, {1.0f,1.0f}, false, true);
-            glyph.bearingX = loadedGlyph->metricsBearingX;
-            glyph.bearingY = loadedGlyph->metricsBearingY;
+            glyph.bearingX = loadedGlyph->metricsBearing.x;
+            glyph.bearingY = loadedGlyph->metricsBearing.y;
         } else {
             glyph.bearingX = glyph.bearingY = 0.0f;
         }
