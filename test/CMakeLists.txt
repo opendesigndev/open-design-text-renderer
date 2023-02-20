@@ -8,7 +8,7 @@ enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-set(TEXTIFY_DIR ${CMAKE_SOURCE_DIR}/textify/)
+set(TEXTIFY_DIR ${CMAKE_SOURCE_DIR}/open-design-text-renderer/)
 set(TEXTIFY_TEST_DIR ${TEXTIFY_DIR}/test)
 
 # Define a value for testing Octopus files directory
