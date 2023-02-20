@@ -8,11 +8,11 @@ enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-set(TEXTIFY_DIR ${CMAKE_SOURCE_DIR}/open-design-text-renderer/)
-set(TEXTIFY_TEST_DIR ${TEXTIFY_DIR}/test)
+set(TEXTIFY_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(TEXTIFY_DIR ${TEXTIFY_TEST_DIR}/..)
 
 # Define a value for testing Octopus files directory
-add_definitions(-DTESTING_OCTOPUS_DIR="${TEXTIFY_DIR}/test/test-files/")
+add_definitions(-DTESTING_OCTOPUS_DIR="${TEXTIFY_TEST_DIR}/test-files/")
 # Define a value for a directory of fonts
 #     TODO: Matus: Make sure this is an acceptable local directory.
 add_definitions(-DFONTS_DIR="${CMAKE_SOURCE_DIR}/../../Fonts/")
