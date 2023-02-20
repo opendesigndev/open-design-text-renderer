@@ -107,6 +107,16 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
     }
 }
 
+void debug_drawPoint(compat::BitmapRGBA &bitmap, const compat::Vector2i &pos, int radius, Pixel32 color) {
+    BitmapWriter w = BitmapWriter(bitmap);
+
+    for (int x = pos.x-(radius-1) ; x <= pos.x+(radius-1); x += 1) {
+        for (int y = pos.y-(radius-1); y <= pos.y+(radius-1); y += 1) {
+            w.write(x, y, color);
+        }
+    }
+}
+
 void debug_drawHorizontalLine(compat::BitmapRGBA &bitmap, int y, Pixel32 color) {
     BitmapWriter w = BitmapWriter(bitmap);
 

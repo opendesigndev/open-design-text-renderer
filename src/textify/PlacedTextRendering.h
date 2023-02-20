@@ -30,6 +30,7 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
                     const PlacedDecoration &pd,
                     RenderScale scale);
 
+void debug_drawPoint(compat::BitmapRGBA &bitmap, const compat::Vector2i &pos, int radius = 1, Pixel32 color = 0xFF2222FF);
 void debug_drawHorizontalLine(compat::BitmapRGBA &bitmap, int y, Pixel32 color = 0x88CC8888);
 void debug_drawVerticalLine(compat::BitmapRGBA &bitmap, int x, Pixel32 color = 0x88CC8888);
 void debug_drawRectangle(compat::BitmapRGBA &bitmap, const compat::FRectangle &rectangle, Pixel32 color = 0x55008888);
