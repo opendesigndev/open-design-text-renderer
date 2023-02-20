@@ -94,8 +94,12 @@ std::vector<FormattedParagraph> splitText(const utils::Log& log, const Formatted
 
     // Split text & format into paragraphs
     std::vector<FormattedParagraph> paragraphs;
+    if (textFormat.empty()) {
+        return paragraphs;
+    }
+
     const compat::qchar* textPtr = text.getText();
-    const ImmediateFormat* formatPtr = &textFormat[0];
+    const ImmediateFormat* formatPtr = textFormat.data();
 
     for (int limit = text.getLength(); limit > 0; ) {
         paragraphs.emplace_back(FormattedParagraph(log));
