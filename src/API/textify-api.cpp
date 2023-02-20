@@ -141,6 +141,9 @@ TextShapeHandle shapeText(ContextHandle ctx,
     if (ctx == nullptr) {
         return nullptr;
     }
+    if (text.value.empty()) {
+        return nullptr;
+    }
 
     priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
     if (!textShapeResult) {
@@ -271,16 +274,19 @@ TextShapeHandle shapePlacedText(ContextHandle ctx,
     if (ctx == nullptr) {
         return nullptr;
     }
+    if (text.value.empty()) {
+        return nullptr;
+    }
 
     // TODO: Matus: Return just placed text?
     priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
     priv::PlacedTextResult placedShapeResult = priv::shapePlacedText(*ctx, text);
 
     if (!textShapeResult) {
-        ctx->getLogger().error("Text shaping failed with error: {}", (int)textShapeResult.error());
+        ctx->getLogger().error("Text shaping failed with error: {}", errorToString(textShapeResult.error()));
     }
     if (!placedShapeResult) {
-        ctx->getLogger().error("Text shaping failed with error: {}", (int)placedShapeResult.error());
+        ctx->getLogger().error("Text shaping failed with error: {}", errorToString(placedShapeResult.error()));
     }
 
     if (!textShapeResult && !placedShapeResult) {
