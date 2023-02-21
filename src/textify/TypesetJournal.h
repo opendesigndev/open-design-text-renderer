@@ -83,7 +83,7 @@ public:
 
     void setLastLinePolicy(LastLinePolicy policy) { lastLinePolicy_ = policy; }
 
-    void startLine(float y);
+    void startLine();
     void addGlyph(GlyphPtr glyph, const compat::Vector2f &offset);
 
     /**

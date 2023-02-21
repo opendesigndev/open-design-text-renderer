@@ -149,7 +149,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
     Vector2f caret{0.0f, y};
     for (const LineSpan &lineSpan : shapingResult_.lineSpans_) {
-        result.journal.startLine(caret.y);
+        result.journal.startLine();
 
         startCaret(lineSpan, caret.y, positioning, baselinePolicy, scale);
 

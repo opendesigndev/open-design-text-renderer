@@ -13,7 +13,7 @@ using namespace compat;
 
 static const float STRIKETHROUGH_HEIGHT = 0.25f;
 
-void TypesetJournal::startLine(float y)
+void TypesetJournal::startLine()
 {
     lineJournal_.push_back({});
 }
