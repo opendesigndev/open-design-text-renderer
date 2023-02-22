@@ -671,7 +671,6 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
     preserveFixedDimensions(text.boundsMode(), frameSize, w, h);
 
     const compat::FRectangle textBoundsNoTransform { l, t, w, h };
-    const compat::FRectangle textBoundsTransformed = transform(textBoundsNoTransform, textTransform);
 
     const float baseline = resolveBaselinePosition(p0, text.baselinePolicy(), text.verticalAlign());
 
@@ -691,9 +690,6 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
             for (size_t l = 0; l < lineRecord.glyphJournal_.size(); l++) {
                 const GlyphShape &glyphShape = paragraphShape->glyphs()[j];
                 const GlyphPtr &glyph = lineRecord.glyphJournal_[l];
-                const compat::Vector2f &offset = lineRecord.glyphOffsets_[l];
-
-                const IPoint2 &glyphDestination = glyph->getDestination();
 
                 PlacedGlyphPtr placedGlyph = std::make_unique<PlacedGlyph>();
 
@@ -701,10 +697,6 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                 placedGlyph->color = glyphShape.format.color;
                 placedGlyph->fontSize = glyphShape.format.size;
                 placedGlyph->index = glyphIndex;
-
-                const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
-                const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
-
                 placedGlyph->originPosition = Vector2f {
                     glyph->getOrigin().x,
                     glyph->getOrigin().y,
