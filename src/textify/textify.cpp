@@ -444,19 +444,11 @@ TextDrawResult drawTextInner(Context &ctx,
 
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
 
-//    debug_drawBitmapBoundaries(output, width, height);
-//    debug_drawBitmapGrid(output, width, height);
-
     for (const ParagraphShape::DrawResult &paragraphResult : paragraphResults) {
-        const TypesetJournal::DrawResult journalDrawResult = paragraphResult.journal.draw(output, bitmapBounds, stretchedTextBounds.h, viewAreaBounds, offset);
-
-        if (journalDrawResult) {
-            // totalGlyphsDrawn += (decltype(totalGlyphsDrawn)) journalDrawResult.value().numGlyphsRendered;
-            // totalGlyphBlitTime += journalDrawResult.value().glyphsRenderTime.timeSpan();
-        }
+        paragraphResult.journal.draw(output, bitmapBounds, stretchedTextBounds.h, viewAreaBounds, offset);
     }
 
-    return TextDrawOutput{bitmapBounds};
+    return TextDrawOutput { bitmapBounds };
 }
 
 ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
@@ -560,7 +552,8 @@ compat::Rectangle computeDrawBounds(Context &ctx,
                                     const PlacedTextData &placedTextData,
                                     float scale,
                                     const compat::Rectangle &viewArea) {
-    const compat::FRectangle stretchedTextBounds { placedTextData.textBounds.l,
+    const compat::FRectangle stretchedTextBounds {
+        placedTextData.textBounds.l,
         placedTextData.textBounds.t,
         placedTextData.textBounds.w * scale,
         placedTextData.textBounds.h * scale};
@@ -735,12 +728,12 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
     }
 
     // Compute the unscaled stretched bounds
-    const compat::FRectangle unstretchedTextBounds = getStretchedTextBounds(ctx, shapes, textBoundsNoTransform, formattedText->formattingParams(), baseline, 1.0f);
+    const compat::FRectangle textBoundsNotScaled = getStretchedTextBounds(ctx, shapes, textBoundsNoTransform, formattedText->formattingParams(), baseline, 1.0f);
     const Matrix3f transformMatrix = convertMatrix(textTransform);
 
     return std::make_unique<PlacedTextData>(std::move(placedGlyphs),
                                             std::move(placedDecorations),
-                                            convertRect(unstretchedTextBounds),
+                                            convertRect(textBoundsNotScaled),
                                             transformMatrix,
                                             text.baselinePolicy() == BaselinePolicy::SET ? baseline : 0.0f);
 }
@@ -780,9 +773,6 @@ TextDrawResult drawPlacedTextInner(Context &ctx,
                                    const compat::FRectangle& viewArea,
                                    Pixel32* pixels, int width, int height) {
     compat::BitmapRGBA output(compat::BitmapRGBA::WRAP_NO_OWN, pixels, width, height);
-
-//    debug_drawBitmapBoundaries(output, width, height);
-//    debug_drawBitmapGrid(output, width, height);
 
     const compat::Rectangle viewAreaBounds = (ctx.config.enableViewAreaCutout) ? utils::outerRect(viewArea) : compat::INFINITE_BOUNDS;
 

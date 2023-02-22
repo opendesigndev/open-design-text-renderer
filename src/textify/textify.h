@@ -82,9 +82,6 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
                                                 float &caretVerticalPos);
 
 
-
-
-
 compat::FRectangle getStretchedTextBounds(Context &ctx,
                                           const ParagraphShapes &paragraphShapes,
                                           const compat::FRectangle &unscaledTextBounds,
@@ -92,10 +89,12 @@ compat::FRectangle getStretchedTextBounds(Context &ctx,
                                           float baseline,
                                           float scale);
 
+/// Compute drawn bitmap boundaries as an intersection of the scaled text bounds and the view area.
 compat::Rectangle computeDrawBounds(Context &ctx,
                                     const compat::FRectangle &stretchedTextBounds,
                                     const compat::FRectangle& viewAreaTextSpace);
 
+/// Compute drawn bitmap boundaries from the scaled placed text data bounds and the view are.
 compat::Rectangle computeDrawBounds(Context &ctx,
                                     const PlacedTextData &placedTextData,
                                     float scale,
@@ -109,12 +108,14 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                                       const FrameSizeOpt &frameSize,
                                       const compat::Matrix3f &textTransform);
 
+// Draw text in the PlacedText representation into bitmap. Clip by viewArea.
 TextDrawResult drawPlacedText(Context &ctx,
                               const PlacedTextData &placedTextData,
                               float scale,
                               const compat::Rectangle &viewArea,
                               void *pixels, int width, int height);
 
+// Draw text in the PlacedText representation into bitmap. Clip by viewArea.
 TextDrawResult drawPlacedTextInner(Context &ctx,
                                    const PlacedTextData &placedTextData,
                                    RenderScale scale,
