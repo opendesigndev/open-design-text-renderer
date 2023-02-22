@@ -177,27 +177,48 @@ void debug::drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height, Pi
     }
 }
 
-void debug::drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGlyph &pg, RenderScale scale) {
+void debug::drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const FacePtr &face, const PlacedGlyph &pg, RenderScale scale) {
     const Pixel32 bottomLeftColor = 0x55000088;
     const Pixel32 topRightColor = 0x55880000;
     BitmapWriter w = BitmapWriter(bitmap);
 
-    const QuadCorners &placement = pg.placement;
+    float bitmapGlyphScale = 1.0f;
+    const Result<font_size,bool> setSizeRes = face->setSize(pg.fontSize);
 
-    const float width = (pg.placement.topRight.x - pg.placement.topLeft.x) * scale;
-    const float height = (pg.placement.bottomLeft.y - pg.placement.topLeft.y) * scale;
+    if (setSizeRes && !face->isScalable()) {
+        const float resizeFactor = pg.fontSize / setSizeRes.value();
+        const float ascender = FreetypeHandle::from26_6fixed(face->getFtFace()->size->metrics.ascender) * resizeFactor;
 
-    const Vector2f tl {
-        pg.placement.topLeft.x * scale,
-        pg.placement.topLeft.y * scale,
+        bitmapGlyphScale = (ascender * scale) / setSizeRes.value();
+    }
+
+    const Vector2f originOnBitmap {
+        std::floor(pg.originPosition.x * scale),
+        std::floor(pg.originPosition.y * scale),
     };
-    for (int x = tl.x; x < tl.x + width; x += 2) {
-        w.write(x, tl.y + height, bottomLeftColor);
+    const compat::Vector2f offset {
+        pg.originPosition.x * scale - originOnBitmap.x,
+        pg.originPosition.y * scale - originOnBitmap.y,
+    };
+    const ScaleParams glyphScaleParams { scale, bitmapGlyphScale };
+
+    GlyphPtr glyph = face->acquireGlyph(pg.glyphCodepoint, offset, glyphScaleParams, false, false);
+    if (!glyph) {
+        return;
+    }
+
+    const IVec2 tl {
+        static_cast<int>(originOnBitmap.x + glyph->bitmapBearing.x),
+        static_cast<int>(originOnBitmap.y - glyph->bitmapBearing.y)
+    };
+
+    for (int x = tl.x; x < tl.x + glyph->bitmapWidth(); x += 2) {
+        w.write(x, tl.y + glyph->bitmapHeight(), bottomLeftColor);
         w.write(x, tl.y, topRightColor);
     }
-    for (int y = tl.y; y < tl.y + height; y += 2) {
+    for (int y = tl.y; y < tl.y + glyph->bitmapHeight(); y += 2) {
         w.write(tl.x, y, bottomLeftColor);
-        w.write(tl.x + width, y, topRightColor);
+        w.write(tl.x + glyph->bitmapWidth(), y, topRightColor);
     }
 }
 

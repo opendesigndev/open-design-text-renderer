@@ -37,7 +37,7 @@ void drawVerticalLine(compat::BitmapRGBA &bitmap, int x, Pixel32 color = 0x88CC8
 void drawRectangle(compat::BitmapRGBA &bitmap, const compat::FRectangle &rectangle, Pixel32 color = 0x55008888);
 void drawBitmapBoundaries(compat::BitmapRGBA &bitmap, int width, int height, Pixel32 color = 0x55008800);
 void drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height, Pixel32 color = 0x11888888);
-void drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGlyph &pg, RenderScale scale);
+void drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const FacePtr &face, const PlacedGlyph &pg, RenderScale scale);
 }
 
 } // namespace priv

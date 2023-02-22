@@ -28,8 +28,6 @@ struct PlacedGlyph {
     uint32_t glyphCodepoint;
     /// Origin position of the glyph (on the line).
     Vector2f originPosition;
-    /// Glyph placement, specified by its four quad corners.
-    QuadCorners placement;
     /// Glyph color (incl. alpha).
     uint32_t color;
     /// Glyph index.

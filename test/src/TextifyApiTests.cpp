@@ -113,11 +113,8 @@ TEST_F(TextifyApiTests, singleLetter) {
     ASSERT_EQ(pg->fontSize, 600);
     ASSERT_EQ(pg->glyphCodepoint, 60);
     ASSERT_EQ(pg->index, 0);
-    comparePlacement(pg->placement, QuadCorners{
-        Vector2f{1.0f, 142.0f},
-        Vector2f{344.0f, 142.0f},
-        Vector2f{1.0f, 571.0f},
-        Vector2f{344.0f, 571.0f} });
+    ASSERT_EQ(pg->originPosition.x, 0.0f);
+    ASSERT_EQ(pg->originPosition.y, 571.203125f);
 
     ode::BitmapPtr bitmap = nullptr;
 

@@ -710,20 +710,6 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                     glyph->getOrigin().y,
                 };
 
-                placedGlyph->placement.topLeft = Vector2f {
-                    static_cast<float>(glyphDestination.x) + offset.x,
-                    static_cast<float>(glyphDestination.y) + offset.y };
-                const Vector2f &tl = placedGlyph->placement.topLeft;
-                placedGlyph->placement.topRight = Vector2f {
-                    tl.x + bitmapWidthF,
-                    tl.y };
-                placedGlyph->placement.bottomLeft = Vector2f {
-                    tl.x,
-                    tl.y + bitmapHeightF };
-                placedGlyph->placement.bottomRight = Vector2f {
-                    tl.x + bitmapWidthF,
-                    tl.y + bitmapHeightF };
-
                 placedGlyphs[FontSpecifier { glyphShape.format.faceId }].emplace_back(std::move(placedGlyph));
 
                 ++j;
