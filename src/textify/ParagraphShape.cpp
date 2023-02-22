@@ -291,10 +291,19 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 const float fracOffset = glyph->rsb_delta - glyph->lsb_delta;
                 caret.x += fracOffset * scale;
 
-                glyph->setOrigin(caret);
+                // x (horizontal) shift to the next character.
+                const float xShift = (isWhitespace(unscaledGlyphShape.character) ? spaceCoef : nonSpaceCoef) *
+                    (hAdvance + scaledGlyphShape.letterSpacing);
 
-                caret.x += direction * (isWhitespace(unscaledGlyphShape.character) ? spaceCoef : nonSpaceCoef) *
-                           (hAdvance + scaledGlyphShape.letterSpacing);
+                // Shit the origin to the left if RTL.
+                Vector2f origin = caret;
+                if (runRtl) {
+                    origin.x -= xShift;
+                }
+                glyph->setOrigin(origin);
+
+                // Shift caret hirozontally to the beginning of the next glyph.
+                caret.x += direction * xShift;
 
                 glyph->setDestination({static_cast<int>(floor(coord.x)), static_cast<int>(floor(coord.y))});
                 glyph->setColor(alphaMask ? ~Pixel32() : unscaledGlyphShape.format.color);
