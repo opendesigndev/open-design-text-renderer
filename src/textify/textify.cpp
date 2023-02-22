@@ -701,6 +701,9 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                     glyph->getOrigin().x,
                     glyph->getOrigin().y,
                 };
+                // TODO: Glyph rotation and scaling
+                placedGlyph->rotation = 0.0f;
+                placedGlyph->scaling = 1.0f;
 
                 placedGlyphs[FontSpecifier { glyphShape.format.faceId }].emplace_back(std::move(placedGlyph));
 

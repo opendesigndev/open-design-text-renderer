@@ -28,6 +28,10 @@ struct PlacedGlyph {
     uint32_t codepoint;
     /// Origin position of the glyph (on the line).
     Vector2f originPosition;
+    /// Rotation around glyph origin.
+    float rotation = 0.0f;
+    /// Additional scaling relative to glyph origin.
+    float scaling = 1.0f;
     /// Glyph color (incl. alpha).
     uint32_t color;
     /// Glyph index.
