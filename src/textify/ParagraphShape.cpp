@@ -152,7 +152,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
         result.journal.startLine();
 
         // Start caret for the new line
-        caret.y += std::round(computeCaretShift(lineSpan, positioning, baselinePolicy, scale));
+        caret.y += computeCaretShift(lineSpan, positioning, baselinePolicy, scale);
         positioning = VerticalPositioning::BASELINE;
 
         // Resolve justification
@@ -382,13 +382,13 @@ float ParagraphShape::computeCaretShift(const LineSpan& lineSpan, VerticalPositi
         case VerticalPositioning::BASELINE:
             break;
         case VerticalPositioning::PREV_BASELINE:
-            yShift = std::round(maxLineHeight(lineSpan, scale));
+            yShift = maxLineHeight(lineSpan, scale);
             break;
         case VerticalPositioning::TOP_BOUND:
             if (baselinePolicy == BaselinePolicy::OFFSET_BEARING) {
-                yShift = std::round(maxBearing(lineSpan, scale));
+                yShift = maxBearing(lineSpan, scale);
             } else {
-                yShift = std::round(maxAscender(lineSpan, scale));
+                yShift = maxAscender(lineSpan, scale);
             }
             break;
     }
