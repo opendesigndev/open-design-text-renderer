@@ -29,11 +29,13 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
         bitmapGlyphScale = (ascender * scale) / setSizeRes.value();
     }
 
-    const Vector2f &placedGlyphPosition = placedGlyph.placement.topLeft;
-
+    const Vector2f originOnBitmap {
+        std::floor(placedGlyph.originPosition.x * scale),
+        std::floor(placedGlyph.originPosition.y * scale),
+    };
     const compat::Vector2f offset {
-        placedGlyphPosition.x - std::floor(placedGlyphPosition.x),
-        placedGlyphPosition.y - std::floor(placedGlyphPosition.y),
+        placedGlyph.originPosition.x * scale - originOnBitmap.x,
+        placedGlyph.originPosition.y * scale - originOnBitmap.y,
     };
     const ScaleParams glyphScaleParams { scale, bitmapGlyphScale };
 
@@ -43,8 +45,9 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
     }
 
     glyph->setDestination({
-        static_cast<int>(std::floor(placedGlyphPosition.x * scale)),
-        static_cast<int>(std::floor(placedGlyphPosition.y * scale))});
+        static_cast<int>(originOnBitmap.x + glyph->bitmapBearing.x),
+        static_cast<int>(originOnBitmap.y - glyph->bitmapBearing.y) });
+
     glyph->setColor(placedGlyph.color);
 
     return glyph;

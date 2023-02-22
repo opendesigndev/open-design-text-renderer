@@ -147,11 +147,13 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
     const float align = evaluateAlign(shapingResult_.glyphs_[0].format.align, shapingResult_.glyphs_[0].direction);
 
-    Vector2f caret{0.0f, y};
+    Vector2f caret { 0.0f, y };
     for (const LineSpan &lineSpan : shapingResult_.lineSpans_) {
         result.journal.startLine();
 
-        startCaret(lineSpan, caret.y, positioning, baselinePolicy, scale);
+        // Start caret for the new line
+        caret.y += std::round(computeCaretShift(lineSpan, positioning, baselinePolicy, scale));
+        positioning = VerticalPositioning::BASELINE;
 
         // Resolve justification
         const JustifyParams justifyParams {
@@ -276,14 +278,17 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                     caret.x -= direction * glyph->bitmapBearing.x;
                 }
 
-                Vector2f coord = {caret.x, caret.y};
-                coord.x += glyph->bitmapBearing.x;
-                coord.y -= glyph->bitmapBearing.y;
+                Vector2f coord {
+                    caret.x + glyph->bitmapBearing.x,
+                    caret.y - glyph->bitmapBearing.y,
+                };
 
                 const spacing hAdvance = scaledGlyphShape.horizontalAdvance * (1 - (int)fixedHorizontalAdvance);
                 if (runRtl) {
                     coord.x -= hAdvance + scaledGlyphShape.letterSpacing;
                 }
+
+                glyph->setOrigin(caret);
 
                 caret.x += direction * (isWhitespace(unscaledGlyphShape.character) ? spaceCoef : nonSpaceCoef) *
                            (hAdvance + scaledGlyphShape.letterSpacing);
@@ -369,9 +374,10 @@ const LineSpans& ParagraphShape::lineSpans() const
     return shapingResult_.lineSpans_;
 }
 
-void ParagraphShape::startCaret(const LineSpan& lineSpan, float& y, VerticalPositioning& positioning, BaselinePolicy baselinePolicy, float scale) const
+float ParagraphShape::computeCaretShift(const LineSpan& lineSpan, VerticalPositioning positioning, BaselinePolicy baselinePolicy, float scale) const
 {
     float yShift = 0;
+
     switch (positioning) {
         case VerticalPositioning::BASELINE:
             break;
@@ -387,16 +393,7 @@ void ParagraphShape::startCaret(const LineSpan& lineSpan, float& y, VerticalPosi
             break;
     }
 
-    /*
-    // this is how to find "default" baseline
-    if (true && positioning != VerticalPositioning::PREV_BASELINE) {
-        auto gap = glyphs_[0].lineHeight - (yShift - maxDescender(lineSpan));
-        yShift += gap * 0.5;
-    }
-    */
-
-    y += yShift;
-    positioning = VerticalPositioning::BASELINE;
+    return yShift;
 }
 
 spacing ParagraphShape::evalLineHeight(const uint32_t codepoint, const ImmediateFormat& fmt, const FacePtr face) const

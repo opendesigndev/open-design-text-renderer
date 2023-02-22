@@ -167,8 +167,9 @@ public:
     const LineSpans& lineSpans() const;
 
 private:
-    /// Get caret position at the start of a line
-    void startCaret(const LineSpan& lineSpan, float& y, VerticalPositioning& positioning, BaselinePolicy baselinePolicy, float scale) const;
+    /// Compute the shift in the caret Y coordinate on the new line.
+    float computeCaretShift(const LineSpan& lineSpan, VerticalPositioning positioning, BaselinePolicy baselinePolicy, float scale) const;
+
     spacing evalLineHeight(const uint32_t codepoint, const ImmediateFormat& fmt, const FacePtr face) const;
 
     // return {spaceCoef, nonSpaceCoef, lineWidth};

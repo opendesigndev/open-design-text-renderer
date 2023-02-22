@@ -705,6 +705,11 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                 const float bitmapWidthF = static_cast<float>(glyph->bitmapWidth());
                 const float bitmapHeightF = static_cast<float>(glyph->bitmapHeight());
 
+                placedGlyph->originPosition = Vector2f {
+                    glyph->getOrigin().x,
+                    glyph->getOrigin().y,
+                };
+
                 placedGlyph->placement.topLeft = Vector2f {
                     static_cast<float>(glyphDestination.x) + offset.x,
                     static_cast<float>(glyphDestination.y) + offset.y };

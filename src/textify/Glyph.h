@@ -17,19 +17,26 @@ public:
     virtual int bitmapHeight() const = 0;
     virtual int bitmapWidth() const = 0;
     virtual void setColor(const Pixel32& c) = 0;
-    void setDestination(const IPoint2& dest);
     virtual bool putBitmap(const FT_Bitmap &bitmap) = 0;
     virtual void scaleBitmap(float scale) = 0;
 
+    void setDestination(const IPoint2& p);
+    const IPoint2 &getDestination() const;
+
+    void setOrigin(const FPoint2& p);
+    const FPoint2 &getOrigin() const;
+
     compat::Rectangle getBitmapBounds() const;
-    const IPoint2 &getDestination() const { return destPos_; }
 
     IVec2 bitmapBearing;          /// Position of bitmap relative to origin (and to baseline)
     spacing lsb_delta, rsb_delta; /// left / right side bearing delta, see FT_GlyphSlotRec_ for details
-    FVec2 metricsBearing;         /// Position of the real glyph relative to origin (and to baseline)
+    FVec2 metricsBearing;         /// Position of the real glyph relative to origin (and to baseline) (unscaled)
 
 protected:
-    IPoint2 destPos_; /// Position in the destination bitmap, computed using #bitmapBearing.
+    /// Position in the destination bitmap, computed using #bitmapBearing.
+    IPoint2 destPos_;
+    /// A real-valued ideal position of the glyph origin (on baseline) in the destination bitmap. Used for scaling to preserve the line.
+    FPoint2 originPos_;
 };
 using GlyphPtr = std::unique_ptr<Glyph>;
 

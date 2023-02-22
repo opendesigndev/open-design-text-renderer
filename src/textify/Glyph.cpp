@@ -8,9 +8,18 @@ namespace textify {
 
 using namespace compat;
 
-void Glyph::setDestination(const IPoint2& dest)
-{
-    destPos_ = dest;
+void Glyph::setDestination(const IPoint2& p) {
+    destPos_ = p;
+}
+const IPoint2 &Glyph::getDestination() const {
+    return destPos_;
+}
+
+void Glyph::setOrigin(const FPoint2& p) {
+    originPos_ = p;
+}
+const FPoint2 &Glyph::getOrigin() const {
+    return originPos_;
 }
 
 Rectangle Glyph::getBitmapBounds() const
