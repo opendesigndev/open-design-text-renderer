@@ -275,19 +275,6 @@ DrawTextResult drawText(ContextHandle ctx,
 
 // TODO: Matus: New textify functionality. Cleanup.
 /**
- * @brief Shapes a given Octopus text and returns a handle to be used to reference the particular text shape within the context.
- *
- * @param ctx   context handle
- * @param text  Octopus text object
- *
- * @returns shaped text handle to be used in draw calls
- */
-TextShapeHandle shapePlacedText(ContextHandle ctx,
-                                const octopus::Text& text);
-
-
-// TODO: Matus: New textify functionality. Cleanup.
-/**
  * @brief Draws a text shape into a buffer.
  *
  * Caller is expected to allocate the buffer, pixel size is 4 bytes.  Output

@@ -145,13 +145,26 @@ TextShapeHandle shapeText(ContextHandle ctx,
         return nullptr;
     }
 
+    // TODO: Matus: Return just placed text?
     priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
+    priv::PlacedTextResult placedShapeResult = priv::shapePlacedText(*ctx, text);
+
     if (!textShapeResult) {
-        ctx->getLogger().error("shaping of a text failed with error: {}", (int)textShapeResult.error());
-        return nullptr;
+        ctx->getLogger().error("Text shaping failed with error: {}", errorToString(textShapeResult.error()));
+    }
+    if (!placedShapeResult) {
+        ctx->getLogger().error("Text shaping failed with error: {}", errorToString(placedShapeResult.error()));
     }
 
-    ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue()));
+    if (!textShapeResult && !placedShapeResult) {
+        return nullptr;
+    } else if (!textShapeResult) {
+        ctx->shapes.emplace_back(std::make_unique<TextShape>(placedShapeResult.moveValue()));
+    } else if (!placedShapeResult) {
+        ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue()));
+    } else {
+        ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue(), placedShapeResult.moveValue()));
+    }
 
     return ctx->shapes.back().get();
 }
@@ -266,40 +279,6 @@ DrawTextResult drawText(ContextHandle ctx,
     }
 
     return {{}, {}, true};
-}
-
-TextShapeHandle shapePlacedText(ContextHandle ctx,
-                                const octopus::Text& text)
-{
-    if (ctx == nullptr) {
-        return nullptr;
-    }
-    if (text.value.empty()) {
-        return nullptr;
-    }
-
-    // TODO: Matus: Return just placed text?
-    priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
-    priv::PlacedTextResult placedShapeResult = priv::shapePlacedText(*ctx, text);
-
-    if (!textShapeResult) {
-        ctx->getLogger().error("Text shaping failed with error: {}", errorToString(textShapeResult.error()));
-    }
-    if (!placedShapeResult) {
-        ctx->getLogger().error("Text shaping failed with error: {}", errorToString(placedShapeResult.error()));
-    }
-
-    if (!textShapeResult && !placedShapeResult) {
-        return nullptr;
-    } else if (!textShapeResult) {
-        ctx->shapes.emplace_back(std::make_unique<TextShape>(placedShapeResult.moveValue()));
-    } else if (!placedShapeResult) {
-        ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue()));
-    } else {
-        ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue(), placedShapeResult.moveValue()));
-    }
-
-    return ctx->shapes.back().get();
 }
 
 DrawTextResult drawPlacedText(ContextHandle ctx,
