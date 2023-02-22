@@ -693,7 +693,7 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
 
                 PlacedGlyphPtr placedGlyph = std::make_unique<PlacedGlyph>();
 
-                placedGlyph->glyphCodepoint = glyphShape.codepoint;
+                placedGlyph->codepoint = glyphShape.codepoint;
                 placedGlyph->color = glyphShape.format.color;
                 placedGlyph->fontSize = glyphShape.format.size;
                 placedGlyph->index = glyphIndex;

@@ -294,7 +294,6 @@ private:
         LineSpans lineSpans_;
     } shapingResult_;
 
-    // TODO: Matus: Whom are these font faces reported to? It seems like nobody reads this.
     ReportedFaces reportedFaces_;
 
     const utils::Log &log_;

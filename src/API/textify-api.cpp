@@ -145,7 +145,7 @@ TextShapeHandle shapeText(ContextHandle ctx,
         return nullptr;
     }
 
-    // TODO: Matus: Return just placed text?
+    // TODO: Return just placed text
     priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
     priv::PlacedTextResult placedShapeResult = priv::shapePlacedText(*ctx, text);
 
@@ -289,7 +289,7 @@ DrawTextResult drawPlacedText(ContextHandle ctx,
         return {{}, {}, true};
     }
 
-    // TODO: Matus: It would be nice to sanitize the shape - reshape it in case it got dirty (when font face changes)
+    // TODO: It would be nice to sanitize the shape - reshape it in case it got dirty (when font face changes)
     //   But the PlacedTextData doesn't have the original text data (FormattedText)
     if (textShape) {
         const PlacedTextData &placedTextData = textShape->getPlacedData();

@@ -15,7 +15,6 @@ enum class ReportedFontReason
     LOAD_FAILED
 };
 
-// TODO: Matus: Whom are these font items reported to?
 struct ReportedFontItem
 {
     std::string fontName;

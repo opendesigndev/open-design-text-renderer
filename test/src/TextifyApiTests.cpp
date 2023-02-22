@@ -100,7 +100,7 @@ TEST_F(TextifyApiTests, singleLetter) {
 
     const PlacedGlyphPtr &pg = pgs.front();
     ASSERT_EQ(pg->fontSize, 600);
-    ASSERT_EQ(pg->glyphCodepoint, 60);
+    ASSERT_EQ(pg->codepoint, 60);
     ASSERT_EQ(pg->index, 0);
     ASSERT_EQ(pg->originPosition.x, 0.0f);
     ASSERT_EQ(pg->originPosition.y, 571.203125f);

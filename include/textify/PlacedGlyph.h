@@ -25,7 +25,7 @@ struct PlacedGlyph {
     /// Font size.
     float fontSize = 0.0f;
     /// Glyph codepoint - index within the loaded font file.
-    uint32_t glyphCodepoint;
+    uint32_t codepoint;
     /// Origin position of the glyph (on the line).
     Vector2f originPosition;
     /// Glyph color (incl. alpha).

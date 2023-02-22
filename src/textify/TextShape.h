@@ -17,7 +17,7 @@ struct TextShape
 
     /* implicit */ TextShape(DataPtr&& data);
     /* implicit */ TextShape(PlacedDataPtr&& data);
-    // TODO: Matus: Remove
+    // TODO: Remove
     /* implicit */ TextShape(DataPtr&& data, PlacedDataPtr&& placedData);
 
     /// The data.

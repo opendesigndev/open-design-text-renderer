@@ -39,7 +39,7 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
     };
     const ScaleParams glyphScaleParams { scale, bitmapGlyphScale };
 
-    GlyphPtr glyph = face->acquireGlyph(placedGlyph.glyphCodepoint, offset, glyphScaleParams, true, internalDisableHinting);
+    GlyphPtr glyph = face->acquireGlyph(placedGlyph.codepoint, offset, glyphScaleParams, true, internalDisableHinting);
     if (!glyph) {
         return nullptr;
     }
@@ -202,7 +202,7 @@ void debug::drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const FacePtr
     };
     const ScaleParams glyphScaleParams { scale, bitmapGlyphScale };
 
-    GlyphPtr glyph = face->acquireGlyph(pg.glyphCodepoint, offset, glyphScaleParams, false, false);
+    GlyphPtr glyph = face->acquireGlyph(pg.codepoint, offset, glyphScaleParams, false, false);
     if (!glyph) {
         return;
     }

@@ -273,7 +273,7 @@ DrawTextResult drawText(ContextHandle ctx,
                         const DrawOptions& drawOptions = {});
 
 
-// TODO: Matus: New textify functionality. Cleanup.
+// TODO: New textify functionality. Cleanup.
 /**
  * @brief Draws a text shape into a buffer.
  *

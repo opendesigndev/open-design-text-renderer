@@ -20,7 +20,7 @@ TextShape::TextShape(PlacedDataPtr&& data) :
     placedData(std::move(data)) {
 }
 
-// TODO: Matus: Remove
+// TODO: Remove
 TextShape::TextShape(DataPtr&& data, PlacedDataPtr&& placedData) :
     data(std::move(data)),
     placedData(std::move(placedData)) {
