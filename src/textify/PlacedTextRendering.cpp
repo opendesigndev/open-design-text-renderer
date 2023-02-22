@@ -108,7 +108,7 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
     }
 }
 
-void debug_drawPoint(compat::BitmapRGBA &bitmap, const compat::Vector2i &pos, int radius, Pixel32 color) {
+void debug::drawPoint(compat::BitmapRGBA &bitmap, const compat::Vector2i &pos, int radius, Pixel32 color) {
     BitmapWriter w = BitmapWriter(bitmap);
 
     for (int x = pos.x-(radius-1) ; x <= pos.x+(radius-1); x += 1) {
@@ -118,7 +118,7 @@ void debug_drawPoint(compat::BitmapRGBA &bitmap, const compat::Vector2i &pos, in
     }
 }
 
-void debug_drawHorizontalLine(compat::BitmapRGBA &bitmap, int y, Pixel32 color) {
+void debug::drawHorizontalLine(compat::BitmapRGBA &bitmap, int y, Pixel32 color) {
     BitmapWriter w = BitmapWriter(bitmap);
 
     for (int x = 0 ; x < bitmap.width(); x += 1) {
@@ -126,7 +126,7 @@ void debug_drawHorizontalLine(compat::BitmapRGBA &bitmap, int y, Pixel32 color) 
     }
 }
 
-void debug_drawVerticalLine(compat::BitmapRGBA &bitmap, int x, Pixel32 color) {
+void debug::drawVerticalLine(compat::BitmapRGBA &bitmap, int x, Pixel32 color) {
     BitmapWriter w = BitmapWriter(bitmap);
 
     for (int y = 0 ; y < bitmap.height(); y += 1) {
@@ -134,7 +134,7 @@ void debug_drawVerticalLine(compat::BitmapRGBA &bitmap, int x, Pixel32 color) {
     }
 }
 
-void debug_drawRectangle(compat::BitmapRGBA &bitmap, const compat::FRectangle &rectangle, Pixel32 color) {
+void debug::drawRectangle(compat::BitmapRGBA &bitmap, const compat::FRectangle &rectangle, Pixel32 color) {
     BitmapWriter w = BitmapWriter(bitmap);
 
     const compat::Rectangle r = utils::outerRect(rectangle);
@@ -149,7 +149,7 @@ void debug_drawRectangle(compat::BitmapRGBA &bitmap, const compat::FRectangle &r
     }
 }
 
-void debug_drawBitmapBoundaries(compat::BitmapRGBA &bitmap, int width, int height, Pixel32 color) {
+void debug::drawBitmapBoundaries(compat::BitmapRGBA &bitmap, int width, int height, Pixel32 color) {
     BitmapWriter w = BitmapWriter(bitmap);
 
     for (int x = 0; x < width; x += 2) {
@@ -162,7 +162,7 @@ void debug_drawBitmapBoundaries(compat::BitmapRGBA &bitmap, int width, int heigh
     }
 }
 
-void debug_drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height, Pixel32 color) {
+void debug::drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height, Pixel32 color) {
     BitmapWriter w = BitmapWriter(bitmap);
 
     for (int x = 10; x < width; x += 10) {
@@ -177,7 +177,7 @@ void debug_drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height, Pix
     }
 }
 
-void debug_drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGlyph &pg, RenderScale scale) {
+void debug::drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const PlacedGlyph &pg, RenderScale scale) {
     const Pixel32 bottomLeftColor = 0x55000088;
     const Pixel32 topRightColor = 0x55880000;
     BitmapWriter w = BitmapWriter(bitmap);
