@@ -288,12 +288,13 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                     coord.x -= hAdvance + scaledGlyphShape.letterSpacing;
                 }
 
+                const float fracOffset = glyph->rsb_delta - glyph->lsb_delta;
+                caret.x += fracOffset * scale;
+
                 glyph->setOrigin(caret);
 
                 caret.x += direction * (isWhitespace(unscaledGlyphShape.character) ? spaceCoef : nonSpaceCoef) *
                            (hAdvance + scaledGlyphShape.letterSpacing);
-                const float fracOffset = glyph->rsb_delta - glyph->lsb_delta;
-                caret.x += fracOffset * scale;
 
                 glyph->setDestination({static_cast<int>(floor(coord.x)), static_cast<int>(floor(coord.y))});
                 glyph->setColor(alphaMask ? ~Pixel32() : unscaledGlyphShape.format.color);
