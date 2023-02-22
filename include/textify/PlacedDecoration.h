@@ -17,8 +17,12 @@ struct PlacedDecoration {
         DOUBLE_UNDERLINE,
         STRIKE_THROUGH,
     } type;
-    /// Decoration placement in the containing layer, specified by its four quad corners.
-    QuadCorners placement;
+    /// Start position.
+    Vector2f start;
+    /// End position.
+    Vector2f end;
+    /// Thickness. In case of a double underline, this is the thickness of each of the lines.
+    float thickness;
     /// Decoration color (incl. alpha).
     uint32_t color;
 };

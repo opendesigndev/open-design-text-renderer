@@ -40,7 +40,7 @@ void TypesetJournal::addDecoration(const DecorationInput& d, float scale, int in
 
     DecorationRecord decoration;
 
-    decoration.range = {d.start.x, d.end.x};
+    decoration.range = { d.start.x, d.end.x };
     decoration.type = d.type;
     decoration.color = d.color;
 
@@ -48,7 +48,7 @@ void TypesetJournal::addDecoration(const DecorationInput& d, float scale, int in
         ? (STRIKETHROUGH_HEIGHT * d.face->scaleFontUnits(d.face->getFtFace()->height, true))
         : (d.face->scaleFontUnits(d.face->getFtFace()->underline_position, true));
 
-    decoration.offset = d.start.y - static_cast<int>(decorOffset * scale);
+    decoration.offset = d.start.y - decorOffset * scale;
 
     const float thickness = d.face->scaleFontUnits(d.face->getFtFace()->underline_thickness, true);
     decoration.thickness = thickness * scale;
@@ -59,7 +59,7 @@ void TypesetJournal::addDecoration(const DecorationInput& d, float scale, int in
     lineJournal_.back().decorationJournal_.push_back(decoration);
 }
 
-bool TypesetJournal::extendLastDecoration(Decoration type, int newRange, int newIndex)
+bool TypesetJournal::extendLastDecoration(Decoration type, float newRange, int newIndex)
 {
     const size_t decorationsCount = lineJournal_.back().decorationJournal_.size();
     if (decorationsCount >= 1) {
@@ -161,7 +161,7 @@ void TypesetJournal::drawDecorations(BitmapRGBA& bitmap, const Vector2i& offset)
 
     for (const LineRecord &line : lineJournal_) {
         for (const DecorationRecord &decoration : line.decorationJournal_) {
-            const int vpos = decoration.offset + offset.y;
+            const int vpos = static_cast<int>(decoration.offset) + offset.y;
 
             for (int j = 0; j < decoration.range.last - decoration.range.first; j++) {
                 const int penX = decoration.range.first + j + offset.x;

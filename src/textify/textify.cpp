@@ -716,22 +716,15 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
                 placedDecoration->type = static_cast<PlacedDecoration::Type>(decoration.type);
                 placedDecoration->color = decoration.color;
 
-                placedDecoration->placement.topLeft = Vector2f {
-                    static_cast<float>(decoration.range.first),
-                    static_cast<float>(decoration.offset),
+                placedDecoration->start = Vector2f {
+                    decoration.range.first,
+                    decoration.offset,
                 };
-                placedDecoration->placement.topRight = Vector2f {
-                    static_cast<float>(decoration.range.last),
-                    static_cast<float>(decoration.offset),
+                placedDecoration->end = Vector2f {
+                    decoration.range.last,
+                    decoration.offset,
                 };
-                placedDecoration->placement.bottomLeft = Vector2f {
-                    static_cast<float>(decoration.range.first),
-                    static_cast<float>(decoration.offset) + decoration.thickness * (decoration.type == Decoration::DOUBLE_UNDERLINE ? 2.5f : 1.0f),
-                };
-                placedDecoration->placement.bottomRight = Vector2f {
-                    static_cast<float>(decoration.range.last),
-                    static_cast<float>(decoration.offset) + decoration.thickness * (decoration.type == Decoration::DOUBLE_UNDERLINE ? 2.5f : 1.0f),
-                };
+                placedDecoration->thickness = decoration.thickness;
 
                 placedDecorations.emplace_back(std::move(placedDecoration));
             }

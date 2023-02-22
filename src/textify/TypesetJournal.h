@@ -27,17 +27,16 @@ public:
         bool partialOverflow(int limit) const;
     };
 
-    /// Specifies a decoration for a range of pixels
+    /// Specifies a decoration
     struct DecorationRecord
     {
-        struct
-        {
-            int first, last;
-        } range; ///< horizontal range in pixels
+        struct {
+            float first, last;
+        } range; ///< horizontal range
 
         Decoration type;
         Pixel32 color;
-        int offset; ///< vertical distance from the top
+        float offset; ///< vertical distance from the top
         float thickness;
 
         LowHighPair indices { 0, 0 };
@@ -45,8 +44,8 @@ public:
 
     struct DecorationInput
     {
-        IPoint2 start;
-        IPoint2 end;
+        compat::Vector2f start;
+        compat::Vector2f end;
 
         Decoration type;
         Pixel32 color;
@@ -107,7 +106,7 @@ private:
     /**
      * Extends range of the last decoration if it shares the @a type.
      **/
-    bool extendLastDecoration(Decoration type, int newRange, int newIndex);
+    bool extendLastDecoration(Decoration type, float newRange, int newIndex);
 
     /**
      * Renders glyphs from lines journal to the given bitmap.

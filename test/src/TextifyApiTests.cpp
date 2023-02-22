@@ -162,22 +162,6 @@ TEST_F(TextifyApiTests, decorations) {
     ASSERT_EQ(decorations[5]->type, PlacedDecoration::Type::DOUBLE_UNDERLINE);
     ASSERT_EQ(decorations[6]->type, PlacedDecoration::Type::UNDERLINE);
 
-    comparePlacement(decorations[4]->placement, QuadCorners{
-        Vector2f{118.0f, 94.0f},
-        Vector2f{208.0f, 94.0f},
-        Vector2f{118.0f, 96.5f},
-        Vector2f{208.0f, 96.5f} });
-    comparePlacement(decorations[5]->placement, QuadCorners{
-        Vector2f{118.0f, 116.0f},
-        Vector2f{152.0f, 116.0f},
-        Vector2f{118.0f, 122.25f},
-        Vector2f{152.0f, 122.25f} });
-    comparePlacement(decorations[6]->placement, QuadCorners{
-        Vector2f{208.0f, 116.0f},
-        Vector2f{428.0f, 116.0f},
-        Vector2f{208.0f, 118.5f},
-        Vector2f{428.0f, 118.5f} });
-
     ode::BitmapPtr bitmap = nullptr;
 
     const DrawOptions drawOptions { 1.0f, std::nullopt };

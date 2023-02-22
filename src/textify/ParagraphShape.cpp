@@ -310,9 +310,15 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
                 for (Decoration decoration : unscaledGlyphShape.format.decorations) {
                     if (decoration != Decoration::NONE) {
+                        const Vector2f dStart {
+                            coord.x,
+                            caret.y };
+                        const Vector2f dEnd {
+                            coord.x + glyph->bitmapWidth(),
+                            caret.y };
                         const TypesetJournal::DecorationInput decorationInput {
-                            {static_cast<int>(floor(coord.x)), static_cast<int>(floor(caret.y))},
-                            {static_cast<int>(round(coord.x)) + glyph->bitmapWidth(), static_cast<int>(floor(caret.y))},
+                            dStart,
+                            dEnd,
                             decoration,
                             unscaledGlyphShape.format.color,
                             face

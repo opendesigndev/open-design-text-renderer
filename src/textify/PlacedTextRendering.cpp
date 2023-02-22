@@ -74,16 +74,16 @@ void drawDecoration(compat::BitmapRGBA &bitmap,
         return;
     }
 
+    const float dt = pd.thickness * (pd.type == PlacedDecoration::Type::DOUBLE_UNDERLINE ? 2.5f : 1.0f) * scale;
     const IPoint2 start {
-        static_cast<int>(std::floor(pd.placement.topLeft.x * scale)),
-        static_cast<int>(std::floor(pd.placement.topLeft.y * scale)) };
+        static_cast<int>(std::floor(pd.start.x * scale)),
+        static_cast<int>(std::floor(pd.start.y * scale)) };
     const IPoint2 end {
-        static_cast<int>(std::round(pd.placement.bottomRight.x * scale)),
-        static_cast<int>(std::floor(pd.placement.bottomRight.y * scale)) };
+        static_cast<int>(std::round(pd.end.x * scale)),
+        static_cast<int>(std::floor(pd.end.y * scale)) };
 
-    const float dt = (pd.placement.bottomLeft.y - pd.placement.topLeft.y) * scale;
     const int decorationThickness = (pd.type == PlacedDecoration::Type::DOUBLE_UNDERLINE)
-        ? static_cast<int>(std::ceil(dt / 2.5f * (2.0f / 3.0f)))
+        ? static_cast<int>(std::ceil(dt * (2.0f / (3.0f * 2.5f))))
         : static_cast<int>(std::ceil(dt));
     const int vOffset = static_cast<int>(decorationThickness * 0.5);
 
