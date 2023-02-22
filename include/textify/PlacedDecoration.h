@@ -17,10 +17,8 @@ struct PlacedDecoration {
         DOUBLE_UNDERLINE,
         STRIKE_THROUGH,
     } type;
-    /// Start position.
-    Vector2f start;
-    /// End position.
-    Vector2f end;
+    /// Start and end positions.
+    Vector2f start, end;
     /// Thickness. In case of a double underline, this is the thickness of each of the lines.
     float thickness;
     /// Decoration color (incl. alpha).
