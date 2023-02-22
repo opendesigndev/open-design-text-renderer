@@ -582,7 +582,7 @@ PlacedTextResult shapePlacedText(Context &ctx,
     return shapePlacedTextInner(ctx, std::move(parsedText.text), frameSize, parsedText.transformation);
 }
 
-// TODO: Matus: This function is the same as the old one, the only difference is it collects the PlacedGlyphs.
+// TODO: This function is the same as the old one, the only difference is it collects the PlacedGlyphs.
 PlacedTextResult shapePlacedTextInner(Context &ctx,
                                       FormattedTextPtr formattedText,
                                       const FrameSizeOpt &frameSize,
