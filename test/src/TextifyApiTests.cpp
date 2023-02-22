@@ -64,17 +64,6 @@ protected:
         ASSERT_FALSE(octopusData.content->layers->empty());
     }
 
-    static void comparePlacement(const textify::QuadCorners &pg1pos, const textify::QuadCorners &pg2pos) {
-        ASSERT_EQ(pg1pos.topLeft.x, pg2pos.topLeft.x);
-        ASSERT_EQ(pg1pos.topLeft.y, pg2pos.topLeft.y);
-        ASSERT_EQ(pg1pos.topRight.x, pg2pos.topRight.x);
-        ASSERT_EQ(pg1pos.topRight.y, pg2pos.topRight.y);
-        ASSERT_EQ(pg1pos.bottomLeft.x, pg2pos.bottomLeft.x);
-        ASSERT_EQ(pg1pos.bottomLeft.y, pg2pos.bottomLeft.y);
-        ASSERT_EQ(pg1pos.bottomRight.x, pg2pos.bottomRight.x);
-        ASSERT_EQ(pg1pos.bottomRight.y, pg2pos.bottomRight.y);
-    }
-
     textify::ContextHandle context;
 
     const std::string fontsDirectory = std::string(FONTS_DIR);
@@ -97,7 +86,7 @@ TEST_F(TextifyApiTests, singleLetter) {
 
     addMissingFonts(*text);
 
-    const TextShapeHandle textShape = shapePlacedText(context, *text);
+    const TextShapeHandle textShape = shapeText(context, *text);
     ASSERT_TRUE(textShape != nullptr);
 
     ASSERT_TRUE(textShape->placedData != nullptr);
@@ -141,7 +130,7 @@ TEST_F(TextifyApiTests, decorations) {
 
     addMissingFonts(*text);
 
-    const TextShapeHandle textShape = shapePlacedText(context, *text);
+    const TextShapeHandle textShape = shapeText(context, *text);
     ASSERT_TRUE(textShape != nullptr);
 
     ASSERT_TRUE(textShape->placedData != nullptr);
