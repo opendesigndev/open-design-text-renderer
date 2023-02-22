@@ -202,7 +202,7 @@ void debug::drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const FacePtr
     };
     const ScaleParams glyphScaleParams { scale, bitmapGlyphScale };
 
-    GlyphPtr glyph = face->acquireGlyph(pg.codepoint, offset, glyphScaleParams, false, false);
+    GlyphPtr glyph = face->acquireGlyph(pg.codepoint, offset, glyphScaleParams, true, false);
     if (!glyph) {
         return;
     }
