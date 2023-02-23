@@ -19,10 +19,6 @@ GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
                            const FacePtr &face,
                            RenderScale scale,
                            bool internalDisableHinting) {
-    // TODO: apply placedGlyph rotation
-
-    scale *= placedGlyph.scaling;
-
     float bitmapGlyphScale = 1.0f;
     const Result<font_size,bool> setSizeRes = face->setSize(placedGlyph.fontSize);
 
@@ -182,8 +178,6 @@ void debug::drawBitmapGrid(compat::BitmapRGBA &bitmap, int width, int height, Pi
 }
 
 void debug::drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const FacePtr &face, const PlacedGlyph &pg, RenderScale scale) {
-    scale *= pg.scaling;
-
     const Pixel32 bottomLeftColor = 0x55000088;
     const Pixel32 topRightColor = 0x55880000;
     BitmapWriter w = BitmapWriter(bitmap);
