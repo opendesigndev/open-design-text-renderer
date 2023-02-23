@@ -639,7 +639,7 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
     const compat::FRectangle textBoundsNotScaled = getStretchedTextBounds(ctx,
                                                                           textShapeData->paragraphShapes,
                                                                           textShapeData->textBoundsNoTransform,
-                                                                          formattedText->formattingParams(),
+                                                                          textShapeData->formattedText->formattingParams(),
                                                                           textShapeData->baseline,
                                                                           1.0f);
     const Matrix3f transformMatrix = convertMatrix(textTransform);
