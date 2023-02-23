@@ -38,6 +38,7 @@ enum class TextDrawError
 using TextShapeResult = Result<TextShapeDataPtr, TextShapeError>;
 using TextDrawResult = Result<TextDrawOutput, TextDrawError>;
 using PlacedTextResult = Result<PlacedTextDataPtr, TextShapeError>;
+using TextShapeParagraphsResult = std::pair<TextShapeResult, ParagraphShape::DrawResults>;
 
 /// List all font face names that have not been loaded to the context's FontManager.
 FacesNames listMissingFonts(Context &ctx,
@@ -49,10 +50,10 @@ TextShapeResult shapeText(Context &ctx,
 TextShapeResult reshapeText(Context &ctx,
                             TextShapeDataPtr&& textShapeData);
 
-TextShapeResult shapeTextInner(Context &ctx,
-                FormattedTextPtr text,
-                const FrameSizeOpt &frameSize,
-                const compat::Matrix3f &textTransform);
+TextShapeParagraphsResult shapeTextInner(Context &ctx,
+                                         FormattedTextPtr text,
+                                         const FrameSizeOpt &frameSize,
+                                         const compat::Matrix3f &textTransform);
 
 TextDrawResult drawText(Context &ctx,
                         const TextShapeData& shapeData,
