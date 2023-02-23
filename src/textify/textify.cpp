@@ -665,8 +665,9 @@ TextDrawResult drawPlacedText(Context &ctx,
                                                     static_cast<Pixel32*>(pixels), width, height);
 
     if (drawResult) {
+        // TODO: Fix text bounds scaling with right-aligned text. They should be scaled relative to the right vertical bound.
         compat::FRectangle stretchedTextBounds {
-            placedTextData.textBounds.l,
+            placedTextData.textBounds.l * scale,
             placedTextData.textBounds.t + placedTextData.baseline * (1.0f - scale),
             placedTextData.textBounds.w * scale,
             placedTextData.textBounds.h * scale };
