@@ -665,12 +665,20 @@ TextDrawResult drawPlacedText(Context &ctx,
                                                     static_cast<Pixel32*>(pixels), width, height);
 
     if (drawResult) {
-        // TODO: Fix text bounds scaling with right-aligned text. They should be scaled relative to the right vertical bound.
         compat::FRectangle stretchedTextBounds {
             placedTextData.textBounds.l * scale,
             placedTextData.textBounds.t + placedTextData.baseline * (1.0f - scale),
             placedTextData.textBounds.w * scale,
             placedTextData.textBounds.h * scale };
+
+        // Fix text bounds scaling with right-aligned text so that they are scaled relative to the right vertical bound.
+        const float trX = placedTextData.textTransform.m[2][0];
+        const float l = placedTextData.textBounds.l;
+        const float w = placedTextData.textBounds.w;
+        const bool isRightAligned = (l != 0.0f && trX != 0.0f && w + l + trX == 0.0f);
+        if (isRightAligned) {
+            stretchedTextBounds.l = - trX - w * scale;
+        }
 
         TextDrawOutput value = drawResult.moveValue();
         value.transform = convertMatrix(placedTextData.textTransform);
