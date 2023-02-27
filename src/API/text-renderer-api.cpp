@@ -170,8 +170,10 @@ void destroyTextShapes(ContextHandle ctx,
         return;
     }
 
-    for (auto textShape = textShapes; textShape != textShapes + count; ++textShape) {
-        (*textShape)->deactivate();
+    for (TextShapeHandle* textShape = textShapes; textShape != textShapes + count; ++textShape) {
+        if (textShape != nullptr && *textShape != nullptr) {
+            (*textShape)->deactivate();
+        }
     }
 
     ctx->removeInactiveShapes();

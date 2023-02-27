@@ -554,6 +554,11 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
 PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeInput)
 {
     const TextShapeParagraphsResult res = shapeTextInner(ctx, textShapeInput);
+    if (!res.first) {
+        ctx.getLogger().error("Text shaping failed with error: {}", errorToString(res.first.error()));
+        return TextShapeError::SHAPE_ERROR;
+    }
+
     const TextShapeDataPtr &textShapeData = res.first.value();
     const ParagraphShape::DrawResults &paragraphResults = res.second;
 
