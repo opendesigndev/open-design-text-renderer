@@ -10,7 +10,7 @@ FreetypeHandle::FreetypeHandle() {
 
 bool FreetypeHandle::initialize() {
     /*
-    Log::instance.logf(Log::TEXTIFY,
+    Log::instance.logf(Log::TEXT_RENDERER,
                       Log::EXTRA_INFO,
                       "Using Freetype %d.%d.%d and Harfbuzz %s.",
                       FREETYPE_MAJOR,
@@ -88,7 +88,7 @@ bool FreetypeHandle::checkOk(const char* func)
     }
 
     // FT Error codes: https://freetype.org/freetype2/docs/reference/ft2-error_code_values.html
-    // Log::instance.logf(Log::TEXTIFY, Log::ERROR, "Freetype error in function %s: (%d) %s.", func, error, getErrorMessage(error));
+    // Log::instance.logf(Log::TEXT_RENDERER, Log::ERROR, "Freetype error in function %s: (%d) %s.", func, error, getErrorMessage(error));
     error = FT_Err_Ok;
     return false;
 }

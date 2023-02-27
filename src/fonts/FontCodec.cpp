@@ -82,7 +82,7 @@ Codec::Result CodecLZ4::decode(const BufferType & input)
 
     if (decompressed != subheader->original_length) {
         // REFACTOR
-        // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Font decode: invalid LZ4 stream.");
+        // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Font decode: invalid LZ4 stream.");
         return false;
     }
 
@@ -122,7 +122,7 @@ Codec::Result CodecMonocypher::decode(const BufferType & input)
 
     int result = crypto_unlock((uint8_t *)output.data(), (uint8_t *)key, subheader->nonce, subheader->mac, bytes, output_length);
     if (result != 0) {
-        // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Font decode: corrupted Monocypher message.");
+        // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Font decode: corrupted Monocypher message.");
         return false;
     }
 
@@ -200,13 +200,13 @@ Codec::Result encode(int format, const BufferType & buffer, bool verify)
 {
     auto codec = createCodec(format);
     if (!codec) {
-        // Log::instance.logf(Log::TEXTIFY, Log::ERROR, "Font codec not recognized: %d", format);
+        // Log::instance.logf(Log::TEXT_RENDERER, Log::ERROR, "Font codec not recognized: %d", format);
         return false;
     }
 
     auto result = codec->encode(buffer);
     if (!result) {
-        // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Font encoding failed.");
+        // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Font encoding failed.");
         return false;
     }
 
@@ -216,13 +216,13 @@ Codec::Result encode(int format, const BufferType & buffer, bool verify)
         auto decoded = codec->decode(encoded);
 
         if (!decoded) {
-            // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Font verification failed (decode).");
+            // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Font verification failed (decode).");
             return false;
         }
 
         bool identical = buffer == decoded.value();
         if (!identical) {
-            // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Font verification failed (mismatch).");
+            // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Font verification failed (mismatch).");
             return false;
         }
     }

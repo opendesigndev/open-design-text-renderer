@@ -75,7 +75,7 @@ set(TEXT_RENDERER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(TEXT_RENDERER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 if (NOT STANDALONE)
-    # TODO: might not be needed as this should be set as a part of textify target
+    # TODO: might not be needed as this should be set as a part of Text Renderer target
     set(TEXT_RENDERER_INCLUDE_DIR ${TEXT_RENDERER_INCLUDE_DIR} PARENT_SCOPE)
 endif()
 

@@ -88,7 +88,7 @@ void ParagraphShape::initialize(const GlyphShapes &glyphs,
 ParagraphShape::ShapeResult ParagraphShape::shape(const FormattedParagraph& paragraph, float width, bool loadGlyphsBearings)
 {
     if (paragraph.text_.size() != paragraph.format_.size()) {
-        log_.warn("[Textify / ParagraphShape::shape] Paragraph shaping error: Text format incorrectly expanded.");
+        log_.warn("[Text Renderer / ParagraphShape::shape] Paragraph shaping error: Text format incorrectly expanded.");
         return false;
     }
 
@@ -118,7 +118,7 @@ ParagraphShape::ShapeResult ParagraphShape::shape(const FormattedParagraph& para
     breaker.breakLines(static_cast<int>(std::floor(width)));
     const LineSpans &lineSpans = breaker.getLines();
     if (lineSpans.empty()) {
-        log_.warn("[Textify / ParagraphShape::shape] Paragraph breaking error: No lines present.");
+        log_.warn("[Text Renderer / ParagraphShape::shape] Paragraph breaking error: No lines present.");
         return result;
     }
 
@@ -141,7 +141,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
     DrawResult result;
 
     if (shapingResult_.glyphs_.empty()) {
-        log_.warn("[Textify / ParagraphShape::draw] No glyphs in ParagraphShape.");
+        log_.warn("[Text Renderer / ParagraphShape::draw] No glyphs in ParagraphShape.");
         return result;
     }
 
@@ -240,7 +240,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
                 const FaceId &faceID = unscaledGlyphShape.format.faceId;
                 const FaceTable::Item* faceItem = faceTable_.getFaceItem(faceID);
                 if (!faceItem) {
-                    log_.warn("[Textify / ParagraphShape::draw] Line drawing error: Missing font face \"{}\"", faceID);
+                    log_.warn("[Text Renderer / ParagraphShape::draw] Line drawing error: Missing font face \"{}\"", faceID);
                     continue;
                 }
 
@@ -473,7 +473,7 @@ ParagraphShape::JustifyResult ParagraphShape::justify(const LineSpan& lineSpan, 
     const size_t startIdx = static_cast<std::size_t>(lineSpan.start);
 
     if (startIdx >= shapingResult_.glyphs_.size()) {
-        log_.warn("[Textify / ParagraphShape::justify] Line drawing error: Line length equals zero.");
+        log_.warn("[Text Renderer / ParagraphShape::justify] Line drawing error: Line length equals zero.");
         return {0.0f, 0.0f, 0.0f, false};
     }
 
@@ -620,7 +620,7 @@ bool ParagraphShape::validateUserFeatures(const FacePtr face, const TypeFeatures
     for (const auto& userFeature : features) {
         const auto& tag = userFeature.tag;
         if (!face->hasOpenTypeFeature(userFeature.tag)) {
-            log_.warn("[Textify / ParagraphShape::validateUserFeatures] Missing OpenType feature: {}", tag);
+            log_.warn("[Text Renderer / ParagraphShape::validateUserFeatures] Missing OpenType feature: {}", tag);
             ok = false;
         }
     }
@@ -639,7 +639,7 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
         bool inserted = false;
         std::tie(std::ignore, inserted) = reportedFaces_.insert({seq.format.faceId, ReportedFontReason::NO_DATA});
         if (inserted) {
-            log_.warn("[Textify / ParagraphShape::shapeSequence] Paragraph shaping error: Reported face item '{}'", seq.format.faceId);
+            log_.warn("[Text Renderer / ParagraphShape::shapeSequence] Paragraph shaping error: Reported face item '{}'", seq.format.faceId);
         }
         return;
     }
@@ -647,7 +647,7 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
     const FacePtr face = faceItem->face;
     if (!face->getFtFace()) {
         reportedFaces_.insert({seq.format.faceId, ReportedFontReason::LOAD_FAILED});
-        log_.warn("[Textify / ParagraphShape::shapeSequence] Paragraph shaping error: Missing font face '{}'", seq.format.faceId);
+        log_.warn("[Text Renderer / ParagraphShape::shapeSequence] Paragraph shaping error: Missing font face '{}'", seq.format.faceId);
         return;
     } else {
         result.insertFontItem(seq.format.faceId, faceItem->fallback);
@@ -688,7 +688,7 @@ void ParagraphShape::shapeSequence(const Sequence& seq,
         // If HB does not evaluate emoji modifiers and ZWJ sequences correctly,
         // force skip those pseudo-glyphs. Known to happen with Apple Color Emoji.
         if (isSkipGlyph(paragraph.text_[i])) {
-            log_.info("[Textify / ParagraphShape::shapeSequence] Skipping unrecognized glyph '{}'", paragraph.text_[i]);
+            log_.info("[Text Renderer / ParagraphShape::shapeSequence] Skipping unrecognized glyph '{}'", paragraph.text_[i]);
             continue;
         }
 

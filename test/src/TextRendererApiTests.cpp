@@ -15,13 +15,13 @@
 
 
 namespace {
-static odtr::ContextOptions textifyContextOptions() {
+static odtr::ContextOptions contextOptions() {
     odtr::ContextOptions options;
     options.errorFunc = [](const std::string &message) {
-        fprintf(stderr, "Textify error: %s\n", message.c_str());
+        fprintf(stderr, "Text Renderer error: %s\n", message.c_str());
     };
     options.warnFunc = [](const std::string &message) {
-        fprintf(stderr, "Textify warning: %s\n", message.c_str());
+        fprintf(stderr, "Text Renderer warning: %s\n", message.c_str());
     };
     options.infoFunc = [](const std::string &) { };
     return options;
@@ -33,7 +33,7 @@ static odtr::ContextOptions textifyContextOptions() {
 class TextRendererApiTests : public ::testing::Test {
 protected:
     virtual void SetUp() override {
-        context = odtr::createContext(textifyContextOptions());
+        context = odtr::createContext(contextOptions());
     }
 
     void addMissingFonts(const octopus::Text &text) {

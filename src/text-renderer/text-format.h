@@ -147,7 +147,7 @@ enum class OverflowPolicy
 };
 
 
-/// Textify representation of octopus OpenType features.
+/// Text Renderer representation of octopus OpenType features.
 struct TypeFeature
 {
     std::string tag;
@@ -162,7 +162,7 @@ typedef sorted_vector<spacing> TabStops;
 /// Format properties that affect the bare render of an individual glyph
 struct GlyphFormat
 {
-    /// Textify representation of octopus Ligatures enum
+    /// Text Renderer representation of octopus Ligatures enum
     enum class Ligatures
     {
         NONE = 0,

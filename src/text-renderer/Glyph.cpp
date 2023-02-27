@@ -56,7 +56,7 @@ static void convertGrayscaleBitmap(Pixel8 *dst, const FT_Bitmap &bitmap) {
                         *dst++ = (unsigned char) ((unsigned) *src++*0xffu/(bitmap.num_grays-1));
                 }
             } else {
-                // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Unexpected value of FT_Bitmap::num_grays!");
+                // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Unexpected value of FT_Bitmap::num_grays!");
                 memset(dst, 0, sizeof(Pixel8)*bitmap.width*bitmap.rows);
             }
             break;
@@ -79,7 +79,7 @@ static void convertGrayscaleBitmap(Pixel8 *dst, const FT_Bitmap &bitmap) {
             }
             break;
         default:
-            // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Unexpected glyph pixel format");
+            // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Unexpected glyph pixel format");
             memset(dst, 0, sizeof(Pixel8)*bitmap.width*bitmap.rows);
     }
 }
@@ -165,7 +165,7 @@ bool ColorGlyph::putBitmap(const FT_Bitmap &bitmap) {
             }
             break;
         default:
-            // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Unexpected glyph pixel format");
+            // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Unexpected glyph pixel format");
             ;
     }
     return true;
@@ -174,12 +174,12 @@ bool ColorGlyph::putBitmap(const FT_Bitmap &bitmap) {
 void GrayGlyph::blit(Pixel32* dst, const IDims2& dDims, const Vector2i& offset) const
 {
     if (!bitmap_ || !bitmap_->pixels()) {
-        // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Trying to blit an empty bitmap.");
+        // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Trying to blit an empty bitmap.");
         return;
     }
 
     if (!dst) {
-        // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Trying to blit into an empty bitmap.");
+        // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Trying to blit into an empty bitmap.");
         return;
     }
 
@@ -220,12 +220,12 @@ void GrayGlyph::blit(Pixel32* dst, const IDims2& dDims, const Vector2i& offset) 
 void ColorGlyph::blit(Pixel32* dst, const IDims2& dDims, const Vector2i& offset) const
 {
     if (!bitmap_ || !bitmap_->pixels()) {
-        // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Trying to blit an empty bitmap.");
+        // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Trying to blit an empty bitmap.");
         return;
     }
 
     if (!dst) {
-        // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Trying to blit into an empty bitmap.");
+        // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Trying to blit into an empty bitmap.");
         return;
     }
 

@@ -95,12 +95,12 @@ void Face::logFeatures(bool all) const
     // REFACTOR
     /*
     Log::instance.logf(
-        Log::TEXTIFY, Log::EXTRA_INFO, "Available features for %s %s:", ftFace_->family_name, ftFace_->style_name);
+        Log::TEXT_RENDERER, Log::EXTRA_INFO, "Available features for %s %s:", ftFace_->family_name, ftFace_->style_name);
     for (const auto& f : features) {
         if (all) {
-            Log::instance.logf(Log::TEXTIFY, Log::EXTRA_INFO, "    %s\t%d", f.first.c_str(), f.second);
+            Log::instance.logf(Log::TEXT_RENDERER, Log::EXTRA_INFO, "    %s\t%d", f.first.c_str(), f.second);
         } else if (f.second) {
-            Log::instance.logf(Log::TEXTIFY, Log::EXTRA_INFO, "    %s", f.first.c_str());
+            Log::instance.logf(Log::TEXT_RENDERER, Log::EXTRA_INFO, "    %s", f.first.c_str());
         }
     }
     */
@@ -121,7 +121,7 @@ bool Face::isColorFont(bool log) const
             if (log) {
                 // REFACTOR
                 /*
-                Log::instance.logf(Log::TEXTIFY,
+                Log::instance.logf(Log::TEXT_RENDERER,
                                    Log::EXTRA_INFO,
                                    "%s %s is %s style color font, which %s",
                                    ftFace_->family_name,

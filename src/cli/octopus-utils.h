@@ -7,7 +7,7 @@ namespace octopus {
     struct Color;
 }
 
-namespace textify {
+namespace odtr {
 namespace cli {
 
 compat::Matrix3f convertMatrix(const double octopusMatrix[6]);

@@ -2,7 +2,7 @@
 
 #ifndef FULL_EMOJI_TABLE
 
-namespace textify {
+namespace odtr {
 namespace unicode {
 
 EmojiTable EmojiTable::create()
@@ -51,5 +51,5 @@ EmojiTable EmojiTable::create()
 }
 
 } // namespace unicode
-} // namespace textify
+} // namespace odtr
 #endif

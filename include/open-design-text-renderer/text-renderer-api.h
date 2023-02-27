@@ -73,7 +73,7 @@ typedef Context* ContextHandle;
 typedef TextShape* TextShapeHandle;
 
 /**
- * @brief Creates and initializes Textify's context.
+ * @brief Creates and initializes Text Renderer's context.
  *
  * A context represent a particular configuration of the engine, it
  * encapsulates a set of fonts and text shapes.

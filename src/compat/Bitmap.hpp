@@ -46,7 +46,7 @@ public:
 private:
     T* pixels_;
     int width_, height_;
-    bool ownsData_ = true;     // MODIFIED for use in textify 2!!!
+    bool ownsData_ = true;     // MODIFIED for use in text renderer 2!!!
 };
 
 typedef Bitmap<Pixel8> BitmapGrayscale;

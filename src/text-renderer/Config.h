@@ -5,7 +5,7 @@ namespace odtr {
 namespace priv {
 
 /**
- * Configure context dependent and unique Textify behaviour.
+ * Configure context dependent and unique Text Renderer behaviour.
  *
  * @note If you ever think about `if (origin == ...)` then stop and put it here instead.
  */

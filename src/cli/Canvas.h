@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <string>
 
-namespace textify {
+namespace odtr {
 namespace cli {
 
 class Canvas
@@ -34,4 +34,4 @@ private:
 };
 
 }
-}
+} // namespace odtr

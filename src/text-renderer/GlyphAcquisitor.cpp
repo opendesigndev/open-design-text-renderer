@@ -133,7 +133,7 @@ Path GlyphAcquisitor::acquireOutline(const FT_GlyphSlot& glyphSlot) const
     return DUMMY.clone();
 
     if (glyphSlot->format != FT_GLYPH_FORMAT_OUTLINE) {
-        Log::instance.log(Log::TEXTIFY, Log::WARNING, "Outline acquisition: cannot load outline from bitmap glyph.");
+        Log::instance.log(Log::TEXT_RENDERER, Log::WARNING, "Outline acquisition: cannot load outline from bitmap glyph.");
         return DUMMY.clone();
     }
 
@@ -151,7 +151,7 @@ Path GlyphAcquisitor::acquireOutline(const FT_GlyphSlot& glyphSlot) const
     FT_BBox ftBBox;
     FreetypeHandle::error = FT_Outline_Get_BBox(&ftOutline, &ftBBox);
     if (!FreetypeHandle::checkOk(__func__)) {
-        Log::instance.log(Log::TEXTIFY, Log::WARNING, "Outline acquisition: cannot get bounds.");
+        Log::instance.log(Log::TEXT_RENDERER, Log::WARNING, "Outline acquisition: cannot get bounds.");
         return DUMMY.clone();
     }
 
@@ -184,7 +184,7 @@ GlyphPtr GlyphAcquisitor::createGlyph(FT_GlyphSlot glyphSlot) const
         #if (FREETYPE_MAJOR > 2 || (FREETYPE_MAJOR == 2 && FREETYPE_MINOR >= 10))
         if (glyphSlot->glyph_index && glyphSlot->bitmap.pixel_mode != FT_PIXEL_MODE_BGRA && !params_.cpalUsed) {
             // REFACTOR
-            // Log::instance.logf(Log::TEXTIFY, Log::INFORMATION, "Suspicious pixel mode.");
+            // Log::instance.logf(Log::TEXT_RENDERER, Log::INFORMATION, "Suspicious pixel mode.");
         }
         #endif
         return std::make_unique<ColorGlyph>();
