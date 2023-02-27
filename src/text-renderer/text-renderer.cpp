@@ -567,6 +567,8 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
 
     size_t glyphIndex = 0;
 
+    const std::vector<compat::qchar> &inText = textShapeInput.formattedText->text();
+
     for (size_t i = 0; i < paragraphResults.size(); i++) {
         const ParagraphShapePtr &paragraphShape = textShapeData->paragraphShapes[i];
         const ParagraphShape::DrawResult &drawResult = paragraphResults[i];
@@ -579,6 +581,14 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
                 const GlyphShape &glyphShape = paragraphShape->glyphs()[j];
                 const GlyphPtr &glyph = lineRecord.glyphJournal_[l];
 
+                // Find the glyph index
+                for (size_t i = glyphIndex; i < inText.size(); ++i) {
+                    if (inText[i] != glyphShape.character) {
+                        ++glyphIndex;
+                    } else {
+                        break;
+                    }
+                }
                 PlacedGlyphPtr placedGlyph = std::make_unique<PlacedGlyph>();
 
                 placedGlyph->codepoint = glyphShape.codepoint;

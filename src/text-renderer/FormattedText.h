@@ -55,6 +55,7 @@ public:
     void setBaseFormat(const ImmediateFormat& format);
     const ImmediateFormat& getBaseFormat() const { return baseFormat_; }
 
+    const std::vector<compat::qchar> &text() const { return text_; };
     const compat::qchar* getText() const;
     int getLength() const;
 

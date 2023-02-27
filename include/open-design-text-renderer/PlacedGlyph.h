@@ -30,7 +30,7 @@ struct PlacedGlyph {
     Vector2f originPosition;
     /// Glyph color (incl. alpha).
     uint32_t color;
-    /// Glyph index. TODO: Make sure the index corresponds to index in text and not in the glyphs.
+    /// Index of the glyph within the input text.
     size_t index = 0;
 };
 using PlacedGlyphPtr = std::unique_ptr<PlacedGlyph>;
