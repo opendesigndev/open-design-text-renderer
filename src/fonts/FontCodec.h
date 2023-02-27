@@ -42,7 +42,7 @@ public:
     Result decode(const BufferType & input) override;
 };
 
-#if defined(TEXTIFY_USE_LZ4)
+#if defined(TEXT_RENDERER_USE_LZ4)
 class CodecLZ4: public Codec {
 public:
     Result encode(const BufferType & input) override;
@@ -54,7 +54,7 @@ public:
 };
 #endif
 
-#if defined(TEXTIFY_USE_MONOCYPHER)
+#if defined(TEXT_RENDERER_USE_MONOCYPHER)
 class CodecMonocypher: public Codec {
 public:
     Result encode(const BufferType & input) override;
@@ -71,7 +71,7 @@ private:
 };
 #endif
 
-#if defined(TEXTIFY_USE_LZ4) && defined(TEXTIFY_USE_MONOCYPHER)
+#if defined(TEXT_RENDERER_USE_LZ4) && defined(TEXT_RENDERER_USE_MONOCYPHER)
 class CodecLZ4Mono: public Codec {
 private:
     CodecLZ4 lz4;

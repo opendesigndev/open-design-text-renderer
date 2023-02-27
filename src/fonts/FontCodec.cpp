@@ -44,7 +44,7 @@ Codec::Result CodecXOR::decode(const BufferType & input)
     return encode(input);
 }
 
-#if defined(TEXTIFY_USE_LZ4)
+#if defined(TEXT_RENDERER_USE_LZ4)
 
 Codec::Result CodecLZ4::encode(const BufferType & input)
 {
@@ -91,7 +91,7 @@ Codec::Result CodecLZ4::decode(const BufferType & input)
 
 #endif
 
-#if defined(TEXTIFY_USE_MONOCYPHER)
+#if defined(TEXT_RENDERER_USE_MONOCYPHER)
 
 Codec::Result CodecMonocypher::encode(const BufferType & input)
 {
@@ -148,7 +148,7 @@ void CodecMonocypher::Subheader::generate()
 
 #endif
 
-#if defined(TEXTIFY_USE_LZ4) && defined(TEXTIFY_USE_MONOCYPHER)
+#if defined(TEXT_RENDERER_USE_LZ4) && defined(TEXT_RENDERER_USE_MONOCYPHER)
 
 Codec::Result CodecLZ4Mono::encode(const BufferType & input)
 {
@@ -174,13 +174,13 @@ static std::unique_ptr<Codec> createCodec(int format)
 {
     if (format == CODEC_FORMAT_RAW) return std::make_unique<CodecRaw>();
     if (format == CODEC_FORMAT_XOR) return std::make_unique<CodecXOR>();
-#if defined(TEXTIFY_USE_LZ4)
+#if defined(TEXT_RENDERER_USE_LZ4)
     if (format == CODEC_FORMAT_LZ4) return std::make_unique<CodecLZ4>();
 #endif
-#if defined(TEXTIFY_USE_MONOCYPHER)
+#if defined(TEXT_RENDERER_USE_MONOCYPHER)
     if (format == CODEC_FORMAT_MONO) return std::make_unique<CodecMonocypher>();
 #endif
-#if defined(TEXTIFY_USE_LZ4) && defined(TEXTIFY_USE_MONOCYPHER)
+#if defined(TEXT_RENDERER_USE_LZ4) && defined(TEXT_RENDERER_USE_MONOCYPHER)
     if (format == CODEC_FORMAT_LZ4_MONO) return std::make_unique<CodecLZ4Mono>();
 #endif
 
