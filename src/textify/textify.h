@@ -41,6 +41,13 @@ using TextDrawResult = Result<TextDrawOutput, TextDrawError>;
 using PlacedTextResult = Result<PlacedTextDataPtr, TextShapeError>;
 using TextShapeParagraphsResult = std::pair<TextShapeResult, ParagraphShape::DrawResults>;
 
+
+/// Compute drawn bitmap boundaries from the scaled placed text data bounds and the view are.
+compat::Rectangle computeDrawBounds(Context &ctx,
+                                    const PlacedTextData &placedTextData,
+                                    float scale,
+                                    const compat::Rectangle &viewArea);
+
 /// List all font face names that have not been loaded to the context's FontManager.
 FacesNames listMissingFonts(Context &ctx,
                             const octopus::Text& text);
@@ -50,9 +57,6 @@ TextShapeInputPtr preprocessText(Context &ctx,
 
 TextShapeResult shapeText(Context &ctx,
                           const TextShapeInput &textShapeInput);
-
-TextShapeParagraphsResult shapeTextInner(Context &ctx,
-                                         const TextShapeInput &textShapeInput);
 
 TextDrawResult drawText(Context &ctx,
                         const TextShapeInput &shapeInput,
@@ -81,25 +85,6 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
                                                 VerticalPositioning positioning,
                                                 BaselinePolicy baselinePolicy,
                                                 float &caretVerticalPos);
-
-
-compat::FRectangle getStretchedTextBounds(Context &ctx,
-                                          const ParagraphShapes &paragraphShapes,
-                                          const compat::FRectangle &unscaledTextBounds,
-                                          const FormattedText::FormattingParams &textParams,
-                                          float baseline,
-                                          float scale);
-
-/// Compute drawn bitmap boundaries as an intersection of the scaled text bounds and the view area.
-compat::Rectangle computeDrawBounds(Context &ctx,
-                                    const compat::FRectangle &stretchedTextBounds,
-                                    const compat::FRectangle& viewAreaTextSpace);
-
-/// Compute drawn bitmap boundaries from the scaled placed text data bounds and the view are.
-compat::Rectangle computeDrawBounds(Context &ctx,
-                                    const PlacedTextData &placedTextData,
-                                    float scale,
-                                    const compat::Rectangle &viewArea);
 
 PlacedTextResult shapePlacedText(Context &ctx,
                                  const TextShapeInput &textShapeInput);

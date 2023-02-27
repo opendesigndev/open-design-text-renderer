@@ -200,40 +200,58 @@ float roundCaretPosition(float pos, bool floorBaseline)
     return floorBaseline ? std::floor(pos) : std::round(pos);
 }
 
-} // namespace
-
-
-FacesNames listMissingFonts(Context &ctx, const octopus::Text& text)
-{
-    const TextParser::ParseResult parsedText = TextParser(text).parseText();
-    const std::unordered_set<std::string> usedNames = parsedText.text->collectUsedFaceNames();
-
-    FacesNames missing;
-    for (auto&& name : usedNames) {
-        if (!ctx.fontManager->faceExists(name)) {
-            missing.emplace_back(std::move(name));
-        }
-    }
-    return missing;
-}
-
-TextShapeInputPtr preprocessText(Context &ctx,
-                                 const octopus::Text &text) {
-    TextParser::ParseResult parsedText = TextParser(text).parseText();
-
-    FrameSizeOpt frameSize;
-    if (text.frame.has_value()) {
-        auto [w, h] = text.frame.value().size.value_or(octopus::Dimensions{0.0,0.0});
-        frameSize = compat::Vector2f{static_cast<float>(w), static_cast<float>(h)};
+compat::FRectangle getStretchedTextBounds(Context &ctx,
+                                          const ParagraphShapes &paragraphShapes,
+                                          const compat::FRectangle &unscaledTextBounds,
+                                          const FormattedText::FormattingParams &textParams,
+                                          float baseline,
+                                          float scale) {
+    const compat::FRectangle textBounds = utils::scaleRect(unscaledTextBounds, scale);
+    if (!textBounds) {
+        return compat::FRectangle{};
     }
 
-    return std::make_unique<TextShapeInput>(std::move(parsedText.text), frameSize, parsedText.transformation);
+    float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
+
+    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx,
+                                                                             paragraphShapes,
+                                                                             textParams.overflowPolicy,
+                                                                             textBounds.w,
+                                                                             scale,
+                                                                             VerticalPositioning::BASELINE,
+                                                                             textParams.baselinePolicy,
+                                                                             caretVerticalPos);
+    if (paragraphResults.empty()) {
+        return compat::FRectangle{};
+    }
+
+    // account for descenders of last paragraph's last line
+    const spacing textBottom = caretVerticalPos - paragraphResults.back().lastlineDescender;
+
+    const spacing baselineOffset = resolveBaselineOffset(paragraphResults.front(), textParams.baselinePolicy, textParams.verticalAlign);
+    const float verticalOffset = resolveVerticalOffset(textParams.boundsMode, textParams.verticalAlign, textBounds, textBottom, baselineOffset * scale);
+
+    const bool unlimitedVerticalStretch =
+        textParams.overflowPolicy == OverflowPolicy::EXTEND_ALL ||
+        textParams.boundsMode == BoundsMode::AUTO_HEIGHT ||
+        textParams.verticalAlign != VerticalAlign::TOP;
+
+    const float verticalStretchLimit = unlimitedVerticalStretch ? 0.0f : textBounds.h;
+    compat::Rectangle stretchedGlyphsBounds {};
+    if (textParams.boundsMode != BoundsMode::FIXED || textParams.overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
+        stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
+    }
+
+    return stretchBounds(textBounds, stretchedGlyphsBounds);
 }
 
-TextShapeResult shapeText(Context &ctx,
-                          const TextShapeInput &textShapeInput) {
-    TextShapeParagraphsResult res = shapeTextInner(ctx, textShapeInput);
-    return std::move(res.first);
+/// Compute drawn bitmap boundaries as an intersection of the scaled text bounds and the view area.
+compat::Rectangle computeDrawBounds(Context &ctx,
+                                    const compat::FRectangle &stretchedTextBounds,
+                                    const compat::FRectangle& viewAreaTextSpace) {
+    return ctx.config.enableViewAreaCutout
+        ? utils::outerRect(viewAreaTextSpace & stretchedTextBounds)
+        : utils::outerRect(stretchedTextBounds);
 }
 
 TextShapeParagraphsResult shapeTextInner(Context &ctx,
@@ -330,6 +348,56 @@ TextShapeParagraphsResult shapeTextInner(Context &ctx,
                                                            textBoundsTransform,
                                                            baseline);
     return std::make_pair(std::move(tsd), std::move(paragraphResults));
+}
+
+} // namespace
+
+
+compat::Rectangle computeDrawBounds(Context &ctx,
+                                    const PlacedTextData &placedTextData,
+                                    float scale,
+                                    const compat::Rectangle &viewArea) {
+    const compat::FRectangle stretchedTextBounds {
+        placedTextData.textBounds.l,
+        placedTextData.textBounds.t,
+        placedTextData.textBounds.w * scale,
+        placedTextData.textBounds.h * scale};
+
+    const compat::FRectangle viewAreaTextSpace = utils::scaleRect(utils::toFRectangle(viewArea), scale);
+    return computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
+}
+
+FacesNames listMissingFonts(Context &ctx, const octopus::Text& text)
+{
+    const TextParser::ParseResult parsedText = TextParser(text).parseText();
+    const std::unordered_set<std::string> usedNames = parsedText.text->collectUsedFaceNames();
+
+    FacesNames missing;
+    for (auto&& name : usedNames) {
+        if (!ctx.fontManager->faceExists(name)) {
+            missing.emplace_back(std::move(name));
+        }
+    }
+    return missing;
+}
+
+TextShapeInputPtr preprocessText(Context &ctx,
+                                 const octopus::Text &text) {
+    TextParser::ParseResult parsedText = TextParser(text).parseText();
+
+    FrameSizeOpt frameSize;
+    if (text.frame.has_value()) {
+        auto [w, h] = text.frame.value().size.value_or(octopus::Dimensions{0.0,0.0});
+        frameSize = compat::Vector2f{static_cast<float>(w), static_cast<float>(h)};
+    }
+
+    return std::make_unique<TextShapeInput>(std::move(parsedText.text), frameSize, parsedText.transformation);
+}
+
+TextShapeResult shapeText(Context &ctx,
+                          const TextShapeInput &textShapeInput) {
+    TextShapeParagraphsResult res = shapeTextInner(ctx, textShapeInput);
+    return std::move(res.first);
 }
 
 TextDrawResult drawText(Context &ctx,
@@ -479,73 +547,6 @@ ParagraphShape::DrawResults drawParagraphsInner(Context &ctx,
     }
 
     return drawResults;
-}
-
-compat::FRectangle getStretchedTextBounds(Context &ctx,
-                                          const ParagraphShapes &paragraphShapes,
-                                          const compat::FRectangle &unscaledTextBounds,
-                                          const FormattedText::FormattingParams &textParams,
-                                          float baseline,
-                                          float scale) {
-    const compat::FRectangle textBounds = utils::scaleRect(unscaledTextBounds, scale);
-    if (!textBounds) {
-        return compat::FRectangle{};
-    }
-
-    float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
-
-    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx,
-                                                                             paragraphShapes,
-                                                                             textParams.overflowPolicy,
-                                                                             textBounds.w,
-                                                                             scale,
-                                                                             VerticalPositioning::BASELINE,
-                                                                             textParams.baselinePolicy,
-                                                                             caretVerticalPos);
-    if (paragraphResults.empty()) {
-        return compat::FRectangle{};
-    }
-
-    // account for descenders of last paragraph's last line
-    const spacing textBottom = caretVerticalPos - paragraphResults.back().lastlineDescender;
-
-    const spacing baselineOffset = resolveBaselineOffset(paragraphResults.front(), textParams.baselinePolicy, textParams.verticalAlign);
-    const float verticalOffset = resolveVerticalOffset(textParams.boundsMode, textParams.verticalAlign, textBounds, textBottom, baselineOffset * scale);
-
-    const bool unlimitedVerticalStretch =
-        textParams.overflowPolicy == OverflowPolicy::EXTEND_ALL ||
-        textParams.boundsMode == BoundsMode::AUTO_HEIGHT ||
-        textParams.verticalAlign != VerticalAlign::TOP;
-
-    const float verticalStretchLimit = unlimitedVerticalStretch ? 0.0f : textBounds.h;
-    compat::Rectangle stretchedGlyphsBounds {};
-    if (textParams.boundsMode != BoundsMode::FIXED || textParams.overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
-        stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
-    }
-
-    return stretchBounds(textBounds, stretchedGlyphsBounds);
-}
-
-compat::Rectangle computeDrawBounds(Context &ctx,
-                                    const compat::FRectangle &stretchedTextBounds,
-                                    const compat::FRectangle& viewAreaTextSpace) {
-    return ctx.config.enableViewAreaCutout
-        ? utils::outerRect(viewAreaTextSpace & stretchedTextBounds)
-        : utils::outerRect(stretchedTextBounds);
-}
-
-compat::Rectangle computeDrawBounds(Context &ctx,
-                                    const PlacedTextData &placedTextData,
-                                    float scale,
-                                    const compat::Rectangle &viewArea) {
-    const compat::FRectangle stretchedTextBounds {
-        placedTextData.textBounds.l,
-        placedTextData.textBounds.t,
-        placedTextData.textBounds.w * scale,
-        placedTextData.textBounds.h * scale};
-
-    const compat::FRectangle viewAreaTextSpace = utils::scaleRect(utils::toFRectangle(viewArea), scale);
-    return computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
 }
 
 PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeInput)
