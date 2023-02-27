@@ -15,7 +15,7 @@ extern "C" {
 }
 #endif
 
-namespace textify {
+namespace odtr {
 namespace codec {
 Codec::Result CodecRaw::encode(const BufferType & input)
 {
@@ -252,4 +252,4 @@ Codec::Result decode(BufferType & buffer) {
 }
 
 } // namespace codec
-} // namespace textify
+} // namespace odtr

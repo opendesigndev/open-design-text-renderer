@@ -6,7 +6,7 @@
 #include <string>
 #include <cassert>
 
-namespace textify {
+namespace odtr {
 
 using namespace compat;
 
@@ -248,4 +248,4 @@ FacePtr::operator Face*() const
     return face_;
 }
 
-} // namespace textify
+} // namespace odtr

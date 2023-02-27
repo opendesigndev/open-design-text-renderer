@@ -8,7 +8,7 @@
 
 #include <vector>
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 class TypesetJournal
@@ -135,4 +135,4 @@ private:
 };
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

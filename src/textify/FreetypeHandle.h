@@ -2,7 +2,7 @@
 
 #include "base.h"
 
-namespace textify {
+namespace odtr {
 
 /**
  * This is a wrapper for the FT_Library handle, representing an instance of FreeType, which can be used to create Faces.
@@ -40,4 +40,4 @@ private:
 
 };
 
-} // namespace textify
+} // namespace odtr

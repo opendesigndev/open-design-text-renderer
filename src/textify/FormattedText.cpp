@@ -9,7 +9,7 @@
 #include "unicode/EmojiTable.h"
 
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 using namespace compat;
@@ -396,4 +396,4 @@ void FormattedText::scale(float scale)
 }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

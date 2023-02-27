@@ -27,7 +27,7 @@ TypeFeatures convertFeatures(const std::vector<octopus::OpenTypeFeature>& featur
 }
 }
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 TextParser::TextParser(const octopus::Text& text)
@@ -348,4 +348,4 @@ FormatModifiers TextParser::parseStyle(const octopus::TextStyle& style) const
 }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

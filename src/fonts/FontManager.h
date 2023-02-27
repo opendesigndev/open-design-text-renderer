@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-namespace textify {
+namespace odtr {
 
 namespace utils {
 class Log;
@@ -27,7 +27,7 @@ public:
 
     FontManager(FontManager&& other) = default;
 
-    const textify::FaceTable& facesTable() const;
+    const odtr::FaceTable& facesTable() const;
 
     /**
      * Allocs buffer of given size in @a FontStorage and returns pointer to it.
@@ -102,11 +102,11 @@ private:
 
     const utils::Log& log_;
 
-    std::unique_ptr<textify::FreetypeHandle> ft_;
-    std::unique_ptr<textify::FaceTable> faces_;
-    std::unique_ptr<textify::FontStorage> fontStorage_;
+    std::unique_ptr<odtr::FreetypeHandle> ft_;
+    std::unique_ptr<odtr::FaceTable> faces_;
+    std::unique_ptr<odtr::FontStorage> fontStorage_;
 
     bool requiresDefaultEmojiFont_;
 };
 
-} // namespace textify
+} // namespace odtr

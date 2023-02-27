@@ -9,7 +9,7 @@ namespace octopus {
     struct TextStyle;
 }
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 class TextParser

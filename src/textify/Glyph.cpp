@@ -4,7 +4,7 @@
 
 #include <cmath>
 
-namespace textify {
+namespace odtr {
 
 using namespace compat;
 
@@ -278,4 +278,4 @@ void ColorGlyph::scaleBitmap(float scale)
     }
 }
 
-} // namespace textify
+} // namespace odtr

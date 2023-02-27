@@ -5,7 +5,7 @@
 
 #include "common/result.hpp"
 
-namespace textify {
+namespace odtr {
 
 struct ScaleParams
 {
@@ -91,4 +91,4 @@ private:
     FT_Face ftFace_ = nullptr;
 };
 
-} // namespace textify
+} // namespace odtr

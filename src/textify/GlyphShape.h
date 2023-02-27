@@ -4,7 +4,7 @@
 
 #include <optional>
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 /**
@@ -53,4 +53,4 @@ struct GlyphShape
 using GlyphShapes = std::vector<GlyphShape>;
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

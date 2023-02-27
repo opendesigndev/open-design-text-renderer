@@ -8,7 +8,7 @@
 #include <vector>
 
 
-namespace textify {
+namespace odtr {
 
 typedef std::vector<Byte> BufferType;
 
@@ -37,4 +37,4 @@ private:
     void decode( Item & item );
 };
 
-} // namespace textify
+} // namespace odtr

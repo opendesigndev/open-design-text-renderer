@@ -1,6 +1,6 @@
 #pragma once
 
-namespace textify {
+namespace odtr {
 
 namespace priv {
 
@@ -109,4 +109,4 @@ struct Config
 };
 
 }
-} // namespace textify
+} // namespace odtr

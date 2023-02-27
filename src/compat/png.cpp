@@ -6,7 +6,7 @@
 #include <png.h>
 #include <vector>
 
-namespace textify {
+namespace odtr {
 namespace compat {
 
 static void pngError(png_structp png, png_const_charp message) {
@@ -121,6 +121,6 @@ bool savePngImage(const BitmapRGBA& bitmap, const char* filename) {
 }
 
 } // namespace compat
-} // namespace textify
+} // namespace odtr
 
 #endif

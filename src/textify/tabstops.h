@@ -7,7 +7,7 @@
 
 #include <optional>
 
-namespace textify {
+namespace odtr {
 
 inline static std::optional<spacing> newlineOffset(const TabStops& tabStops)
 {

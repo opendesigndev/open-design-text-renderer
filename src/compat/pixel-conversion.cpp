@@ -5,7 +5,7 @@
 #include <cmath>
 #include <algorithm>
 
-namespace textify {
+namespace odtr {
 namespace compat {
 
 float cComp_b2f(byte v) {
@@ -62,4 +62,4 @@ Pixel32 unpremultiplyPixel(Pixel32 p) {
 }
 
 } // namespace compat
-} // namespace textify
+} // namespace odtr

@@ -19,7 +19,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace textify {
+namespace odtr {
 
 typedef std::unordered_map<std::string, bool> FlagsTable;
 
@@ -35,4 +35,4 @@ inline static bool isTabStop(compat::qchar c)
     return c == (compat::qchar)'\t';
 }
 
-} // namespace textify
+} // namespace odtr

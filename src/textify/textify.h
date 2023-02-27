@@ -14,11 +14,11 @@
 namespace octopus {
     struct Text;
 }
-namespace textify {
+namespace odtr {
     struct Context;
 }
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 struct TextDrawOutput
@@ -104,4 +104,4 @@ TextDrawResult drawPlacedTextInner(Context &ctx,
                                    Pixel32* pixels, int width, int height);
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

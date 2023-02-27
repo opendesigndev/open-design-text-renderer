@@ -4,23 +4,23 @@
 #include <array>
 #include <cmath>
 
-namespace textify {
+namespace odtr {
 namespace utils {
 
 // the reinterpret_cast bellow is kind of dangerous, however, these fundamental types most likely won't ever change
-textify::FRectangle castFRectangle(const compat::FRectangle& r)
+odtr::FRectangle castFRectangle(const compat::FRectangle& r)
 {
-    return *reinterpret_cast<const textify::FRectangle*>(&r);
+    return *reinterpret_cast<const odtr::FRectangle*>(&r);
 }
 
-textify::Rectangle castRectangle(const compat::Rectangle& r)
+odtr::Rectangle castRectangle(const compat::Rectangle& r)
 {
-    return *reinterpret_cast<const textify::Rectangle*>(&r);
+    return *reinterpret_cast<const odtr::Rectangle*>(&r);
 }
 
-textify::Matrix3f castMatrix(const compat::Matrix3f& m)
+odtr::Matrix3f castMatrix(const compat::Matrix3f& m)
 {
-    return *reinterpret_cast<const textify::Matrix3f*>(&m);
+    return *reinterpret_cast<const odtr::Matrix3f*>(&m);
 }
 
 compat::FRectangle toFRectangle(const compat::Rectangle& r)
@@ -86,4 +86,4 @@ compat::FRectangle scaleRect(const compat::FRectangle& rect, float scale)
 }
 
 } // namespace utils
-} // namespace textify
+} // namespace odtr

@@ -5,7 +5,7 @@
 
 #include "FormattedText.h"
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 using UsedFaces = std::unordered_set<std::string>;
@@ -26,4 +26,4 @@ struct TextShapeInput
 using TextShapeInputPtr = std::unique_ptr<TextShapeInput>;
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

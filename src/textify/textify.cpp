@@ -26,7 +26,7 @@
 #include <iterator>
 #include <optional>
 
-namespace textify {
+namespace odtr {
 
 namespace {
 FRectangle convertRect(const compat::FRectangle& r) {
@@ -702,4 +702,4 @@ TextDrawResult drawPlacedTextInner(Context &ctx,
 }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

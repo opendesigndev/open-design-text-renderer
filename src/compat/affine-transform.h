@@ -3,7 +3,7 @@
 
 #include "basic-types.h"
 
-namespace textify {
+namespace odtr {
 namespace compat {
 
 Matrix3f rotationMatrix(float angle, Vector2f center = { });
@@ -22,4 +22,4 @@ bool hasTranslation(const Matrix3f& m);
 float deconstructRotation(const Matrix3f& transformation, bool &flip);
 
 } // namespace compat
-} // namespace textify
+} // namespace odtr

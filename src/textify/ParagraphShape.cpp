@@ -12,7 +12,7 @@
 
 #define MAX_SPACE_COEF 2.8f // arbitrary
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 using namespace compat;
@@ -752,4 +752,4 @@ void ParagraphShape::ShapeResult::insertFontItem(const std::string& faceID, bool
 }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

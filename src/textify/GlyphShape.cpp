@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 void GlyphShape::applyResizeFactor(float resizeFactor)
@@ -28,4 +28,4 @@ GlyphShape::Scalable GlyphShape::scaledGlyphShape(float scale) const
 }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

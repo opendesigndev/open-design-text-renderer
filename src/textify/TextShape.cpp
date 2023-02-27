@@ -6,7 +6,7 @@
 #include "textify.h"
 #include "TextShapeInput.h"
 
-namespace textify {
+namespace odtr {
 
 TextShape::TextShape(InputPtr &&input, DataPtr &&data) :
     input(std::move(input)),

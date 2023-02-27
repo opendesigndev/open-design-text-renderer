@@ -1,6 +1,6 @@
 #include "StorageBufferImpl.h"
 
-namespace textify {
+namespace odtr {
 namespace otf {
 
 Result<StorageBufferImpl,bool> StorageBufferImpl::create(BufferView buffer)
@@ -15,4 +15,4 @@ StorageBufferImpl::StorageBufferImpl(BufferView::BytePtr base, std::uint64_t max
 { }
 
 } // namespace otf
-} // namespace textify
+} // namespace odtr

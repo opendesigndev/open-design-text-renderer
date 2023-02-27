@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace textify {
+namespace odtr {
 namespace compat {
 
 typedef unsigned char byte;
@@ -158,4 +158,4 @@ enum class PixelFormat
 // ... continues ...
 
 } // namespace compat
-} // namespace textify
+} // namespace odtr

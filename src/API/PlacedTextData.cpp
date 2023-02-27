@@ -1,7 +1,7 @@
 
 #include <textify/PlacedTextData.h>
 
-namespace textify {
+namespace odtr {
 
 PlacedTextData::PlacedTextData(PlacedGlyphsPerFont &&glyphs_,
                                PlacedDecorations &&decorations_,
@@ -15,4 +15,4 @@ PlacedTextData::PlacedTextData(PlacedGlyphsPerFont &&glyphs_,
     baseline(baseline_) {
 }
 
-} // namespace textify
+} // namespace odtr

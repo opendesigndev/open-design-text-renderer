@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-namespace textify {
+namespace odtr {
 namespace otf {
 
 class StorageBufferImpl
@@ -46,4 +46,4 @@ T StorageBufferImpl::read(std::int64_t offset)
 }
 
 } // namespace otf
-} // namespace textify
+} // namespace odtr

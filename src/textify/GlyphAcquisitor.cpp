@@ -1,7 +1,7 @@
 #include "GlyphAcquisitor.h"
 #include "FreetypeHandle.h"
 
-namespace textify {
+namespace odtr {
 
 using namespace compat;
 
@@ -193,4 +193,4 @@ GlyphPtr GlyphAcquisitor::createGlyph(FT_GlyphSlot glyphSlot) const
     }
 }
 
-} // namespace textify
+} // namespace odtr

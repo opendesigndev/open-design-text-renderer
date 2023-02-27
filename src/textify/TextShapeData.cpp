@@ -1,7 +1,7 @@
 
 #include "TextShapeData.h"
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 TextShapeData::TextShapeData(ParagraphShapes&& shapes,
@@ -15,4 +15,4 @@ TextShapeData::TextShapeData(ParagraphShapes&& shapes,
 { }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

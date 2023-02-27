@@ -1,6 +1,6 @@
 #include "StorageFileImpl.h"
 
-namespace textify {
+namespace odtr {
 namespace otf {
 
 Result<StorageFileImpl,bool> StorageFileImpl::create(const std::string& filename)
@@ -32,4 +32,4 @@ bool StorageFileImpl::open(const std::string& filename)
 }
 
 } // namespace otf
-} // namespace textify
+} // namespace odtr

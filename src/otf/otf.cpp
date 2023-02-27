@@ -12,7 +12,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace textify {
+namespace odtr {
 namespace otf {
 
 using StorageType = Storage<StorageBufferImpl>;
@@ -322,7 +322,7 @@ FeaturesResult listFeatures(const std::string& filename)
 }
 
 } // namespace otf
-} // namespace textify
+} // namespace odtr
 
 
 /*

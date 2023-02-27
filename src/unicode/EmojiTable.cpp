@@ -1,7 +1,7 @@
 #include "EmojiTable.h"
 #include <algorithm>
 
-namespace textify {
+namespace odtr {
 namespace unicode {
 
 using namespace compat;
@@ -59,4 +59,4 @@ bool EmojiTable::RangeRec::operator<(qchar cp) const
 }
 
 } // namespace unicode
-} // namespace textify
+} // namespace odtr

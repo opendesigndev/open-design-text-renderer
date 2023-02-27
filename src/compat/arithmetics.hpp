@@ -1,6 +1,6 @@
 #pragma once
 
-namespace textify {
+namespace odtr {
 namespace compat {
 
 template <typename T>
@@ -18,4 +18,4 @@ bool isPOT(int x);
 int floorPOT(int x);
 
 } // namespace compat
-} // namespace textify
+} // namespace odtr

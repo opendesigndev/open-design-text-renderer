@@ -6,7 +6,7 @@
 
 #include "BitmapWriter.h"
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 using namespace compat;
@@ -224,4 +224,4 @@ TypesetJournal::LowHighPair TypesetJournal::LineRecord::glyphBitmapExtremes() co
 }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

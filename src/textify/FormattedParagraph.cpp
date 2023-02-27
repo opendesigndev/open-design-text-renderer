@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <locale>
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 using namespace compat;
@@ -183,4 +183,4 @@ void FormattedParagraph::resolveEmoji(std::size_t glyphIndex, FontManager& fontM
 }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

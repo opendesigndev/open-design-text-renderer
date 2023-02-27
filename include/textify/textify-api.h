@@ -10,7 +10,7 @@ namespace octopus {
     struct Text;
 }
 
-namespace textify {
+namespace odtr {
 
 struct Context;
 struct TextShape;

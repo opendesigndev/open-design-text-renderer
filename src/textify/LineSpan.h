@@ -4,7 +4,7 @@
 #include "text-format.h"
 #include "VisualRun.h"
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 struct LineSpan
@@ -36,4 +36,4 @@ struct LineSpan
 using LineSpans = std::vector<LineSpan>;
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

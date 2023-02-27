@@ -5,7 +5,7 @@
 
 #include "text-format.h"
 
-namespace textify {
+namespace odtr {
 
 struct VisualRun
 {
@@ -15,4 +15,4 @@ struct VisualRun
 };
 using VisualRuns = std::vector<VisualRun>;
 
-} // namespace textify
+} // namespace odtr

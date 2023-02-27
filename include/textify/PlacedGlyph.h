@@ -8,7 +8,7 @@
 
 #include "textify-api.h"
 
-namespace textify {
+namespace odtr {
 
 struct FontSpecifier {
     /// Font face Id.
@@ -30,11 +30,11 @@ struct PlacedGlyph {
     Vector2f originPosition;
     /// Glyph color (incl. alpha).
     uint32_t color;
-    /// Glyph index.
+    /// Glyph index. TODO: Make sure the index corresponds to index in text and not in the glyphs.
     size_t index = 0;
 };
 using PlacedGlyphPtr = std::unique_ptr<PlacedGlyph>;
 using PlacedGlyphs = std::vector<PlacedGlyphPtr>;
 using PlacedGlyphsPerFont = std::map<FontSpecifier, PlacedGlyphs>;
 
-} // namespace textify
+} // namespace odtr

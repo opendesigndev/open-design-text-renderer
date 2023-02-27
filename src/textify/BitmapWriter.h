@@ -3,7 +3,7 @@
 
 #include "compat/Bitmap.hpp"
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 class BitmapWriter
@@ -21,4 +21,4 @@ private:
 };
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

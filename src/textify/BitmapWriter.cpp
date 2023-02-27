@@ -1,7 +1,7 @@
 
 #include "BitmapWriter.h"
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 BitmapWriter::BitmapWriter(compat::BitmapRGBA& bitmap)
@@ -23,4 +23,4 @@ void BitmapWriter::write(int x, int y, compat::Pixel32 color) {
 }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

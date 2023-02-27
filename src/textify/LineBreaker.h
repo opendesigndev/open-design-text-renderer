@@ -9,13 +9,13 @@
 #include "LineSpan.h"
 
 // Forward declaration
-namespace textify {
+namespace odtr {
 namespace utils {
 class Log;
 }
 }
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 class LineBreaker
@@ -88,4 +88,4 @@ private:
 };
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

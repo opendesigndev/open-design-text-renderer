@@ -10,7 +10,7 @@
 #include "text-format.h"
 
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 class TextParser;
@@ -113,4 +113,4 @@ private:
 using FormattedTextPtr = std::unique_ptr<FormattedText>;
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

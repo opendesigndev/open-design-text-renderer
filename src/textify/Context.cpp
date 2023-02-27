@@ -3,7 +3,7 @@
 #include "textify.h"
 #include "fonts/FontManager.h"
 
-namespace textify {
+namespace odtr {
 
 const utils::Log& Context::getLogger() const
 {

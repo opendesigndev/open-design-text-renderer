@@ -1,7 +1,7 @@
 /*
 #include "TextifyConfig.h"
 
-namespace textify {
+namespace odtr {
 
 Config::Config(const Document::Origin origin)
     : floorBaseline(origin == Document::Origin::SKETCH && false), // this *might* appear in some designs
@@ -23,5 +23,5 @@ Config::Config(const Document::Origin origin)
 {
 }
 
-} // namespace textify
+} // namespace odtr
 */

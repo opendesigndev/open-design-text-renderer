@@ -5,7 +5,7 @@
 #include <cmath>
 #include <limits>
 
-namespace textify {
+namespace odtr {
 namespace compat {
 
 Matrix3f rotationMatrix(float angle, Vector2f center) {
@@ -100,4 +100,4 @@ float deconstructRotation(const Matrix3f& transformation, bool &flip) {
 }
 
 } // namespace compat
-} // namespace textify
+} // namespace odtr

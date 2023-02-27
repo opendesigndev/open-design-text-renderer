@@ -6,7 +6,7 @@
 #include "common/result.hpp"
 #include "textify/base-types.h"
 
-namespace textify {
+namespace odtr {
 namespace codec {
 
 enum Format {
@@ -94,4 +94,4 @@ Codec::Result encode(int format, const BufferType & buffer, bool verify);
 Codec::Result decode(BufferType & buffer);
 
 } // namespace codec
-} // namespace textify
+} // namespace odtr

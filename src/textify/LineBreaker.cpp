@@ -8,7 +8,7 @@
 
 #include "utils/Log.h"
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 LineBreaker::LineBreaker(const utils::Log& log,
@@ -222,4 +222,4 @@ bool LineBreaker::performBidi()
 }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

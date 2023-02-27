@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace textify {
+namespace odtr {
 
 typedef compat::Vector2i IVec2;
 typedef compat::Vector2f FVec2;
@@ -20,4 +20,4 @@ typedef std::vector<Byte> BufferType;
 
 typedef float RenderScale;
 
-} // namespace textify
+} // namespace odtr

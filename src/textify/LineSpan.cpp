@@ -1,7 +1,7 @@
 
 #include "LineSpan.h"
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 LineSpan::LineSpan(long start, long end, float lineWidth, TextDirection dir, Justifiable justifiable)
@@ -9,4 +9,4 @@ LineSpan::LineSpan(long start, long end, float lineWidth, TextDirection dir, Jus
 { }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

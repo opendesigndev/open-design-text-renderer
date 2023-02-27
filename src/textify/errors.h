@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TextShape.h"
-namespace textify {
+namespace odtr {
 
 enum class TextShapeError
 {

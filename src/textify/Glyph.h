@@ -3,7 +3,7 @@
 #include "base.h"
 #include "compat/Bitmap.hpp"
 
-namespace textify {
+namespace odtr {
 
 class Face;
 
@@ -77,4 +77,4 @@ private:
     Pixel32 alpha_;
 };
 
-} // namespace textify
+} // namespace odtr

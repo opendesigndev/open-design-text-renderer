@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-namespace textify {
+namespace odtr {
 
 class FontManager;
 

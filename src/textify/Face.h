@@ -11,7 +11,7 @@
 
 #include <string>
 
-namespace textify {
+namespace odtr {
 
 /**
  * This class represents a typeface (corresponding to one TTF/OTF file).
@@ -108,4 +108,4 @@ private:
     Face* face_;
 };
 
-} // namespace textify
+} // namespace odtr

@@ -1,6 +1,6 @@
 #include "FreetypeHandle.h"
 
-namespace textify {
+namespace odtr {
 
 using namespace compat;
 
@@ -95,4 +95,4 @@ bool FreetypeHandle::checkOk(const char* func)
 
 FT_Error FreetypeHandle::error = FT_Err_Ok;
 
-} // namespace textify
+} // namespace odtr

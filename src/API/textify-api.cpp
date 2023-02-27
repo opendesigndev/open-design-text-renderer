@@ -26,13 +26,13 @@
 #include <string>
 #include <vector>
 
-namespace textify {
+namespace odtr {
 namespace {
 
-compat::Rectangle convertRect(const textify::Rectangle& r) {
+compat::Rectangle convertRect(const odtr::Rectangle& r) {
     return compat::Rectangle{r.l, r.t, r.w, r.h};
 }
-compat::FRectangle convertRect(const textify::FRectangle& r) {
+compat::FRectangle convertRect(const odtr::FRectangle& r) {
     return compat::FRectangle{r.l, r.t, r.w, r.h};
 }
 
@@ -278,4 +278,4 @@ DrawTextResult drawText(ContextHandle ctx,
     return {{}, {}, true};
 }
 
-} // namespace textify
+} // namespace odtr

@@ -5,7 +5,7 @@
 
 #include "TextShapeInput.h"
 
-namespace textify {
+namespace odtr {
 
 struct PlacedTextData;
 namespace priv { struct TextShapeInput; }

@@ -15,8 +15,8 @@
 
 
 namespace {
-static textify::ContextOptions textifyContextOptions() {
-    textify::ContextOptions options;
+static odtr::ContextOptions textifyContextOptions() {
+    odtr::ContextOptions options;
     options.errorFunc = [](const std::string &message) {
         fprintf(stderr, "Textify error: %s\n", message.c_str());
     };
@@ -33,7 +33,7 @@ static textify::ContextOptions textifyContextOptions() {
 class TextifyApiTests : public ::testing::Test {
 protected:
     virtual void SetUp() override {
-        context = textify::createContext(textifyContextOptions());
+        context = odtr::createContext(textifyContextOptions());
     }
 
     void addMissingFonts(const octopus::Text &text) {
@@ -64,17 +64,17 @@ protected:
         ASSERT_FALSE(octopusData.content->layers->empty());
     }
 
-    textify::ContextHandle context;
+    odtr::ContextHandle context;
 
     const std::string fontsDirectory = std::string(FONTS_DIR);
     const std::string singleLetterOctopusPath = std::string(TESTING_OCTOPUS_DIR) + "SingleLetter.json";
     const std::string decorationsOctopusPath = std::string(TESTING_OCTOPUS_DIR) + "Decorations.json";
-    const textify::FontSpecifier fontHelveticaNeue { "HelveticaNeue" };
+    const odtr::FontSpecifier fontHelveticaNeue { "HelveticaNeue" };
 };
 
 
 TEST_F(TextifyApiTests, singleLetter) {
-    using namespace textify;
+    using namespace odtr;
 
     octopus::Octopus octopusData;
     readOctopusFile(singleLetterOctopusPath, octopusData);
@@ -118,7 +118,7 @@ TEST_F(TextifyApiTests, singleLetter) {
 }
 
 TEST_F(TextifyApiTests, decorations) {
-    using namespace textify;
+    using namespace odtr;
 
     octopus::Octopus octopusData;
     readOctopusFile(decorationsOctopusPath, octopusData);

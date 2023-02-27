@@ -6,7 +6,7 @@
 #include "FormattedText.h"
 #include "ParagraphShape.h"
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 using UsedFaces = std::unordered_set<std::string>;
@@ -27,4 +27,4 @@ struct TextShapeData
 using TextShapeDataPtr = std::unique_ptr<TextShapeData>;
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

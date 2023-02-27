@@ -3,12 +3,12 @@
 #include "compat/basic-types.h"
 #include "textify/textify-api.h"
 
-namespace textify {
+namespace odtr {
 namespace utils {
 
-textify::FRectangle castFRectangle(const compat::FRectangle& r);
-textify::Rectangle castRectangle(const compat::Rectangle& r);
-textify::Matrix3f castMatrix(const compat::Matrix3f& m);
+odtr::FRectangle castFRectangle(const compat::FRectangle& r);
+odtr::Rectangle castRectangle(const compat::Rectangle& r);
+odtr::Matrix3f castMatrix(const compat::Matrix3f& m);
 
 compat::FRectangle toFRectangle(const compat::Rectangle& r);
 
@@ -19,4 +19,4 @@ compat::Rectangle outerRect(const compat::FRectangle& rect);
 compat::FRectangle scaleRect(const compat::FRectangle& rect, float scale);
 
 } // namespace utils
-} // namespace textify
+} // namespace odtr

@@ -6,7 +6,7 @@
 
 #include "textify-api.h"
 
-namespace textify {
+namespace odtr {
 
 /// A single glyph decoration (underline / strikethrough) which is a result of the shaping phase, placed into its containing layer.
 struct PlacedDecoration {
@@ -27,4 +27,4 @@ struct PlacedDecoration {
 using PlacedDecorationPtr = std::unique_ptr<PlacedDecoration>;
 using PlacedDecorations = std::vector<PlacedDecorationPtr>;
 
-} // namespace textify
+} // namespace odtr

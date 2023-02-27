@@ -4,7 +4,7 @@
 #include <textify/PlacedGlyph.h>
 #include <textify/PlacedDecoration.h>
 
-namespace textify {
+namespace odtr {
 
 /// The result of the shaping phase (glyphs and decorations), placed into their containing layer.
 struct PlacedTextData
@@ -29,4 +29,4 @@ struct PlacedTextData
 };
 using PlacedTextDataPtr = std::unique_ptr<PlacedTextData>;
 
-} // namespace textify
+} // namespace odtr

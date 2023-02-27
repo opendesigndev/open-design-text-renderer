@@ -5,7 +5,7 @@
 
 #include "VisualRun.h"
 
-namespace textify {
+namespace odtr {
 
 namespace unicode {
 class EmojiTable;
@@ -56,4 +56,4 @@ private:
 using FormattedParagraphs = std::vector<FormattedParagraph>;
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

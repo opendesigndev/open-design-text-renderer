@@ -12,7 +12,7 @@
 
 #include "utils/utils.h"
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
@@ -223,4 +223,4 @@ void debug::drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const FacePtr
 }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

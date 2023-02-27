@@ -1,7 +1,7 @@
 
 #include "TextShapeInput.h"
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 TextShapeInput::TextShapeInput(FormattedTextPtr text,
@@ -14,4 +14,4 @@ TextShapeInput::TextShapeInput(FormattedTextPtr text,
 { }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

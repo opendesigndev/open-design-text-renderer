@@ -11,13 +11,13 @@
 #include <unordered_set>
 
 
-namespace textify {
+namespace odtr {
 namespace utils {
 class Log;
 }
 }
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 /** A sequence of GlyphShape objects, which forms the visual representation of a paragraph.
@@ -303,4 +303,4 @@ using ParagraphShapePtr = std::unique_ptr<ParagraphShape>;
 using ParagraphShapes = std::vector<ParagraphShapePtr>;
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

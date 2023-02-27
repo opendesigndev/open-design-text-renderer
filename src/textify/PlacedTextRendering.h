@@ -5,16 +5,16 @@
 #include "text-format.h"
 
 // Forward declarations
-namespace textify {
+namespace odtr {
 struct PlacedGlyph;
 struct PlacedDecoration;
 class Glyph;
 class FacePtr;
 using GlyphPtr = std::unique_ptr<Glyph>;
 typedef float RenderScale;
-} // namespace textify
+} // namespace odtr
 
-namespace textify {
+namespace odtr {
 namespace priv {
 
 GlyphPtr renderPlacedGlyph(const PlacedGlyph &placedGlyph,
@@ -41,4 +41,4 @@ void drawGlyphBoundingRectangle(compat::BitmapRGBA &bitmap, const FacePtr &face,
 }
 
 } // namespace priv
-} // namespace textify
+} // namespace odtr

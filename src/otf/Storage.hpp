@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <utility>
 
-namespace textify {
+namespace odtr {
 namespace otf {
 
 template <typename Impl>
@@ -24,4 +24,4 @@ private:
 };
 
 } // namespace otf
-} // namespace textify
+} // namespace odtr
