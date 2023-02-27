@@ -41,7 +41,7 @@ private:
     int scale(int x) const;
 
     const octopus::Octopus& octopus_;
-    odtr::ContextHandle textifyCtx_;
+    odtr::ContextHandle textRendererCtx_;
     std::unique_ptr<utils::Log> log;
     float scale_;
     std::optional<compat::Rectangle> viewArea_;

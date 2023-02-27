@@ -34,14 +34,14 @@ void printMatrix(const std::string& label, const odtr::Matrix3f& r) {
 }
 
 
-class TextifyContext
+class TextRendererContext
 {
 public:
-    explicit TextifyContext(const odtr::ContextOptions& opts)
+    explicit TextRendererContext(const odtr::ContextOptions& opts)
         : handle(odtr::createContext(opts))
     { }
 
-    ~TextifyContext() {
+    ~TextRendererContext() {
         odtr::destroyContext(handle);
     }
 
@@ -91,7 +91,7 @@ bool minimalExample() {
     ctxOptions.warnFunc = [](const std::string &msg) { fmt::print("[WARN] {}\n", msg); };
     ctxOptions.infoFunc = [](const std::string &msg) { fmt::print("[INFO] {}\n", msg); };
 
-    auto ctx = TextifyContext(ctxOptions);
+    auto ctx = TextRendererContext(ctxOptions);
     if (!ctx) {
         return false;
     }
@@ -206,7 +206,7 @@ bool runOctopusRenderer(const std::string& filename) {
 }
 
 int main(int argc, char* argv[]) {
-    // printf("usage: textify-cli <octopus-file>\n");
+    // printf("usage: text-renderer-cli <octopus-file>\n");
 
     std::vector<std::string> args(argv, argv + argc);
     if (args.size() >= 2) {

@@ -1,8 +1,8 @@
 by @vadimpetrov
 
-# Textify
+# Open Design Text Renderer
 
-Textify is a module responsible for text rendering. The input is formatted text with information about text styles, colors etc. and the output is either a transparent raster image or a collection of vector text outlines (experimental).
+**Open Design Text Renderer** is a module responsible for text rendering. The input is formatted text with information about text styles, colors etc. and the output is either a transparent raster image or a collection of vector text outlines (experimental).
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ Textify is a module responsible for text rendering. The input is formatted text 
 
 ## Prerequisities
 
-Textify is based on two widespread libraries from the (more or less) standard [text rendering stack][behdad]. On the bottom is font rasterizer [FreeType], on top the slightly more abstract text shaper [HarfBuzz].
+**Open Design Text Renderer** is based on two widespread libraries from the (more or less) standard [text rendering stack][behdad]. On the bottom is font rasterizer [FreeType], on top the slightly more abstract text shaper [HarfBuzz].
 
 **Why rasterize?** Fonts are most commonly represented as TrueType `ttf` or OpenType `otf` files. Both use tables mapping characters to their respective glyphs (encoding of 'a' to an image of 'a') and to various rules that apply to single glyphs and their combinations, such as hinting or kerning (see later). Both formats represent glyphs most commonly with vector outlines using line segments and Beziér curves (altough bitmap or svg fonts also exist), which need to be nontrivially rasterized. The many challenges in font rasterization lie in *hinting* – keeping vertical and horizontal lines visible even at small pixel sizes, aligning with the pixel grid, optimizing for LCDs etc.
 
@@ -26,7 +26,7 @@ Textify is based on two widespread libraries from the (more or less) standard [t
 
 ### Glyph metrics
 
-A glyph is described by multiple metrics, some more and some less important in the context of Textify. The following image is an edited version from the FreeType manual.
+A glyph is described by multiple metrics, some more and some less important in the context of **ODTR**. The following image is an edited version from the FreeType manual.
 
 ![Glyph Metrics][glyph]
 
@@ -56,27 +56,27 @@ For more on font files, glyph metrics, measurements and other (but far from all!
 
 ## Workflow
 
-Textify has two main public methods which hide all the maelstrom within: `preprocess` and `drawText`. The idea is that each layer should be preprocessed exactly once and then drawn multiple times with different parameters such as rectangle cutout or scale factor. All data required for those procedures is supplied by a `textify::Context`.
+**ODTR** has two main public methods which hide all the maelstrom within: `preprocess` and `drawText`. The idea is that each layer should be preprocessed exactly once and then drawn multiple times with different parameters such as rectangle cutout or scale factor. All data required for those procedures is supplied by a `odtr::Context`.
 
 The text is first split into paragraphs which are then processed independently as `ParagraphShape` objects. Each paragraph is shaped by HarfBuzz and then drawn – converted to glyphs, but without any raster operations. Multiple values are computed during this phase such as the first ascender, first baseline, last descender and perhaps most importantly the text bounds. The entire result is saved in the context, which is later used during drawing.
 
-`ParagraphShape` does most of the Textify magic as it represents paragraphs with everything required to render them. Multiple operations take place while shaping a paragraph: analyzing line break opportunities in [bidirectional texts][bidi] using the International Components for Unicode lib, dividing paragraph into sequences with unfirom glyph format, shaping said sequences and eventually breaking them into lines. The result is a collection of `GlyphShape` objects with information about lines, text direction and glyph format and metrics.
+`ParagraphShape` does most of the **ODTR** magic as it represents paragraphs with everything required to render them. Multiple operations take place while shaping a paragraph: analyzing line break opportunities in [bidirectional texts][bidi] using the International Components for Unicode lib, dividing paragraph into sequences with unfirom glyph format, shaping said sequences and eventually breaking them into lines. The result is a collection of `GlyphShape` objects with information about lines, text direction and glyph format and metrics.
 
 The shapes are redrawn using a given scale factor into a `TypesetJournal` with records describing lines and text decorations (underline etc). During this the text is justified and the glyphs are translated to their position in the final bitmap, where they are eventually rendered.
 
 ## Debugging
 
-Textify, as all of Rendering does, suffers from a terrible case of GIGO. Many of the issues like *font not rendered correctly* or *text missing* come from bad data in Octopus such as mangled or missing text or formatting data. It is therefore a good idea to check the Octopus first and if there's anything wrong with it, it's someone else's job, yay!
+**ODTR**, as all of Rendering does, suffers from a terrible case of GIGO. Many of the issues like *font not rendered correctly* or *text missing* come from bad data in Octopus such as mangled or missing text or formatting data. It is therefore a good idea to check the Octopus first and if there's anything wrong with it, it's someone else's job, yay!
 
-Sometimes there is a problem with a font. Fonts are identified by their `PostScriptName` and often a single font can be known to different systems under various names, consider `Arial`, `ArialMT` or `ArialMS`. The font file provided can also contain a different subset of Unicode characters that is required by the text, usually out of the basic ASCII / English range – Hebrew, Cyrillic, Chinese etc. however this should be handled by a service independent on Textify (Schriftmeister at the time of writing this document). On the other hand, different font files with the same `PostScriptName` can contain different values regarding single glyphs or the font in genearal. This can happen with later and earlier versions of the font from the same provider, with hacked fonts or with no apparent reason and is not really generally solvable.
+Sometimes there is a problem with a font. Fonts are identified by their `PostScriptName` and often a single font can be known to different systems under various names, consider `Arial`, `ArialMT` or `ArialMS`. The font file provided can also contain a different subset of Unicode characters that is required by the text, usually out of the basic ASCII / English range – Hebrew, Cyrillic, Chinese etc. however this should be handled by a service independent on **ODTR** (Schriftmeister at the time of writing this document). On the other hand, different font files with the same `PostScriptName` can contain different values regarding single glyphs or the font in genearal. This can happen with later and earlier versions of the font from the same provider, with hacked fonts or with no apparent reason and is not really generally solvable.
 
 Correctly rendered but misplaced text is usually a problem with bounds. Layer bounds sound simple enough, but they are actually a debugging evergreen and over time seem to get worse instead of better. Beware of editors that translate text to the start of the baseline instead of the top left corner (I'm looking at you, XD)!
 
-Some editors offer automatic computation of bounds and it does happen that Textify comes up with slightly different values. There has been a lot of discussion on this, sometimes it has been fixed and a few times deemed unsolvable or marked as a feature instead of a bug.
+Some editors offer automatic computation of bounds and it does happen that **ODTR** comes up with slightly different values. There has been a lot of discussion on this, sometimes it has been fixed and a few times deemed unsolvable or marked as a feature instead of a bug.
 
 Longer texts with multiple lines commonly end up with different line breaking compared to the original – meaning a word can be at the start of the next line instead of at the end of the current one or the other way around. This problem is considered unavoidable because of the many factors affecting horizontal placement of a glyph, including character spacing, kerning, glyph advances and bearings, font differences (and fallback fonts!), hinting, sub-pixel positioning, limited precision arithmetic, rounding errors... and just one pixel difference can force the word to shift. This does not constitue a real problem for longer texts since they are mostly Lorem ipsum anyway, but affects single lines greatly. Those need to be approached with care.
 
-For most other problems the best approach is top down. Check if Textify produces any images, how many `ParagraphShape` objects are created, what values glyphs get during shaping... There are many warnings to help you locate a problem and more often than not, they will repeat a couple of times making them rather hard to miss, just set the log level.
+For most other problems the best approach is top down. Check if **ODTR** produces any images, how many `ParagraphShape` objects are created, what values glyphs get during shaping... There are many warnings to help you locate a problem and more often than not, they will repeat a couple of times making them rather hard to miss, just set the log level.
 
 ## Further reading
 

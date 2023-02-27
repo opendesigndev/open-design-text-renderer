@@ -58,20 +58,20 @@ void infoFunc(const std::string& msg) {
 
 SimpleRenderer::SimpleRenderer(const octopus::Octopus& oct, float scale)
     : octopus_(oct),
-      textifyCtx_(odtr::createContext({})),
+      textRendererCtx_(odtr::createContext({})),
       log(std::make_unique<utils::Log>(errorFunc, warnFunc, infoFunc)),
       scale_(scale)
 {
     // preload emoji font
-    // odtr::addFontFile(textifyCtx_, odtr::FontManager::DEFAULT_EMOJI_FONT, "", "fonts/NotoColorEmoji.ttf", false);
-    if (!odtr::addFontFile(textifyCtx_, odtr::FontManager::DEFAULT_EMOJI_FONT, "", "fonts/AppleColorEmoji.ttc", false)) {
+    // odtr::addFontFile(textRendererCtx_, odtr::FontManager::DEFAULT_EMOJI_FONT, "", "fonts/NotoColorEmoji.ttf", false);
+    if (!odtr::addFontFile(textRendererCtx_, odtr::FontManager::DEFAULT_EMOJI_FONT, "", "fonts/AppleColorEmoji.ttc", false)) {
         log->info("Emoji font not preloaded");
     }
 }
 
 SimpleRenderer::~SimpleRenderer()
 {
-    odtr::destroyContext(textifyCtx_);
+    odtr::destroyContext(textRendererCtx_);
 }
 
 bool SimpleRenderer::renderToFile(const std::string& filename)
@@ -148,7 +148,7 @@ bool SimpleRenderer::renderTextLayer(const octopus::Layer& layer, Canvas& canvas
 bool SimpleRenderer::renderText(const octopus::Text& text, Canvas& canvas, const compat::Matrix3f& transform,
         const std::optional<odtr::Rectangle>& viewArea)
 {
-    for (const auto& missingFont : odtr::listMissingFonts(textifyCtx_, text)) {
+    for (const auto& missingFont : odtr::listMissingFonts(textRendererCtx_, text)) {
 
         if (loadFont(missingFont)) {
             log->info("loaded missing font: {}", missingFont);
@@ -158,9 +158,9 @@ bool SimpleRenderer::renderText(const octopus::Text& text, Canvas& canvas, const
         }
     }
 
-    auto textShape = odtr::shapeText(textifyCtx_, text);
+    auto textShape = odtr::shapeText(textRendererCtx_, text);
 
-    auto bounds = odtr::getBounds(textifyCtx_, textShape);
+    auto bounds = odtr::getBounds(textRendererCtx_, textShape);
     utils::printRect("text bounds:", bounds);
 
     if (viewArea.has_value()) {
@@ -172,13 +172,13 @@ bool SimpleRenderer::renderText(const octopus::Text& text, Canvas& canvas, const
         viewArea
     };
 
-    auto [width, height] = odtr::getDrawBufferDimensions(textifyCtx_, textShape, drawOptions);
+    auto [width, height] = odtr::getDrawBufferDimensions(textRendererCtx_, textShape, drawOptions);
 
     auto bitmap = compat::BitmapRGBA(width, height);
     bitmap.clear();
     // bitmap.fill(0x1fcc11cc);
 
-    auto drawResult = odtr::drawText(textifyCtx_, textShape, bitmap.pixels(), width, height, drawOptions);
+    auto drawResult = odtr::drawText(textRendererCtx_, textShape, bitmap.pixels(), width, height, drawOptions);
     if (drawResult.error) {
         log->error("failed to shape text content: {}...", text.value.substr(0, std::min(text.value.size(), (size_t) 16)));
         return false;
@@ -192,7 +192,7 @@ bool SimpleRenderer::renderText(const octopus::Text& text, Canvas& canvas, const
             canvasTransform
         );
 
-    odtr::destroyTextShapes(textifyCtx_, &textShape, 1);
+    odtr::destroyTextShapes(textRendererCtx_, &textShape, 1);
 
     return true;
 }
@@ -262,7 +262,7 @@ SimpleRenderer::RenderShapeResult SimpleRenderer::renderShape(const octopus::Sha
 bool SimpleRenderer::loadFont(const std::string& name)
 {
     auto tryLoad = [&](const std::string& name, const std::string& ext) {
-        return odtr::addFontFile(textifyCtx_, name, "", fmt::format("fonts/{}.{}", name, ext), false);
+        return odtr::addFontFile(textRendererCtx_, name, "", fmt::format("fonts/{}.{}", name, ext), false);
     };
 
     for (const auto& ext : {"ttf", "otf", "ttc"}) {

@@ -18,7 +18,7 @@ Consult [README](README.md) for more information, here is just a visual overview
 
 ![terminology_glyph](img/terminology_glyph.png)
 
-Baseline Policy types in Octopus3+ and 'Textify':
+Baseline Policy types in Octopus3+ and 'Text Renderer':
 
 - `SET`
 - `CENTER`
