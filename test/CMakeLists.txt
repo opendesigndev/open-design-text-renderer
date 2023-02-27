@@ -20,7 +20,7 @@ add_definitions(-DFONTS_DIR="${CMAKE_SOURCE_DIR}/../../Fonts/")
 # Test source files
 set(TEST_SOURCE_FILES
     ${TEXT_RENDERER_TEST_DIR}/src/main.cpp
-    ${TEXT_RENDERER_TEST_DIR}/src/TextifyApiTests.cpp
+    ${TEXT_RENDERER_TEST_DIR}/src/TextRendererApiTests.cpp
 )
 
 # Add executables

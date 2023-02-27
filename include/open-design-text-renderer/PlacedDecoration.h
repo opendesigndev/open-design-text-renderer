@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "textify-api.h"
+#include "text-renderer-api.h"
 
 namespace odtr {
 

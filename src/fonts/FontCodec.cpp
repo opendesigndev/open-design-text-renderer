@@ -5,11 +5,11 @@
 #include <random>
 #include <chrono>
 
-#ifdef TEXTIFY_USE_LZ4
+#ifdef TEXT_RENDERER_USE_LZ4
 #include "lz4/lz4.h"
 #endif
 
-#ifdef TEXTIFY_USE_MONOCYPHER
+#ifdef TEXT_RENDERER_USE_MONOCYPHER
 extern "C" {
 #include "monocypher/monocypher.h"
 }

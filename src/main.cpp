@@ -7,9 +7,9 @@
 
 #include "octopus/fill.h"
 #include "octopus/general.h"
-#include "textify/Context.h"
-#include "textify/base-types.h"
-#include "textify/textify-api.h"
+#include "text-renderer/Context.h"
+#include "text-renderer/base-types.h"
+#include "text-renderer/text-renderer-api.h"
 
 #include "utils/fmt.h"
 #include "vendor/fmt/color.h"

@@ -1,4 +1,6 @@
-#include "textify.h"
+
+#include "text-renderer.h"
+
 #include "Context.h"
 
 #include "errors.h"

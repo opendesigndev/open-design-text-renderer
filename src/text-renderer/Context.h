@@ -1,8 +1,7 @@
 #pragma once
 
 #include "fonts/FontManager.h"
-// #include "textify.h"
-#include "textify/Config.h"
+#include "text-renderer/Config.h"
 #include "TextShape.h"
 #include "utils/Log.h"
 

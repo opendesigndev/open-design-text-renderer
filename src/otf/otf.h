@@ -5,7 +5,7 @@
 #include "common/buffer_view.h"
 #include "common/result.hpp"
 
-#include "textify/base.h"
+#include "text-renderer/base.h"
 
 #include <string>
 #include <unordered_set>

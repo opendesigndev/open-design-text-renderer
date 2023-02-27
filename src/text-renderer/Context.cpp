@@ -1,6 +1,6 @@
 #include "Context.h"
 #include "TextShape.h"
-#include "textify.h"
+#include "text-renderer.h"
 #include "fonts/FontManager.h"
 
 namespace odtr {

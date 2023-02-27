@@ -80,10 +80,10 @@ if (NOT STANDALONE)
 endif()
 
 set(TEXT_RENDERER_PUBLIC_HEADERS
-    ${TEXT_RENDERER_INCLUDE_DIR}/textify/textify-api.h
-    ${TEXT_RENDERER_INCLUDE_DIR}/textify/PlacedGlyph.h
-    ${TEXT_RENDERER_INCLUDE_DIR}/textify/PlacedDecoration.h
-    ${TEXT_RENDERER_INCLUDE_DIR}/textify/PlacedTextData.h
+    ${TEXT_RENDERER_INCLUDE_DIR}/open-design-text-renderer/text-renderer-api.h
+    ${TEXT_RENDERER_INCLUDE_DIR}/open-design-text-renderer/PlacedGlyph.h
+    ${TEXT_RENDERER_INCLUDE_DIR}/open-design-text-renderer/PlacedDecoration.h
+    ${TEXT_RENDERER_INCLUDE_DIR}/open-design-text-renderer/PlacedTextData.h
 )
 
 set(TEXT_RENDERER_PRIVATE_HEADERS
@@ -112,33 +112,33 @@ set(TEXT_RENDERER_PRIVATE_HEADERS
     ${TEXT_RENDERER_SOURCE_DIR}/otf/StorageBufferImpl.h
     ${TEXT_RENDERER_SOURCE_DIR}/otf/StorageFileImpl.h
 
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/base.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/base-types.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/Config.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/Context.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/Face.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/FreetypeHandle.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/FormattedParagraph.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/FormattedText.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/Glyph.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/GlyphAcquisitor.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/GlyphShape.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/LineBreaker.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/ParagraphShape.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/reported-fonts-utils.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/tabstops.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/text-format.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/textify.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/TextParser.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/TextShape.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/TextShapeInput.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/TextShapeData.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/types.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/TypesetJournal.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/VisualRun.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/LineSpan.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/BitmapWriter.h
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/PlacedTextRendering.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/base.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/base-types.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/Config.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/Context.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/Face.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/FreetypeHandle.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/FormattedParagraph.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/FormattedText.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/Glyph.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/GlyphAcquisitor.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/GlyphShape.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/LineBreaker.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/ParagraphShape.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/reported-fonts-utils.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/tabstops.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/text-format.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/text-renderer.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/TextParser.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/TextShape.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/TextShapeInput.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/TextShapeData.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/types.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/TypesetJournal.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/VisualRun.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/LineSpan.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/BitmapWriter.h
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/PlacedTextRendering.h
 
     ${TEXT_RENDERER_SOURCE_DIR}/utils/utils.h
     ${TEXT_RENDERER_SOURCE_DIR}/utils/Log.h
@@ -163,10 +163,10 @@ set(TEXT_RENDERER_PRIVATE_HEADERS
     ${TEXT_RENDERER_SOURCE_DIR}/vendor/fmt/xchar.h
 )
 set(TEXT_RENDERER_SOURCES
-    ${TEXT_RENDERER_SOURCE_DIR}/API/textify-api.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/API/PlacedGlyph.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/API/PlacedDecoration.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/API/PlacedTextData.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/api/text-renderer-api.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/api/PlacedGlyph.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/api/PlacedDecoration.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/api/PlacedTextData.cpp
 
     ${TEXT_RENDERER_SOURCE_DIR}/common/buffer_view.cpp
 
@@ -187,28 +187,28 @@ set(TEXT_RENDERER_SOURCES
     ${TEXT_RENDERER_SOURCE_DIR}/otf/StorageBufferImpl.cpp
     ${TEXT_RENDERER_SOURCE_DIR}/otf/StorageFileImpl.cpp
 
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/Config.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/Context.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/Face.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/FreetypeHandle.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/FormattedParagraph.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/FormattedText.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/Glyph.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/GlyphAcquisitor.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/GlyphShape.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/LineBreaker.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/ParagraphShape.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/text-format.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/textify.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/TextParser.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/TextShape.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/TextShapeInput.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/TextShapeData.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/TypesetJournal.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/VisualRun.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/LineSpan.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/BitmapWriter.cpp
-    ${TEXT_RENDERER_SOURCE_DIR}/textify/PlacedTextRendering.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/Config.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/Context.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/Face.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/FreetypeHandle.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/FormattedParagraph.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/FormattedText.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/Glyph.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/GlyphAcquisitor.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/GlyphShape.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/LineBreaker.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/ParagraphShape.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/text-format.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/text-renderer.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/TextParser.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/TextShape.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/TextShapeInput.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/TextShapeData.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/TypesetJournal.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/VisualRun.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/LineSpan.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/BitmapWriter.cpp
+    ${TEXT_RENDERER_SOURCE_DIR}/text-renderer/PlacedTextRendering.cpp
 
     ${TEXT_RENDERER_SOURCE_DIR}/utils/utils.cpp
     ${TEXT_RENDERER_SOURCE_DIR}/utils/Log.cpp

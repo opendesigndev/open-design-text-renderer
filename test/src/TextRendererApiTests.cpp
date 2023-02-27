@@ -8,10 +8,10 @@
 #include <ode-essentials.h>
 #include <ode-renderer.h>
 
-#include <textify/textify-api.h>
-#include <textify/PlacedTextData.h>
+#include <open-design-text-renderer/text-renderer-api.h>
+#include <open-design-text-renderer/PlacedTextData.h>
 
-#include "textify/TextShape.h"
+#include "text-renderer/TextShape.h"
 
 
 namespace {
@@ -29,8 +29,8 @@ static odtr::ContextOptions textifyContextOptions() {
 }
 
 
-//! TextifyApiTests class tests.
-class TextifyApiTests : public ::testing::Test {
+//! TextRendererApiTests class tests.
+class TextRendererApiTests : public ::testing::Test {
 protected:
     virtual void SetUp() override {
         context = odtr::createContext(textifyContextOptions());
@@ -73,7 +73,7 @@ protected:
 };
 
 
-TEST_F(TextifyApiTests, singleLetter) {
+TEST_F(TextRendererApiTests, singleLetter) {
     using namespace odtr;
 
     octopus::Octopus octopusData;
@@ -117,7 +117,7 @@ TEST_F(TextifyApiTests, singleLetter) {
     ASSERT_FALSE(drawResult.error);
 }
 
-TEST_F(TextifyApiTests, decorations) {
+TEST_F(TextRendererApiTests, decorations) {
     using namespace odtr;
 
     octopus::Octopus octopusData;

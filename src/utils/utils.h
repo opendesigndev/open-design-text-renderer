@@ -1,7 +1,7 @@
 #pragma once
 
 #include "compat/basic-types.h"
-#include "textify/textify-api.h"
+#include <open-design-text-renderer/text-renderer-api.h>
 
 namespace odtr {
 namespace utils {

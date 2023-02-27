@@ -1,6 +1,6 @@
 #pragma once
 
-#include "textify/Face.h"
+#include "text-renderer/Face.h"
 
 #include "common/buffer_view.h"
 

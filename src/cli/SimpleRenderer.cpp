@@ -7,7 +7,7 @@
 #include "octopus/fill.h"
 #include "octopus/layer.h"
 #include "octopus/shape.h"
-#include "textify/textify-api.h"
+#include "text-renderer/text-renderer-api.h"
 
 #include "utils/Log.h"
 #include "utils/utils.h"

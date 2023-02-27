@@ -6,7 +6,7 @@
 #include "compat/basic-types.h"
 #include "octopus/shape.h"
 #include "octopus/text.h"
-#include "textify/textify-api.h"
+#include "text-renderer/text-renderer-api.h"
 #include "utils/Log.h"
 #include <cstddef>
 

@@ -1,16 +1,16 @@
 
-#include <textify/textify-api.h>
+#include <open-design-text-renderer/text-renderer-api.h>
 
 #include "compat/affine-transform.h"
 #include "compat/basic-types.h"
 
 #include "fonts/FontManager.h"
 
-#include "textify/Config.h"
-#include "textify/Context.h"
-#include "textify/textify.h"
-#include "textify/TextShape.h"
-#include "textify/types.h"
+#include "text-renderer/Config.h"
+#include "text-renderer/Context.h"
+#include "text-renderer/text-renderer.h"
+#include "text-renderer/TextShape.h"
+#include "text-renderer/types.h"
 
 #include "utils/utils.h"
 #include "utils/Log.h"

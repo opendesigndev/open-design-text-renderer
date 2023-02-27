@@ -4,7 +4,7 @@
 #include <cmath>
 #include <locale>
 
-#include "textify/text-format.h"
+#include "text-renderer/text-format.h"
 #include "fonts/FontManager.h"
 #include "unicode/EmojiTable.h"
 

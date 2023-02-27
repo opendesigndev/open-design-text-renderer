@@ -7,7 +7,7 @@
 #include "fmt/core.h"
 
 #include "utils/fmt.h"
-#include "textify/textify-api.h"
+#include "text-renderer/text-renderer-api.h"
 
 namespace textify {
 namespace cli {

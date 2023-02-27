@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include <textify/PlacedGlyph.h>
-#include <textify/PlacedDecoration.h>
+#include <open-design-text-renderer/PlacedGlyph.h>
+#include <open-design-text-renderer/PlacedDecoration.h>
 
 namespace odtr {
 

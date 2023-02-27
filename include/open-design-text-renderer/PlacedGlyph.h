@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 
-#include "textify-api.h"
+#include "text-renderer-api.h"
 
 namespace odtr {
 

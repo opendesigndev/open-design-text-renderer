@@ -1,9 +1,9 @@
 
 #include "TextShape.h"
 
-#include <textify/PlacedTextData.h>
+#include <open-design-text-renderer/PlacedTextData.h>
 
-#include "textify.h"
+#include "text-renderer.h"
 #include "TextShapeInput.h"
 
 namespace odtr {

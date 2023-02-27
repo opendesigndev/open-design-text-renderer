@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "common/result.hpp"
-#include "textify/base-types.h"
+#include "text-renderer/base-types.h"
 
 namespace odtr {
 namespace codec {

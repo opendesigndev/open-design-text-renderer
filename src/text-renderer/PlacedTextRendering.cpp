@@ -3,8 +3,8 @@
 
 #include <cmath>
 
-#include <textify/PlacedGlyph.h>
-#include <textify/PlacedDecoration.h>
+#include <open-design-text-renderer/PlacedGlyph.h>
+#include <open-design-text-renderer/PlacedDecoration.h>
 
 #include "BitmapWriter.h"
 #include "Glyph.h"
