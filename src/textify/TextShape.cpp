@@ -4,26 +4,13 @@
 #include <textify/PlacedTextData.h>
 
 #include "textify.h"
-
-#include "vendor/fmt/core.h"
-
-#include <cstdlib>
-#include <utility>
+#include "TextShapeInput.h"
 
 namespace textify {
 
-TextShape::TextShape(DataPtr&& data) :
+TextShape::TextShape(InputPtr &&input, DataPtr &&data) :
+    input(std::move(input)),
     data(std::move(data)) {
-}
-
-TextShape::TextShape(PlacedDataPtr&& data) :
-    placedData(std::move(data)) {
-}
-
-// TODO: Remove
-TextShape::TextShape(DataPtr&& data, PlacedDataPtr&& placedData) :
-    data(std::move(data)),
-    placedData(std::move(placedData)) {
 }
 
 void TextShape::deactivate()
@@ -31,25 +18,16 @@ void TextShape::deactivate()
     active = false;
 }
 
-const priv::TextShapeData& TextShape::getData() const
+const PlacedTextData& TextShape::getData() const
 {
     return *data.get();
 }
 
-const PlacedTextData& TextShape::getPlacedData() const
+void TextShape::onFontFaceChanged(const std::string &postScriptName)
 {
-    return *placedData.get();
-}
-
-void TextShape::onFontFaceChanged(const std::string& postScriptName)
-{
-    if (data->usedFaces.find(postScriptName) != std::end(data->usedFaces)) {
+    if (input->usedFaces.find(postScriptName) != std::end(input->usedFaces)) {
         dirty = true;
     }
-}
-
-bool TextShape::isPlaced() const {
-    return placedData != nullptr;
 }
 
 }

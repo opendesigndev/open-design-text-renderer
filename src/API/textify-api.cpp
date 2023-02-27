@@ -40,12 +40,13 @@ bool sanitizeShape(ContextHandle ctx,
                    TextShapeHandle textShape)
 {
     if (textShape->dirty) {
-        priv::TextShapeResult textShapeResult = priv::reshapeText(*ctx, std::move(textShape->data));
-
-        if (!textShapeResult) {
+        priv::PlacedTextResult placedShapeResult = priv::shapePlacedText(*ctx, *textShape->input);
+        if (!placedShapeResult) {
+            ctx->getLogger().error("Text reshaping failed with error: {}", errorToString(placedShapeResult.error()));
             return false;
         }
-        textShape->data = textShapeResult.moveValue();
+
+        textShape->data = placedShapeResult.moveValue();
         textShape->dirty = false;
     }
     return true;
@@ -145,27 +146,19 @@ TextShapeHandle shapeText(ContextHandle ctx,
         return nullptr;
     }
 
-    // TODO: Return just placed text
-    priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
-    priv::PlacedTextResult placedShapeResult = priv::shapePlacedText(*ctx, text);
-
-    if (!textShapeResult) {
-        ctx->getLogger().error("Text shaping failed with error: {}", errorToString(textShapeResult.error()));
+    priv::TextShapeInputPtr textShapeInput = priv::preprocessText(*ctx, text);
+    if (textShapeInput == nullptr) {
+        ctx->getLogger().error("Text preprocessing failed.");
+        return nullptr;
     }
+
+    priv::PlacedTextResult placedShapeResult = priv::shapePlacedText(*ctx, *textShapeInput);
     if (!placedShapeResult) {
         ctx->getLogger().error("Text shaping failed with error: {}", errorToString(placedShapeResult.error()));
-    }
-
-    if (!textShapeResult && !placedShapeResult) {
         return nullptr;
-    } else if (!textShapeResult) {
-        ctx->shapes.emplace_back(std::make_unique<TextShape>(placedShapeResult.moveValue()));
-    } else if (!placedShapeResult) {
-        ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue()));
-    } else {
-        ctx->shapes.emplace_back(std::make_unique<TextShape>(textShapeResult.moveValue(), placedShapeResult.moveValue()));
     }
 
+    ctx->shapes.emplace_back(std::make_unique<TextShape>(std::move(textShapeInput), placedShapeResult.moveValue()));
     return ctx->shapes.back().get();
 }
 
@@ -192,12 +185,19 @@ bool reshapeText(ContextHandle ctx,
         return false;
     }
 
-    priv::TextShapeResult textShapeResult = priv::shapeText(*ctx, text);
+    priv::TextShapeInputPtr textShapeInput = priv::preprocessText(*ctx, text);
+    if (textShapeInput == nullptr) {
+        ctx->getLogger().error("Text preprocessign failed.");
+        return false;
+    }
+
+    priv::PlacedTextResult textShapeResult = priv::shapePlacedText(*ctx, *textShapeInput);
     if (!textShapeResult) {
         ctx->getLogger().error("reshaping of a text failed with error: {}", (int)textShapeResult.error());
         return false;
     }
 
+    textShape->input = std::move(textShapeInput);
     textShape->data = textShapeResult.moveValue();
     return true;
 }
@@ -210,9 +210,7 @@ FRectangle getBounds(ContextHandle ctx,
     }
 
     if (textShape && sanitizeShape(ctx, textShape)) {
-        return utils::castFRectangle(textShape->isPlaced()
-                                     ? convertRect(textShape->getPlacedData().textBounds)
-                                     : textShape->getData().textBoundsTransformed);
+        return utils::castFRectangle(convertRect(textShape->getData().textBounds));
     }
     return {};
 }
@@ -227,7 +225,8 @@ bool intersect(ContextHandle ctx,
         return false;
     }
 
-    return textShape && textShape->getData().textBoundsTransformed.contains(x, y);
+    const compat::FRectangle textBounds = convertRect(textShape->getData().textBounds);
+    return textShape && textBounds.contains(x, y);
 }
 
 Dimensions getDrawBufferDimensions(ContextHandle ctx,
@@ -239,22 +238,10 @@ Dimensions getDrawBufferDimensions(ContextHandle ctx,
     }
 
     if (textShape && sanitizeShape(ctx, textShape)) {
-        if (textShape->isPlaced()) {
-            const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
-            const compat::Rectangle drawBounds = priv::computeDrawBounds(*ctx, textShape->getPlacedData(), drawOptions.scale, viewArea);
+        const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
+        const compat::Rectangle drawBounds = priv::computeDrawBounds(*ctx, textShape->getData(), drawOptions.scale, viewArea);
 
-            return { drawBounds.w, drawBounds.h };
-        } else {
-            const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
-            const priv::TextDrawResult result = priv::drawText(*ctx, textShape->getData(), drawOptions.scale, viewArea, nullptr, 0, 0, true);
-
-            if (result) {
-                const int w = result.value().drawBounds.w;
-                const int h = result.value().drawBounds.h;
-
-                return {w, h};
-            }
-        }
+        return { drawBounds.w, drawBounds.h };
     }
     return {};
 }
@@ -269,37 +256,12 @@ DrawTextResult drawText(ContextHandle ctx,
     }
 
     if (textShape && sanitizeShape(ctx, textShape)) {
-        const compat::Rectangle viewArea = drawOptions.viewArea.has_value() ? convertRect(drawOptions.viewArea.value()) : compat::INFINITE_BOUNDS;
-        const priv::TextDrawResult result = priv::drawText(*ctx, textShape->getData(), drawOptions.scale, viewArea, pixels, width, height, false);
-
-        if (result) {
-            const auto& drawOutput = result.value();
-            return {utils::castRectangle(drawOutput.drawBounds), utils::castMatrix(drawOutput.transform), false};
-        }
-    }
-
-    return {{}, {}, true};
-}
-
-DrawTextResult drawPlacedText(ContextHandle ctx,
-                              TextShapeHandle textShape,
-                              void* pixels, int width, int height,
-                              const DrawOptions& drawOptions) {
-    if (ctx == nullptr) {
-        return {{}, {}, true};
-    }
-
-    // TODO: It would be nice to sanitize the shape - reshape it in case it got dirty (when font face changes)
-    //   But the PlacedTextData doesn't have the original text data (FormattedText)
-    if (textShape) {
-        const PlacedTextData &placedTextData = textShape->getPlacedData();
-
         const compat::Rectangle viewArea = drawOptions.viewArea.has_value()
             ? convertRect(drawOptions.viewArea.value())
             : compat::INFINITE_BOUNDS;
 
         const priv::TextDrawResult result = priv::drawPlacedText(*ctx,
-                                                                 placedTextData,
+                                                                 textShape->getData(),
                                                                  drawOptions.scale,
                                                                  viewArea,
                                                                  pixels, width, height);

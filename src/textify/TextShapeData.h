@@ -14,21 +14,11 @@ using FrameSizeOpt = std::optional<compat::Vector2f>;
 
 struct TextShapeData
 {
-    TextShapeData(FormattedTextPtr text,
-                  const FrameSizeOpt &frameSize,
-                  const compat::Matrix3f& textTransform,
-                  ParagraphShapes&& shapes,
+    TextShapeData(ParagraphShapes&& shapes,
                   const compat::FRectangle& boundsNoTransform,
                   const compat::FRectangle& boundsTransformed,
                   float baseline);
 
-    // input properties
-    FormattedTextPtr formattedText;
-    FrameSizeOpt frameSize;
-    compat::Matrix3f textTransform;
-    UsedFaces usedFaces;
-
-    // processed
     ParagraphShapes paragraphShapes;
     compat::FRectangle textBoundsNoTransform;
     compat::FRectangle textBoundsTransformed;

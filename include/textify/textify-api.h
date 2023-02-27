@@ -272,29 +272,4 @@ DrawTextResult drawText(ContextHandle ctx,
                         void* pixels, int width, int height,
                         const DrawOptions& drawOptions = {});
 
-
-// TODO: New textify functionality. Cleanup.
-/**
- * @brief Draws a text shape into a buffer.
- *
- * Caller is expected to allocate the buffer, pixel size is 4 bytes.  Output
- * pixel format is RGBA with red channel being stored in the least significant
- * byte.
- *
- * @a drawOptions allows to set text scale and view area (cutout)
- *
- * @param ctx         context handle
- * @param textShape   text shape handle
- * @param pixels      pointer to the start of a buffer to draw into
- * @param width       number of columns in the buffer
- * @param height      number of rows in the buffer
- * @param drawOptions draw configuration
- *
- * @returns   result of the draw call
- **/
-DrawTextResult drawPlacedText(ContextHandle ctx,
-                              TextShapeHandle textShape,
-                              void* pixels, int width, int height,
-                              const DrawOptions& drawOptions = {});
-
 }

@@ -35,6 +35,7 @@ enum class TextDrawError
     DRAW_BOUNDS_ERROR
 };
 
+using TextShapeInputPtr = std::unique_ptr<TextShapeInput>;
 using TextShapeResult = Result<TextShapeDataPtr, TextShapeError>;
 using TextDrawResult = Result<TextDrawOutput, TextDrawError>;
 using PlacedTextResult = Result<PlacedTextDataPtr, TextShapeError>;
@@ -44,19 +45,18 @@ using TextShapeParagraphsResult = std::pair<TextShapeResult, ParagraphShape::Dra
 FacesNames listMissingFonts(Context &ctx,
                             const octopus::Text& text);
 
-TextShapeResult shapeText(Context &ctx,
-                          const octopus::Text& text);
+TextShapeInputPtr preprocessText(Context &ctx,
+                                 const octopus::Text &text);
 
-TextShapeResult reshapeText(Context &ctx,
-                            TextShapeDataPtr&& textShapeData);
+TextShapeResult shapeText(Context &ctx,
+                          const TextShapeInput &textShapeInput);
 
 TextShapeParagraphsResult shapeTextInner(Context &ctx,
-                                         FormattedTextPtr text,
-                                         const FrameSizeOpt &frameSize,
-                                         const compat::Matrix3f &textTransform);
+                                         const TextShapeInput &textShapeInput);
 
 TextDrawResult drawText(Context &ctx,
-                        const TextShapeData& shapeData,
+                        const TextShapeInput &shapeInput,
+                        const TextShapeData &shapeData,
                         float scale,
                         const compat::Rectangle& viewArea,
                         void* pixels, int width, int height,
@@ -102,12 +102,7 @@ compat::Rectangle computeDrawBounds(Context &ctx,
                                     const compat::Rectangle &viewArea);
 
 PlacedTextResult shapePlacedText(Context &ctx,
-                                 const octopus::Text& text);
-
-PlacedTextResult shapePlacedTextInner(Context &ctx,
-                                      FormattedTextPtr text,
-                                      const FrameSizeOpt &frameSize,
-                                      const compat::Matrix3f &textTransform);
+                                 const TextShapeInput &textShapeInput);
 
 // Draw text in the PlacedText representation into bitmap. Clip by viewArea.
 TextDrawResult drawPlacedText(Context &ctx,

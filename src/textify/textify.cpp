@@ -7,6 +7,7 @@
 #include "FreetypeHandle.h"
 #include "ParagraphShape.h"
 #include "TextShape.h"
+#include "TextShapeInput.h"
 #include "text-format.h"
 #include "TextParser.h"
 #include "types.h"
@@ -216,8 +217,8 @@ FacesNames listMissingFonts(Context &ctx, const octopus::Text& text)
     return missing;
 }
 
-TextShapeResult shapeText(Context &ctx, const octopus::Text& text)
-{
+TextShapeInputPtr preprocessText(Context &ctx,
+                                 const octopus::Text &text) {
     TextParser::ParseResult parsedText = TextParser(text).parseText();
 
     FrameSizeOpt frameSize;
@@ -226,23 +227,19 @@ TextShapeResult shapeText(Context &ctx, const octopus::Text& text)
         frameSize = compat::Vector2f{static_cast<float>(w), static_cast<float>(h)};
     }
 
-    TextShapeParagraphsResult res = shapeTextInner(ctx, std::move(parsedText.text), frameSize, parsedText.transformation);
-    return std::move(res.first);
+    return std::make_unique<TextShapeInput>(std::move(parsedText.text), frameSize, parsedText.transformation);
 }
 
-TextShapeResult reshapeText(Context &ctx, TextShapeDataPtr&& textShapeData)
-{
-    TextShapeParagraphsResult res = shapeTextInner(ctx, std::move(textShapeData->formattedText), textShapeData->frameSize, textShapeData->textTransform);
+TextShapeResult shapeText(Context &ctx,
+                          const TextShapeInput &textShapeInput) {
+    TextShapeParagraphsResult res = shapeTextInner(ctx, textShapeInput);
     return std::move(res.first);
 }
 
 TextShapeParagraphsResult shapeTextInner(Context &ctx,
-                                         FormattedTextPtr formattedText,
-                                         const FrameSizeOpt &frameSize,
-                                         const compat::Matrix3f &textTransform)
-{
+                                         const TextShapeInput &textShapeInput) {
     const utils::Log &log = ctx.getLogger();
-    const FormattedText &text = *formattedText.get();
+    const FormattedText &text = *textShapeInput.formattedText;
 
     // Split the text into paragraphs
     const FormattedParagraphs paragraphs = splitText(log, text, ctx.getFontManager());
@@ -250,7 +247,7 @@ TextShapeParagraphsResult shapeTextInner(Context &ctx,
         return std::make_pair(TextShapeError::NO_PARAGRAPHS, ParagraphShape::DrawResults {});
     }
 
-    float maxWidth = text.boundsMode() == BoundsMode::AUTO_WIDTH ? 0.0f : frameSize.value_or(compat::Vector2f{0,0}).x;
+    float maxWidth = text.boundsMode() == BoundsMode::AUTO_WIDTH ? 0.0f : textShapeInput.frameSize.value_or(compat::Vector2f{0,0}).x;
 
     const bool loadGlyphsBearings = text.baselinePolicy() == BaselinePolicy::OFFSET_BEARING;
     // Shape the paragraphs
@@ -321,17 +318,14 @@ TextShapeParagraphsResult shapeTextInner(Context &ctx,
     const float l = isBaselineSet ? -std::floor(p0.leftFirst) : 0.0f;
     const float t = isBaselineSet ? -std::round(p0.firstAscender) : 0.0f;
 
-    preserveFixedDimensions(text.boundsMode(), frameSize, w, h);
+    preserveFixedDimensions(text.boundsMode(), textShapeInput.frameSize, w, h);
 
     const compat::FRectangle textBoundsNoTransform { l, t, w, h };
-    const compat::FRectangle textBoundsTransform = transform(textBoundsNoTransform, textTransform);
+    const compat::FRectangle textBoundsTransform = transform(textBoundsNoTransform, textShapeInput.textTransform);
 
     const float baseline = resolveBaselinePosition(p0, text.baselinePolicy(), text.verticalAlign());
 
-    TextShapeDataPtr tsd = std::make_unique<TextShapeData>(std::move(formattedText),
-                                                           frameSize,
-                                                           textTransform,
-                                                           std::move(shapes),
+    TextShapeDataPtr tsd = std::make_unique<TextShapeData>(std::move(shapes),
                                                            textBoundsNoTransform,
                                                            textBoundsTransform,
                                                            baseline);
@@ -339,22 +333,23 @@ TextShapeParagraphsResult shapeTextInner(Context &ctx,
 }
 
 TextDrawResult drawText(Context &ctx,
-                        const TextShapeData& shapeData,
+                        const TextShapeInput &shapeInput,
+                        const TextShapeData &shapeData,
                         float scale,
                         const compat::Rectangle& viewArea,
                         void* pixels, int width, int height,
                         bool dry) {
-     if (shapeData.formattedText == nullptr || shapeData.formattedText->getLength() == 0) {
+     if (shapeInput.formattedText == nullptr || shapeInput.formattedText->getLength() == 0) {
          return TextDrawOutput{{}};
      }
 
-    const compat::Matrix3f inverseTransform = inverse(shapeData.textTransform);
+    const compat::Matrix3f inverseTransform = inverse(shapeInput.textTransform);
     const compat::FRectangle viewAreaTextSpaceUnscaled = utils::transform(utils::toFRectangle(viewArea), inverseTransform);
     const compat::FRectangle viewAreaTextSpace = utils::scaleRect(viewAreaTextSpaceUnscaled, scale);
 
     TextDrawResult drawResult = drawTextInner(ctx,
                                               shapeData.paragraphShapes,
-                                              shapeData.formattedText->formattingParams(),
+                                              shapeInput.formattedText->formattingParams(),
                                               shapeData.textBoundsNoTransform,
                                               shapeData.baseline,
                                               scale,
@@ -364,7 +359,7 @@ TextDrawResult drawText(Context &ctx,
 
     if (drawResult) {
         TextDrawOutput value = drawResult.moveValue();
-        value.transform = shapeData.textTransform;
+        value.transform = shapeInput.textTransform;
         return value;
     } else {
         return drawResult.error();
@@ -553,25 +548,9 @@ compat::Rectangle computeDrawBounds(Context &ctx,
     return computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
 }
 
-PlacedTextResult shapePlacedText(Context &ctx,
-                                 const octopus::Text& text)
+PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeInput)
 {
-    TextParser::ParseResult parsedText = TextParser(text).parseText();
-
-    FrameSizeOpt frameSize;
-    if (text.frame.has_value()) {
-        const auto [w, h] = text.frame.value().size.value_or(octopus::Dimensions{0.0,0.0});
-        frameSize = compat::Vector2f{static_cast<float>(w), static_cast<float>(h)};
-    }
-    return shapePlacedTextInner(ctx, std::move(parsedText.text), frameSize, parsedText.transformation);
-}
-
-PlacedTextResult shapePlacedTextInner(Context &ctx,
-                                      FormattedTextPtr formattedText,
-                                      const FrameSizeOpt &frameSize,
-                                      const compat::Matrix3f &textTransform)
-{
-    const TextShapeParagraphsResult res = shapeTextInner(ctx, std::move(formattedText), frameSize, textTransform);
+    const TextShapeParagraphsResult res = shapeTextInner(ctx, textShapeInput);
     const TextShapeDataPtr &textShapeData = res.first.value();
     const ParagraphShape::DrawResults &paragraphResults = res.second;
 
@@ -636,16 +615,16 @@ PlacedTextResult shapePlacedTextInner(Context &ctx,
     const compat::FRectangle textBoundsNotScaled = getStretchedTextBounds(ctx,
                                                                           textShapeData->paragraphShapes,
                                                                           textShapeData->textBoundsNoTransform,
-                                                                          textShapeData->formattedText->formattingParams(),
+                                                                          textShapeInput.formattedText->formattingParams(),
                                                                           textShapeData->baseline,
                                                                           1.0f);
-    const Matrix3f transformMatrix = convertMatrix(textTransform);
+    const Matrix3f transformMatrix = convertMatrix(textShapeInput.textTransform);
 
     return std::make_unique<PlacedTextData>(std::move(placedGlyphs),
                                             std::move(placedDecorations),
                                             convertRect(textBoundsNotScaled),
                                             transformMatrix,
-                                            textShapeData->formattedText->baselinePolicy() == BaselinePolicy::SET ? textShapeData->baseline : 0.0f);
+                                            textShapeInput.formattedText->baselinePolicy() == BaselinePolicy::SET ? textShapeData->baseline : 0.0f);
 }
 
 TextDrawResult drawPlacedText(Context &ctx,

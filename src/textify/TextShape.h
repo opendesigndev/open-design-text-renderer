@@ -3,26 +3,24 @@
 #include <memory>
 #include <string>
 
+#include "TextShapeInput.h"
+
 namespace textify {
 
-namespace priv {
-struct TextShapeData;
-}
 struct PlacedTextData;
+namespace priv { struct TextShapeInput; }
 
 struct TextShape
 {
-    using DataPtr = std::unique_ptr<priv::TextShapeData>;
-    using PlacedDataPtr = std::unique_ptr<PlacedTextData>;
+    using InputPtr = std::unique_ptr<priv::TextShapeInput>;
+    using DataPtr = std::unique_ptr<PlacedTextData>;
 
-    /* implicit */ TextShape(DataPtr&& data);
-    /* implicit */ TextShape(PlacedDataPtr&& data);
-    // TODO: Remove
-    /* implicit */ TextShape(DataPtr&& data, PlacedDataPtr&& placedData);
+    /* implicit */ TextShape(InputPtr &&input, DataPtr &&data);
 
+    /// Input data.
+    InputPtr input;
     /// The data.
     DataPtr data;
-    PlacedDataPtr placedData;
 
     bool active = true;
     /// Gets labeled as "dirty" on font face change. Shaping needs to be called again.
@@ -30,12 +28,10 @@ struct TextShape
 
     void deactivate();
 
-    const priv::TextShapeData& getData() const;
-    const PlacedTextData& getPlacedData() const;
+    const PlacedTextData& getData() const;
 
-    void onFontFaceChanged(const std::string& postScriptName);
-
-    bool isPlaced() const;
+    /// Handle font face change - if a used font changed, mark as dirty.
+    void onFontFaceChanged(const std::string &postScriptName);
 };
 
 }
