@@ -1,4 +1,6 @@
 
+#include "TextRendererApiTests.h"
+
 #include <memory>
 #include <gtest/gtest.h>
 
@@ -13,6 +15,14 @@
 
 #include "text-renderer/TextShape.h"
 
+
+namespace odtr {
+namespace test {
+std::string gFontsDirectory = "";
+}
+}
+
+static std::string gFontsDirectory;
 
 namespace {
 static odtr::ContextOptions contextOptions() {
@@ -40,8 +50,8 @@ protected:
         const std::vector<std::string> missingFonts = listMissingFonts(context, text);
         for (const std::string &missingFont : missingFonts) {
             const bool isAdded =
-                addFontFile(context, missingFont, std::string(), (std::string) (fontsDirectory+(missingFont+".ttf")), false) ||
-                addFontFile(context, missingFont, std::string(), (std::string) (fontsDirectory+(missingFont+".otf")), false);
+                addFontFile(context, missingFont, std::string(), (std::string) (odtr::test::gFontsDirectory+"/"+(missingFont+".ttf")), false) ||
+                addFontFile(context, missingFont, std::string(), (std::string) (odtr::test::gFontsDirectory+"/"+(missingFont+".otf")), false);
             ASSERT_TRUE(isAdded);
         }
     }
@@ -66,7 +76,6 @@ protected:
 
     odtr::ContextHandle context;
 
-    const std::string fontsDirectory = std::string(FONTS_DIR);
     const std::string singleLetterOctopusPath = std::string(TESTING_OCTOPUS_DIR) + "SingleLetter.json";
     const std::string decorationsOctopusPath = std::string(TESTING_OCTOPUS_DIR) + "Decorations.json";
     const odtr::FontSpecifier fontHelveticaNeue { "HelveticaNeue" };

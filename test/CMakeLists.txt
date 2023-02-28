@@ -13,9 +13,11 @@ set(TEXT_RENDERER_DIR ${TEXT_RENDERER_TEST_DIR}/..)
 
 # Define a value for testing Octopus files directory
 add_definitions(-DTESTING_OCTOPUS_DIR="${TEXT_RENDERER_TEST_DIR}/test-files/")
-# Define a value for a directory of fonts
-#     TODO: Make sure this is an acceptable local directory.
-add_definitions(-DFONTS_DIR="${CMAKE_SOURCE_DIR}/../../Fonts/")
+
+# Test header files
+set(TEST_HEADER_FILES
+    ${TEXT_RENDERER_TEST_DIR}/src/TextRendererApiTests.h
+)
 
 # Test source files
 set(TEST_SOURCE_FILES
@@ -24,7 +26,7 @@ set(TEST_SOURCE_FILES
 )
 
 # Add executables
-add_executable(${TEST_NAME} ${TEST_SOURCE_FILES})
+add_executable(${TEST_NAME} ${TEST_HEADER_FILES} ${TEST_SOURCE_FILES})
 
 # Required Open Design internal libraries
 set(INTERNAL_LIBRARY_DEPENDENCIES
