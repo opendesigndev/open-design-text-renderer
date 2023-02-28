@@ -12,8 +12,7 @@ else()
     set(HAVE_LIBOCTOPUS_DEFAULT OFF)
 endif()
 
-# TODO: default OFF
-option(TEXT_RENDERER_DEBUG "Debug Mode" ON)
+option(TEXT_RENDERER_DEBUG "Debug Mode" OFF)
 option(TEXT_RENDERER_USE_ENCRYPTED_FONTS "Support Avocode fonts encoded via LZ4/Monocypher" ON)
 option(TEXT_RENDERER_BUILD_CLI "Build OD Text Renderer CLI utility" ${STANDALONE})
 
