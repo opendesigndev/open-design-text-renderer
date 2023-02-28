@@ -1,4 +1,4 @@
-by @vadimpetrov
+by @vadimpetrov, @janroztocil, @matus-z-ceros ...
 
 # Open Design Text Renderer
 
@@ -56,13 +56,21 @@ For more on font files, glyph metrics, measurements and other (but far from all!
 
 ## Workflow
 
-**ODTR** has two main public methods which hide all the maelstrom within: `preprocess` and `drawText`. The idea is that each layer should be preprocessed exactly once and then drawn multiple times with different parameters such as rectangle cutout or scale factor. All data required for those procedures is supplied by a `odtr::Context`.
+**ODTR** has two main public methods which hide all the maelstrom within: `shapeText` and `drawText`. The idea is that each layer should be preprocessed exactly once and then drawn multiple times with different parameters such as rectangle cutout or scale factor. All data required for those procedures is supplied by an `odtr::Context`.
 
-The text is first split into paragraphs which are then processed independently as `ParagraphShape` objects. Each paragraph is shaped by HarfBuzz and then drawn – converted to glyphs, but without any raster operations. Multiple values are computed during this phase such as the first ascender, first baseline, last descender and perhaps most importantly the text bounds. The entire result is saved in the context, which is later used during drawing.
+### Text shaping
+
+The text is first split into paragraphs which are then processed independently as `ParagraphShape` objects. Each paragraph is shaped by HarfBuzz and then drawn – converted to glyphs, but without any raster operations. Multiple values are computed during this phase such as the first ascender, first baseline, last descender and perhaps most importantly the text bounds.
 
 `ParagraphShape` does most of the **ODTR** magic as it represents paragraphs with everything required to render them. Multiple operations take place while shaping a paragraph: analyzing line break opportunities in [bidirectional texts][bidi] using the International Components for Unicode lib, dividing paragraph into sequences with unfirom glyph format, shaping said sequences and eventually breaking them into lines. The result is a collection of `GlyphShape` objects with information about lines, text direction and glyph format and metrics.
 
 The shapes are redrawn using a given scale factor into a `TypesetJournal` with records describing lines and text decorations (underline etc). During this the text is justified and the glyphs are translated to their position in the final bitmap, where they are eventually rendered.
+
+The results of these shaping operations are then processed into a `PlacedTextData` object which contains `PlacedGlyph`s and `PlacedDecoration`s with the information about their positioning in the bitmap. These placed data are saved in the convext which is later used during drawing.
+
+### Text drawing
+
+Text drawing takes placed text data (glyphs and decorations) as input. It uses [FreeType] to renderer the glyphs into their individual bitmaps and then overlays these on top of the output bitmap. Scaling factor and rectangle view area can be specified using the `DrawOptions` parameter of the `drawText` function.
 
 ## Debugging
 
