@@ -19,7 +19,7 @@ struct TextShape
 
     /// Input data.
     InputPtr input;
-    /// The data.
+    /// Shaped text data.
     DataPtr data;
 
     bool active = true;
@@ -28,6 +28,7 @@ struct TextShape
 
     void deactivate();
 
+    /// Read-only access to shaped text data.
     const PlacedTextData& getData() const;
 
     /// Handle font face change - if a used font changed, mark as dirty.

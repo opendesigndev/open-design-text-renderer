@@ -17,7 +17,7 @@ bool BitmapWriter::checkH(int x) {
 }
 
 void BitmapWriter::write(int x, int y, compat::Pixel32 color) {
-    if (checkV(y)) {
+    if (checkH(x) && checkV(y)) {
         bitmap_.pixels()[y * bitmap_.width() + x] = color;
     }
 }

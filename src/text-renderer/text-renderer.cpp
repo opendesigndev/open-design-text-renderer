@@ -363,7 +363,7 @@ compat::Rectangle computeDrawBounds(Context &ctx,
         placedTextData.textBounds.l,
         placedTextData.textBounds.t,
         placedTextData.textBounds.w * scale,
-        placedTextData.textBounds.h * scale};
+        placedTextData.textBounds.h * scale };
 
     const compat::FRectangle viewAreaTextSpace = utils::scaleRect(utils::toFRectangle(viewArea), scale);
     return computeDrawBounds(ctx, stretchedTextBounds, viewAreaTextSpace);
