@@ -94,8 +94,6 @@ struct TRectangle
     // Rectangle translation
     TRectangle<T> operator+(const Vector2<T>& v) const;
     TRectangle<T> operator-(const Vector2<T>& v) const;
-    // Rectangle scaling
-    TRectangle<T> operator*(T coeff) const;
 
     bool operator==(const TRectangle<T>& other) const;
     bool operator!=(const TRectangle<T>& other) const;
@@ -106,7 +104,6 @@ struct TRectangle
     TRectangle<T>& operator|=(const TRectangle<T>& other);
     TRectangle<T>& operator+=(const Vector2<T>& v);
     TRectangle<T>& operator-=(const Vector2<T>& v);
-    TRectangle<T>& operator*=(T coeff);
 
     explicit operator bool() const;
     TRectangle<T> canonical() const;

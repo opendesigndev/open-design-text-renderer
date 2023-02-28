@@ -267,11 +267,6 @@ TRectangle<T> TRectangle<T>::operator-(const Vector2<T>& v) const {
 }
 
 template <typename T>
-TRectangle<T> TRectangle<T>::operator*(T coeff) const {
-    return { l * coeff, t * coeff, w * coeff, h * coeff };
-}
-
-template <typename T>
 bool TRectangle<T>::operator==(const TRectangle<T>& other) const {
     return l == other.l && t == other.t && w == other.w && h == other.h;
 }
@@ -311,11 +306,6 @@ template <typename T>
 TRectangle<T>& TRectangle<T>::operator-=(const Vector2<T>& v) {
     l -= v.x, t -= v.y;
     return *this;
-}
-
-template <typename T>
-TRectangle<T>& TRectangle<T>::operator*=(T coeff) {
-    return *this = *this * coeff;
 }
 
 template <typename T>
