@@ -589,18 +589,19 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
                         break;
                     }
                 }
-                PlacedGlyphPtr placedGlyph = std::make_unique<PlacedGlyph>();
 
-                placedGlyph->codepoint = glyphShape.codepoint;
-                placedGlyph->color = glyphShape.format.color;
-                placedGlyph->fontSize = glyphShape.format.size;
-                placedGlyph->index = glyphIndex;
-                placedGlyph->originPosition = Vector2f {
+                PlacedGlyphs &placedGlyphsForFont = placedGlyphs[FontSpecifier { glyphShape.format.faceId }];
+                placedGlyphsForFont.emplace_back();
+                PlacedGlyph &placedGlyph = placedGlyphsForFont.back();
+
+                placedGlyph.codepoint = glyphShape.codepoint;
+                placedGlyph.color = glyphShape.format.color;
+                placedGlyph.fontSize = glyphShape.format.size;
+                placedGlyph.index = glyphIndex;
+                placedGlyph.originPosition = Vector2f {
                     glyph->getOrigin().x,
                     glyph->getOrigin().y,
                 };
-
-                placedGlyphs[FontSpecifier { glyphShape.format.faceId }].emplace_back(std::move(placedGlyph));
 
                 ++j;
                 ++glyphIndex;
@@ -609,22 +610,21 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
             for (size_t l = 0; l < lineRecord.decorationJournal_.size(); l++) {
                 const TypesetJournal::DecorationRecord &decoration = lineRecord.decorationJournal_[l];
 
-                PlacedDecorationPtr placedDecoration = std::make_unique<PlacedDecoration>();
+                placedDecorations.emplace_back();
+                PlacedDecoration &placedDecoration = placedDecorations.back();
 
-                placedDecoration->type = static_cast<PlacedDecoration::Type>(decoration.type);
-                placedDecoration->color = decoration.color;
+                placedDecoration.type = static_cast<PlacedDecoration::Type>(decoration.type);
+                placedDecoration.color = decoration.color;
 
-                placedDecoration->start = Vector2f {
+                placedDecoration.start = Vector2f {
                     decoration.range.first,
                     decoration.offset,
                 };
-                placedDecoration->end = Vector2f {
+                placedDecoration.end = Vector2f {
                     decoration.range.last,
                     decoration.offset,
                 };
-                placedDecoration->thickness = decoration.thickness;
-
-                placedDecorations.emplace_back(std::move(placedDecoration));
+                placedDecoration.thickness = decoration.thickness;
             }
         }
     }
@@ -698,8 +698,8 @@ TextDrawResult drawPlacedTextInner(Context &ctx,
 
         const FaceTable::Item* faceItem = ctx.getFontManager().facesTable().getFaceItem(fontSpecifier.faceId);
         if (faceItem != nullptr && faceItem->face != nullptr) {
-            for (const PlacedGlyphPtr &pg : placedGlyphs) {
-                const GlyphPtr renderedGlyph = renderPlacedGlyph(*pg,
+            for (const PlacedGlyph &pg : placedGlyphs) {
+                const GlyphPtr renderedGlyph = renderPlacedGlyph(pg,
                                                                  faceItem->face,
                                                                  scale,
                                                                  ctx.config.internalDisableHinting);
@@ -711,8 +711,8 @@ TextDrawResult drawPlacedTextInner(Context &ctx,
         }
     }
 
-    for (const PlacedDecorationPtr& pd : placedTextData.decorations) {
-        drawDecoration(output, *pd, scale);
+    for (const PlacedDecoration &pd : placedTextData.decorations) {
+        drawDecoration(output, pd, scale);
     }
 
     return TextDrawOutput{};

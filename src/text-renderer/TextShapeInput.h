@@ -2,6 +2,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include "FormattedText.h"
 

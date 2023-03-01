@@ -107,12 +107,12 @@ TEST_F(TextRendererApiTests, singleLetter) {
     const PlacedGlyphs &pgs = textShape->data->glyphs.at(fontHelveticaNeue);
     ASSERT_EQ(pgs.size(), 1);
 
-    const PlacedGlyphPtr &pg = pgs.front();
-    ASSERT_EQ(pg->fontSize, 600);
-    ASSERT_EQ(pg->codepoint, 60);
-    ASSERT_EQ(pg->index, 0);
-    ASSERT_EQ(pg->originPosition.x, 0.0f);
-    ASSERT_EQ(pg->originPosition.y, 571.203125f);
+    const PlacedGlyph &pg = pgs.front();
+    ASSERT_EQ(pg.fontSize, 600);
+    ASSERT_EQ(pg.codepoint, 60);
+    ASSERT_EQ(pg.index, 0);
+    ASSERT_EQ(pg.originPosition.x, 0.0f);
+    ASSERT_EQ(pg.originPosition.y, 571.203125f);
 
     ode::BitmapPtr bitmap = nullptr;
 
@@ -152,13 +152,13 @@ TEST_F(TextRendererApiTests, decorations) {
     ASSERT_EQ(pgs.size(), 40);
 
     const PlacedDecorations &decorations = textShape->data->decorations;
-    ASSERT_EQ(decorations[0]->type, PlacedDecoration::Type::UNDERLINE);
-    ASSERT_EQ(decorations[1]->type, PlacedDecoration::Type::STRIKE_THROUGH);
-    ASSERT_EQ(decorations[2]->type, PlacedDecoration::Type::UNDERLINE);
-    ASSERT_EQ(decorations[3]->type, PlacedDecoration::Type::UNDERLINE);
-    ASSERT_EQ(decorations[4]->type, PlacedDecoration::Type::STRIKE_THROUGH);
-    ASSERT_EQ(decorations[5]->type, PlacedDecoration::Type::DOUBLE_UNDERLINE);
-    ASSERT_EQ(decorations[6]->type, PlacedDecoration::Type::UNDERLINE);
+    ASSERT_EQ(decorations[0].type, PlacedDecoration::Type::UNDERLINE);
+    ASSERT_EQ(decorations[1].type, PlacedDecoration::Type::STRIKE_THROUGH);
+    ASSERT_EQ(decorations[2].type, PlacedDecoration::Type::UNDERLINE);
+    ASSERT_EQ(decorations[3].type, PlacedDecoration::Type::UNDERLINE);
+    ASSERT_EQ(decorations[4].type, PlacedDecoration::Type::STRIKE_THROUGH);
+    ASSERT_EQ(decorations[5].type, PlacedDecoration::Type::DOUBLE_UNDERLINE);
+    ASSERT_EQ(decorations[6].type, PlacedDecoration::Type::UNDERLINE);
 
     ode::BitmapPtr bitmap = nullptr;
 

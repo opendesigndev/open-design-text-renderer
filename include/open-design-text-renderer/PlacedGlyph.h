@@ -33,8 +33,7 @@ struct PlacedGlyph {
     /// Index of the glyph within the input text.
     size_t index = 0;
 };
-using PlacedGlyphPtr = std::unique_ptr<PlacedGlyph>;
-using PlacedGlyphs = std::vector<PlacedGlyphPtr>;
+using PlacedGlyphs = std::vector<PlacedGlyph>;
 using PlacedGlyphsPerFont = std::map<FontSpecifier, PlacedGlyphs>;
 
 } // namespace odtr

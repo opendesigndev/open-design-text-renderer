@@ -24,7 +24,6 @@ struct PlacedDecoration {
     /// Decoration color (incl. alpha).
     uint32_t color;
 };
-using PlacedDecorationPtr = std::unique_ptr<PlacedDecoration>;
-using PlacedDecorations = std::vector<PlacedDecorationPtr>;
+using PlacedDecorations = std::vector<PlacedDecoration>;
 
 } // namespace odtr
