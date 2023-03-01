@@ -14,6 +14,7 @@ namespace odtr {
 
 struct Context;
 struct TextShape;
+struct PlacedTextData;
 
 struct ContextOptions
 {
@@ -271,5 +272,19 @@ DrawTextResult drawText(ContextHandle ctx,
                         TextShapeHandle textShape,
                         void* pixels, int width, int height,
                         const DrawOptions& drawOptions = {});
+
+
+/**
+ * @brief Provides read-only access to the shaped text data.
+ *
+ * @note Before accessing the data, the context is checked for font changes and if needed reshaped.
+ *
+ * @param ctx         context handle
+ * @param textShape   text shape handle
+ *
+ * @returns         read-only pointer to PlacedTextData or null
+ */
+const PlacedTextData *getShapedText(ContextHandle ctx,
+                                    TextShapeHandle textShape);
 
 }

@@ -280,4 +280,16 @@ DrawTextResult drawText(ContextHandle ctx,
     return {{}, {}, true};
 }
 
+const PlacedTextData *getShapedText(ContextHandle ctx,
+                                    TextShapeHandle textShape) {
+    if (ctx == nullptr) {
+        return nullptr;
+    }
+
+    if (textShape && sanitizeShape(ctx, textShape) && textShape->data != nullptr) {
+        return textShape->data.get();
+    }
+    return nullptr;
+}
+
 } // namespace odtr

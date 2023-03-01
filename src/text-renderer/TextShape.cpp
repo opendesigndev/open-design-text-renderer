@@ -20,7 +20,7 @@ void TextShape::deactivate()
 
 const PlacedTextData& TextShape::getData() const
 {
-    return *data.get();
+    return *data;
 }
 
 void TextShape::onFontFaceChanged(const std::string &postScriptName)
