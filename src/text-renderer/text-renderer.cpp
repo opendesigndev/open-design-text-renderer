@@ -202,51 +202,6 @@ float roundCaretPosition(float pos, bool floorBaseline)
     return floorBaseline ? std::floor(pos) : std::round(pos);
 }
 
-compat::FRectangle getStretchedTextBounds(Context &ctx,
-                                          const ParagraphShapes &paragraphShapes,
-                                          const compat::FRectangle &unscaledTextBounds,
-                                          const FormattedText::FormattingParams &textParams,
-                                          float baseline,
-                                          float scale) {
-    const compat::FRectangle textBounds = utils::scaleRect(unscaledTextBounds, scale);
-    if (!textBounds) {
-        return compat::FRectangle{};
-    }
-
-    float caretVerticalPos = roundCaretPosition(baseline * scale, ctx.config.floorBaseline);
-
-    const ParagraphShape::DrawResults paragraphResults = drawParagraphsInner(ctx,
-                                                                             paragraphShapes,
-                                                                             textParams.overflowPolicy,
-                                                                             textBounds.w,
-                                                                             scale,
-                                                                             VerticalPositioning::BASELINE,
-                                                                             textParams.baselinePolicy,
-                                                                             caretVerticalPos);
-    if (paragraphResults.empty()) {
-        return compat::FRectangle{};
-    }
-
-    // account for descenders of last paragraph's last line
-    const spacing textBottom = caretVerticalPos - paragraphResults.back().lastlineDescender;
-
-    const spacing baselineOffset = resolveBaselineOffset(paragraphResults.front(), textParams.baselinePolicy, textParams.verticalAlign);
-    const float verticalOffset = resolveVerticalOffset(textParams.boundsMode, textParams.verticalAlign, textBounds, textBottom, baselineOffset * scale);
-
-    const bool unlimitedVerticalStretch =
-        textParams.overflowPolicy == OverflowPolicy::EXTEND_ALL ||
-        textParams.boundsMode == BoundsMode::AUTO_HEIGHT ||
-        textParams.verticalAlign != VerticalAlign::TOP;
-
-    const float verticalStretchLimit = unlimitedVerticalStretch ? 0.0f : textBounds.h;
-    compat::Rectangle stretchedGlyphsBounds {};
-    if (textParams.boundsMode != BoundsMode::FIXED || textParams.overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
-        stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
-    }
-
-    return stretchBounds(textBounds, stretchedGlyphsBounds);
-}
-
 /// Compute drawn bitmap boundaries as an intersection of the scaled text bounds and the view area.
 compat::Rectangle computeDrawBounds(Context &ctx,
                                     const compat::FRectangle &stretchedTextBounds,
@@ -561,6 +516,32 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
 
     const TextShapeDataPtr &textShapeData = res.first.value();
     const ParagraphShape::DrawResults &paragraphResults = res.second;
+    const FormattedText::FormattingParams &textParams = textShapeInput.formattedText->formattingParams();
+    const compat::FRectangle &textBounds = textShapeData->textBoundsNoTransform;
+
+    // account for descenders of last paragraph's last line
+    const float caretVerticalPos = roundCaretPosition(textShapeData->baseline, ctx.config.floorBaseline);
+    const spacing textBottom = caretVerticalPos - paragraphResults.back().lastlineDescender;
+
+    const spacing baselineOffset = resolveBaselineOffset(paragraphResults.front(), textParams.baselinePolicy, textParams.verticalAlign);
+    const float verticalOffset = resolveVerticalOffset(textParams.boundsMode, textParams.verticalAlign, textBounds, textBottom, baselineOffset);
+
+    const bool unlimitedVerticalStretch =
+        textParams.overflowPolicy == OverflowPolicy::EXTEND_ALL ||
+        textParams.boundsMode == BoundsMode::AUTO_HEIGHT ||
+        textParams.verticalAlign != VerticalAlign::TOP;
+
+    const float verticalStretchLimit = unlimitedVerticalStretch ? 0.0f : textBounds.h;
+    compat::Rectangle stretchedGlyphsBounds {};
+    if (textParams.boundsMode != BoundsMode::FIXED || textParams.overflowPolicy != OverflowPolicy::NO_OVERFLOW) {
+        stretchedGlyphsBounds = stretchedBounds(paragraphResults, int(verticalOffset), verticalStretchLimit);
+    }
+
+    // Vertical align offset
+    const float verticalAlignOffset = verticalOffset - stretchedGlyphsBounds.t;
+
+    const compat::FRectangle textBoundsNotScaled = stretchBounds(textBounds, stretchedGlyphsBounds);
+    const Matrix3f transformMatrix = convertMatrix(textShapeInput.textTransform);
 
     PlacedGlyphsPerFont placedGlyphs;
     PlacedDecorations placedDecorations;
@@ -600,7 +581,7 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
                 placedGlyph.index = glyphIndex;
                 placedGlyph.originPosition = Vector2f {
                     glyph->getOrigin().x,
-                    glyph->getOrigin().y,
+                    glyph->getOrigin().y + verticalAlignOffset,
                 };
 
                 ++j;
@@ -618,25 +599,16 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
 
                 placedDecoration.start = Vector2f {
                     decoration.range.first,
-                    decoration.offset,
+                    decoration.offset + verticalAlignOffset,
                 };
                 placedDecoration.end = Vector2f {
                     decoration.range.last,
-                    decoration.offset,
+                    decoration.offset + verticalAlignOffset,
                 };
                 placedDecoration.thickness = decoration.thickness;
             }
         }
     }
-
-    // Compute the unscaled stretched bounds
-    const compat::FRectangle textBoundsNotScaled = getStretchedTextBounds(ctx,
-                                                                          textShapeData->paragraphShapes,
-                                                                          textShapeData->textBoundsNoTransform,
-                                                                          textShapeInput.formattedText->formattingParams(),
-                                                                          textShapeData->baseline,
-                                                                          1.0f);
-    const Matrix3f transformMatrix = convertMatrix(textShapeInput.textTransform);
 
     return std::make_unique<PlacedTextData>(std::move(placedGlyphs),
                                             std::move(placedDecorations),
