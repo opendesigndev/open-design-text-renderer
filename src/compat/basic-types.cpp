@@ -4,7 +4,7 @@
 #include <algorithm>
 #include "arithmetics.hpp"
 
-namespace textify {
+namespace odtr {
 namespace compat {
 
 template <typename T>
@@ -355,4 +355,4 @@ Color Color::operator+(const Color& that) const
 const Color Color::TRANSPARENT = { };
 
 } // namespace compat
-} // namespace textify
+} // namespace odtr

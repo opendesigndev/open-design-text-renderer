@@ -1,26 +1,27 @@
 #include "utils.h"
-#include "textify/textify-api.h"
+
+#include <open-design-text-renderer/text-renderer-api.h>
 
 #include <array>
 #include <cmath>
 
-namespace textify {
+namespace odtr {
 namespace utils {
 
 // the reinterpret_cast bellow is kind of dangerous, however, these fundamental types most likely won't ever change
-textify::FRectangle castFRectangle(const compat::FRectangle& r)
+odtr::FRectangle castFRectangle(const compat::FRectangle& r)
 {
-    return *reinterpret_cast<const textify::FRectangle*>(&r);
+    return *reinterpret_cast<const odtr::FRectangle*>(&r);
 }
 
-textify::Rectangle castRectangle(const compat::Rectangle& r)
+odtr::Rectangle castRectangle(const compat::Rectangle& r)
 {
-    return *reinterpret_cast<const textify::Rectangle*>(&r);
+    return *reinterpret_cast<const odtr::Rectangle*>(&r);
 }
 
-textify::Matrix3f castMatrix(const compat::Matrix3f& m)
+odtr::Matrix3f castMatrix(const compat::Matrix3f& m)
 {
-    return *reinterpret_cast<const textify::Matrix3f*>(&m);
+    return *reinterpret_cast<const odtr::Matrix3f*>(&m);
 }
 
 compat::FRectangle toFRectangle(const compat::Rectangle& r)
@@ -74,5 +75,16 @@ compat::Rectangle outerRect(const compat::FRectangle& rect)
     return result;
 }
 
+compat::FRectangle scaleRect(const compat::FRectangle& rect, float scale)
+{
+    if (scale == 1.f)
+        return rect;
+    const float l = scale*rect.l;
+    const float t = scale*rect.t;
+    const float r = scale*(rect.l+rect.w);
+    const float b = scale*(rect.t+rect.h);
+    return {l, t, r-l, b-t};
+}
+
 } // namespace utils
-} // namespace textify
+} // namespace odtr

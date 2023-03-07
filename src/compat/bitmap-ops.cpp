@@ -4,7 +4,7 @@
 #include <algorithm>
 #include "pixel-conversion.h"
 
-namespace textify {
+namespace odtr {
 namespace compat {
 
 void resampleBitmap(BitmapRGBA& dst, const BitmapRGBA& src) {
@@ -246,4 +246,4 @@ void rescaleBitmap(BitmapRGBA& dst, const BitmapRGBA& src, int mode, const Vecto
 }
 
 } // namespace compat
-} // namespace textify
+} // namespace odtr

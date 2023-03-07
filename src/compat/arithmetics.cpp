@@ -1,6 +1,6 @@
 #include "arithmetics.hpp"
 
-namespace textify {
+namespace odtr {
 namespace compat {
 
 bool isPOT(int x) {
@@ -18,4 +18,4 @@ int floorPOT(int x) {
 }
 
 } // namespace compat
-} // namespace textify
+} // namespace odtr

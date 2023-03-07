@@ -7,9 +7,9 @@
 #include "fmt/core.h"
 
 #include "utils/fmt.h"
-#include "textify/textify-api.h"
+#include <open-design-text-renderer/text-renderer-api.h>
 
-namespace textify {
+namespace odtr {
 namespace cli {
 
 Canvas::Canvas(int width, int height)
@@ -107,4 +107,4 @@ void Canvas::blend(int x, int y, const compat::Color& src)
 }
 
 }
-}
+} // namespace odtr

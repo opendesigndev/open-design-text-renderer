@@ -1,7 +1,7 @@
 #include "cli/octopus-utils.h"
 #include "compat/basic-types.h"
 
-namespace textify {
+namespace odtr {
 namespace cli {
 
 compat::Matrix3f convertMatrix(const double octopusMatrix[6])
@@ -24,4 +24,4 @@ compat::Color convertColor(const octopus::Color& octopusColor)
 }
 
 }
-}
+} // namespace odtr

@@ -3,7 +3,7 @@
 #include "compat/basic-types.h"
 #include "fmt/core.h"
 
-namespace textify {
+namespace odtr {
 namespace utils {
 
 template <typename RectType>
@@ -12,5 +12,5 @@ void printRect(const std::string& label, const RectType& r) {
 }
 
 } // namespace utils
-} // namespace textify
+} // namespace odtr
 

@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-namespace textify {
+namespace odtr {
 namespace utils {
 
 class Log
@@ -22,7 +22,7 @@ public:
     Log(FuncType err, FuncType warn, FuncType info)
         : errFunc(err), warnFunc(warn), infoFunc(info)
     {
-#ifdef TEXTIFY_DEBUG
+#ifdef TEXT_RENDERER_DEBUG
         debugFunc = [] (const std::string& msg) { fmt::print("[DEBUG] {}\n", msg); };
 #endif
     }
@@ -48,7 +48,7 @@ public:
     template <typename... T>
     void debug(const std::string& fmt, T&&... args) const
     {
-#ifdef TEXTIFY_DEBUG
+#ifdef TEXT_RENDERER_DEBUG
         log(debugFunc, fmt, args...);
 #endif
     }
@@ -70,4 +70,4 @@ private:
 };
 
 } // utils
-} // textify
+} // odtr

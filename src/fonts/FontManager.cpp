@@ -8,15 +8,15 @@
 #include <algorithm>
 #include <fstream>
 
-namespace textify {
+namespace odtr {
 
 const std::string FontManager::DEFAULT_EMOJI_FONT = "_default_emoji_font_";
 
 FontManager::FontManager(const utils::Log& log)
     : log_(log),
-      ft_(std::make_unique<textify::FreetypeHandle>()),
-      faces_(std::make_unique<textify::FaceTable>()),
-      fontStorage_(std::make_unique<textify::FontStorage>()),
+      ft_(std::make_unique<odtr::FreetypeHandle>()),
+      faces_(std::make_unique<odtr::FaceTable>()),
+      fontStorage_(std::make_unique<odtr::FontStorage>()),
       requiresDefaultEmojiFont_(false)
 {
     ft_->initialize();
@@ -29,7 +29,7 @@ FontManager::~FontManager()
     ft_->deinitialize();
 }
 
-const textify::FaceTable& FontManager::facesTable() const
+const odtr::FaceTable& FontManager::facesTable() const
 {
     return *faces_.get();
 }
@@ -140,7 +140,7 @@ bool FontManager::requiresDefaultEmojiFont() const
 
 void FontManager::setRequiresDefaultEmojiFont()
 {
-    bool hasDefaultEmojiFont = faces_->getFaceItem(DEFAULT_EMOJI_FONT) != nullptr;
+    const bool hasDefaultEmojiFont = faces_->getFaceItem(DEFAULT_EMOJI_FONT) != nullptr;
     if (!hasDefaultEmojiFont) {
         requiresDefaultEmojiFont_ = true;
     }
@@ -185,4 +185,4 @@ bool FontManager::storeFile(const std::string& storageKey, const std::string& fi
     return true;
 }
 
-} // namespace textify
+} // namespace odtr
