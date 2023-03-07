@@ -288,9 +288,9 @@ std::string FormattedText::getPreview(int len) const
     if (len < 0)
         len = 12;
 
-    std::string preview(len + 1, '\0');
-    auto n = sprintf(&preview[0], "%.*s", len, content_.c_str());
-    preview.resize(n);
+    char preview[len+1];
+    snprintf(preview, sizeof(preview), "%s", content_.c_str());
+    std::string previewStr(preview);
 
     for (auto& c : preview) {
         if (c == '\n')
@@ -298,7 +298,7 @@ std::string FormattedText::getPreview(int len) const
     }
 
     if (content_.length() > len)
-        preview += "...";
+        previewStr += "...";
 
     return preview;
 }
