@@ -13,8 +13,7 @@ struct PlacedTextData
     PlacedTextData(PlacedGlyphsPerFont &&glyphs_,
                    PlacedDecorations &&decorations_,
                    const FRectangle &textBounds_,
-                   const Matrix3f &transform_,
-                   float baseline_);
+                   const Matrix3f &transform_);
 
     /// Glyphs and their placements.
     PlacedGlyphsPerFont glyphs;
@@ -24,8 +23,6 @@ struct PlacedTextData
     FRectangle textBounds;
     /// Text transfomation within the layer.
     Matrix3f textTransform;
-    /// Baseline - optionally used for text scaling, the text should be scaled so that the first baseline is preserved.
-    float baseline = 0.0f;
 };
 using PlacedTextDataPtr = std::unique_ptr<PlacedTextData>;
 

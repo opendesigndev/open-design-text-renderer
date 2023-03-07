@@ -101,7 +101,6 @@ TEST_F(TextRendererApiTests, singleLetter) {
     ASSERT_TRUE(textShape->data != nullptr);
     ASSERT_EQ(textShape->data->glyphs.size(), 1);
     ASSERT_EQ(textShape->data->decorations.size(), 0);
-    ASSERT_EQ(textShape->data->baseline, 571.203125);
     ASSERT_EQ(textShape->data->glyphs.count(fontHelveticaNeue), 1);
 
     const PlacedGlyphs &pgs = textShape->data->glyphs.at(fontHelveticaNeue);
@@ -145,7 +144,6 @@ TEST_F(TextRendererApiTests, decorations) {
     ASSERT_TRUE(textShape->data != nullptr);
     ASSERT_EQ(textShape->data->glyphs.size(), 1);
     ASSERT_EQ(textShape->data->decorations.size(), 7);
-    ASSERT_EQ(textShape->data->baseline, 47.59375);
     ASSERT_EQ(textShape->data->glyphs.count(fontHelveticaNeue), 1);
 
     const PlacedGlyphs &pgs = textShape->data->glyphs.at(fontHelveticaNeue);

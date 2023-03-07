@@ -613,8 +613,7 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
     return std::make_unique<PlacedTextData>(std::move(placedGlyphs),
                                             std::move(placedDecorations),
                                             convertRect(textBoundsNotScaled),
-                                            transformMatrix,
-                                            textShapeInput.formattedText->baselinePolicy() == BaselinePolicy::SET ? textShapeData->baseline : 0.0f);
+                                            transformMatrix);
 }
 
 TextDrawResult drawPlacedText(Context &ctx,
@@ -631,20 +630,11 @@ TextDrawResult drawPlacedText(Context &ctx,
                                                     static_cast<Pixel32*>(pixels), width, height);
 
     if (drawResult) {
-        compat::FRectangle stretchedTextBounds {
+        const compat::FRectangle stretchedTextBounds {
             placedTextData.textBounds.l * scale,
-            placedTextData.textBounds.t + placedTextData.baseline * (1.0f - scale),
+            placedTextData.textBounds.t * scale,
             placedTextData.textBounds.w * scale,
             placedTextData.textBounds.h * scale };
-
-        // Fix text bounds scaling with right-aligned text so that they are scaled relative to the right vertical bound.
-        const float trX = placedTextData.textTransform.m[2][0];
-        const float l = placedTextData.textBounds.l;
-        const float w = placedTextData.textBounds.w;
-        const bool isRightAligned = (l != 0.0f && trX != 0.0f && w + l + trX == 0.0f);
-        if (isRightAligned) {
-            stretchedTextBounds.l = - trX - w * scale;
-        }
 
         TextDrawOutput value = drawResult.moveValue();
         value.transform = convertMatrix(placedTextData.textTransform);
