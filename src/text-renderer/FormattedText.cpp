@@ -288,17 +288,17 @@ std::string FormattedText::getPreview(int len) const
     if (len < 0)
         len = 12;
 
-    char preview[len+1];
-    snprintf(preview, sizeof(preview), "%s", content_.c_str());
-    std::string previewStr(preview);
+    std::string preview(len+1, '\0');
+    const int l = snprintf(preview.data(), len+1, "%s", content_.c_str());
+    preview.resize(std::min(l, len));
 
-    for (auto& c : preview) {
+    for (char& c : preview) {
         if (c == '\n')
             c = ' ';
     }
 
     if (content_.length() > len)
-        previewStr += "...";
+        preview += "...";
 
     return preview;
 }
