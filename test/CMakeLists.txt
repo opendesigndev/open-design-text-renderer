@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13.5)
 
 project(open-design-text-renderer LANGUAGES C CXX)
-set(TEST_NAME "${PROJECT_NAME}_Test")
+set(TEST_NAME "${PROJECT_NAME}-test")
 
 # Google Test
 enable_testing()
