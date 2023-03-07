@@ -285,20 +285,16 @@ OverflowPolicy FormattedText::overflowPolicy() const
 
 std::string FormattedText::getPreview(int len) const
 {
-    if (len < 0)
+    if (len < 0) {
         len = 12;
-
-    std::string preview(len+1, '\0');
-    const int l = snprintf(preview.data(), len+1, "%s", content_.c_str());
-    preview.resize(std::min(l, len));
-
-    for (char& c : preview) {
-        if (c == '\n')
-            c = ' ';
     }
 
-    if (content_.length() > len)
+    std::string preview = content_.substr(0, len);
+    std::replace(preview.begin(), preview.end(), '\n', ' ');
+
+    if (content_.length() > len) {
         preview += "...";
+    }
 
     return preview;
 }
