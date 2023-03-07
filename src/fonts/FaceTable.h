@@ -1,13 +1,13 @@
 #pragma once
 
-#include "textify/Face.h"
+#include "text-renderer/Face.h"
 
 #include "common/buffer_view.h"
 
 #include <string>
 #include <unordered_map>
 
-namespace textify {
+namespace odtr {
 
 /**
  * A table containing FreeType faces
@@ -43,7 +43,7 @@ public:
     using LoadFaceAsResult = Result<LoadFaceAsResultRec, bool>;
 
     /**
-     * @param   storageKey  key under which the data is stored in  @a textify::FontStorage
+     * @param   storageKey  key under which the data is stored in  @a odtr::FontStorage
      * @param   faceKey     key to look up the face in this table, if empty, the original
      *                      postScriptname from the font file is used
      * @param   faceName    postScript name of the face to load from the buffer,
@@ -75,4 +75,4 @@ private:
     TableType faceItems_; ///< The key is a Postscript face name
 };
 
-} // namespace textify
+} // namespace odtr

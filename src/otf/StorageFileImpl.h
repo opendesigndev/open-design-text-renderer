@@ -8,7 +8,7 @@
 #include <cstdio>
 #include <string>
 
-namespace textify {
+namespace odtr {
 namespace otf {
 
 class StorageFileImpl
@@ -54,5 +54,5 @@ private:
 };
 
 } // namespace otf
-} // namespace textify
+} // namespace odtr
 

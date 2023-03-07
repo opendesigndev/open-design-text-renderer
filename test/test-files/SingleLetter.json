@@ -1,0 +1,146 @@
+{
+  "type": "OCTOPUS_COMPONENT",
+  "version": "3.0.0-rc.18",
+  "id": "6e414c14-70fe-45ca-9949-2669bee49d00",
+  "dimensions": {
+    "width": 1920,
+    "height": 1080
+  },
+  "content": {
+    "id": "cf3d64eb-1d7c-4ab1-ae39-a9bf0f7d45f6",
+    "name": "Web 1920 – 1",
+    "transform": [
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "blendMode": "NORMAL",
+    "opacity": 1,
+    "type": "MASK_GROUP",
+    "mask": {
+      "id": "d88ef46c-fe0c-4b6b-aa86-cec722e18bc8",
+      "name": "Background",
+      "transform": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "type": "SHAPE",
+      "shape": {
+        "fillRule": "NON_ZERO",
+        "path": {
+          "type": "RECTANGLE",
+          "rectangle": {
+            "x0": 0,
+            "x1": 1920,
+            "y0": 0,
+            "y1": 1080
+          }
+        },
+        "fills": [
+          {
+            "type": "COLOR",
+            "visible": true,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 1,
+              "g": 1,
+              "b": 1,
+              "a": 1
+            }
+          }
+        ]
+      }
+    },
+    "maskBasis": "BODY",
+    "layers": [
+      {
+        "id": "c4df6538-d375-4dda-be82-7944a6a7d937",
+        "name": "T",
+        "transform": [
+          1,
+          -7.879592978099481e-9,
+          7.879592978099481e-9,
+          1,
+          292.9876403808594,
+          779.6141357421875
+        ],
+        "blendMode": "NORMAL",
+        "opacity": 1,
+        "type": "TEXT",
+        "text": {
+          "value": "T",
+          "defaultStyle": {
+            "font": {
+              "postScriptName": "HelveticaNeue",
+              "family": "Helvetica Neue",
+              "style": "Regular",
+              "syntheticPostScriptName": false
+            },
+            "fontSize": 600,
+            "letterSpacing": 0,
+            "kerning": true,
+            "underline": "NONE",
+            "linethrough": false,
+            "fills": [
+              {
+                "type": "COLOR",
+                "visible": true,
+                "blendMode": "NORMAL",
+                "color": {
+                  "r": 0.4392156862745098,
+                  "g": 0.4392156862745098,
+                  "b": 0.4392156862745098,
+                  "a": 1
+                }
+              }
+            ]
+          },
+          "baselinePolicy": "SET",
+          "transform": [
+            1,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "styles": [
+            {
+              "style": {
+                "font": {
+                  "postScriptName": "HelveticaNeue",
+                  "family": "Helvetica Neue",
+                  "style": "Regular",
+                  "syntheticPostScriptName": false
+                },
+                "letterSpacing": 0,
+                "underline": "NONE",
+                "linethrough": false,
+                "letterCase": "NONE"
+              },
+              "ranges": [
+                {
+                  "from": 0,
+                  "to": 1
+                }
+              ]
+            }
+          ],
+          "frame": {
+            "mode": "AUTO_WIDTH"
+          },
+          "horizontalAlign": "LEFT"
+        }
+      }
+    ]
+  }
+}

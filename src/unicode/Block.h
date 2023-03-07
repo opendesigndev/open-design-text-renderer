@@ -2,7 +2,7 @@
 
 #include "compat/basic-types.h"
 
-namespace textify {
+namespace odtr {
 namespace unicode {
 
 class Block
@@ -19,4 +19,4 @@ private:
 };
 
 } // namespace unicode
-} // namespace textify
+} // namespace odtr

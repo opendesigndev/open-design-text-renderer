@@ -1,14 +1,14 @@
 #pragma once
 
 #include "common/buffer_view.h"
-#include "textify/base-types.h"
+#include "text-renderer/base-types.h"
 
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 
-namespace textify {
+namespace odtr {
 
 typedef std::vector<Byte> BufferType;
 
@@ -37,4 +37,4 @@ private:
     void decode( Item & item );
 };
 
-} // namespace textify
+} // namespace odtr

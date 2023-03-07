@@ -5,17 +5,17 @@
 #include <random>
 #include <chrono>
 
-#ifdef TEXTIFY_USE_LZ4
+#ifdef TEXT_RENDERER_USE_LZ4
 #include "lz4/lz4.h"
 #endif
 
-#ifdef TEXTIFY_USE_MONOCYPHER
+#ifdef TEXT_RENDERER_USE_MONOCYPHER
 extern "C" {
 #include "monocypher/monocypher.h"
 }
 #endif
 
-namespace textify {
+namespace odtr {
 namespace codec {
 Codec::Result CodecRaw::encode(const BufferType & input)
 {
@@ -44,7 +44,7 @@ Codec::Result CodecXOR::decode(const BufferType & input)
     return encode(input);
 }
 
-#if defined(TEXTIFY_USE_LZ4)
+#if defined(TEXT_RENDERER_USE_LZ4)
 
 Codec::Result CodecLZ4::encode(const BufferType & input)
 {
@@ -82,7 +82,7 @@ Codec::Result CodecLZ4::decode(const BufferType & input)
 
     if (decompressed != subheader->original_length) {
         // REFACTOR
-        // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Font decode: invalid LZ4 stream.");
+        // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Font decode: invalid LZ4 stream.");
         return false;
     }
 
@@ -91,7 +91,7 @@ Codec::Result CodecLZ4::decode(const BufferType & input)
 
 #endif
 
-#if defined(TEXTIFY_USE_MONOCYPHER)
+#if defined(TEXT_RENDERER_USE_MONOCYPHER)
 
 Codec::Result CodecMonocypher::encode(const BufferType & input)
 {
@@ -122,7 +122,7 @@ Codec::Result CodecMonocypher::decode(const BufferType & input)
 
     int result = crypto_unlock((uint8_t *)output.data(), (uint8_t *)key, subheader->nonce, subheader->mac, bytes, output_length);
     if (result != 0) {
-        // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Font decode: corrupted Monocypher message.");
+        // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Font decode: corrupted Monocypher message.");
         return false;
     }
 
@@ -148,7 +148,7 @@ void CodecMonocypher::Subheader::generate()
 
 #endif
 
-#if defined(TEXTIFY_USE_LZ4) && defined(TEXTIFY_USE_MONOCYPHER)
+#if defined(TEXT_RENDERER_USE_LZ4) && defined(TEXT_RENDERER_USE_MONOCYPHER)
 
 Codec::Result CodecLZ4Mono::encode(const BufferType & input)
 {
@@ -174,13 +174,13 @@ static std::unique_ptr<Codec> createCodec(int format)
 {
     if (format == CODEC_FORMAT_RAW) return std::make_unique<CodecRaw>();
     if (format == CODEC_FORMAT_XOR) return std::make_unique<CodecXOR>();
-#if defined(TEXTIFY_USE_LZ4)
+#if defined(TEXT_RENDERER_USE_LZ4)
     if (format == CODEC_FORMAT_LZ4) return std::make_unique<CodecLZ4>();
 #endif
-#if defined(TEXTIFY_USE_MONOCYPHER)
+#if defined(TEXT_RENDERER_USE_MONOCYPHER)
     if (format == CODEC_FORMAT_MONO) return std::make_unique<CodecMonocypher>();
 #endif
-#if defined(TEXTIFY_USE_LZ4) && defined(TEXTIFY_USE_MONOCYPHER)
+#if defined(TEXT_RENDERER_USE_LZ4) && defined(TEXT_RENDERER_USE_MONOCYPHER)
     if (format == CODEC_FORMAT_LZ4_MONO) return std::make_unique<CodecLZ4Mono>();
 #endif
 
@@ -200,13 +200,13 @@ Codec::Result encode(int format, const BufferType & buffer, bool verify)
 {
     auto codec = createCodec(format);
     if (!codec) {
-        // Log::instance.logf(Log::TEXTIFY, Log::ERROR, "Font codec not recognized: %d", format);
+        // Log::instance.logf(Log::TEXT_RENDERER, Log::ERROR, "Font codec not recognized: %d", format);
         return false;
     }
 
     auto result = codec->encode(buffer);
     if (!result) {
-        // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Font encoding failed.");
+        // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Font encoding failed.");
         return false;
     }
 
@@ -216,13 +216,13 @@ Codec::Result encode(int format, const BufferType & buffer, bool verify)
         auto decoded = codec->decode(encoded);
 
         if (!decoded) {
-            // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Font verification failed (decode).");
+            // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Font verification failed (decode).");
             return false;
         }
 
         bool identical = buffer == decoded.value();
         if (!identical) {
-            // Log::instance.log(Log::TEXTIFY, Log::ERROR, "Font verification failed (mismatch).");
+            // Log::instance.log(Log::TEXT_RENDERER, Log::ERROR, "Font verification failed (mismatch).");
             return false;
         }
     }
@@ -252,4 +252,4 @@ Codec::Result decode(BufferType & buffer) {
 }
 
 } // namespace codec
-} // namespace textify
+} // namespace odtr

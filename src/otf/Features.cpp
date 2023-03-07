@@ -2,7 +2,7 @@
 
 #include <iterator>
 
-namespace textify {
+namespace odtr {
 namespace otf {
 
 Features::Features(SetType&& featureSet)
@@ -23,4 +23,4 @@ void Features::merge(const Features& features)
 }
 
 } // namespace otf
-} // namespace textify
+} // namespace odtr

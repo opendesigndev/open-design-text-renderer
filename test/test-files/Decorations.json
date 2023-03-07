@@ -1,0 +1,226 @@
+{
+  "type": "OCTOPUS_COMPONENT",
+  "version": "3.0.0-rc.18",
+  "id": "fce80070-9b04-4326-a633-79776a487c38",
+  "dimensions": {
+    "width": 600,
+    "height": 250
+  },
+  "content": {
+    "id": "253623b2-0eaa-412b-a7df-4fbcc76a7967",
+    "name": "Web 1920 – 1",
+    "transform": [
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "blendMode": "NORMAL",
+    "opacity": 1,
+    "type": "MASK_GROUP",
+    "mask": {
+      "id": "75485304-8691-4c94-ae0d-69bd29168d81",
+      "name": "Background",
+      "transform": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "type": "SHAPE",
+      "shape": {
+        "fillRule": "NON_ZERO",
+        "path": {
+          "type": "RECTANGLE",
+          "rectangle": {
+            "x0": 0,
+            "x1": 600,
+            "y0": 0,
+            "y1": 250
+          }
+        },
+        "fills": [
+          {
+            "type": "COLOR",
+            "visible": true,
+            "blendMode": "NORMAL",
+            "color": {
+              "r": 1,
+              "g": 1,
+              "b": 1,
+              "a": 1
+            }
+          }
+        ]
+      }
+    },
+    "maskBasis": "BODY",
+    "layers": [
+      {
+        "id": "5292d9a8-2599-4704-a7e8-52d8f3a8ac14",
+        "name": "Underline Stop Resume New Line underline\n",
+        "transform": [
+          1,
+          0,
+          0,
+          1,
+          24,
+          50
+        ],
+        "blendMode": "NORMAL",
+        "opacity": 1,
+        "type": "TEXT",
+        "text": {
+          "value": "Underline Stop Resume New Line underline ",
+          "defaultStyle": {
+            "font": {
+              "postScriptName": "HelveticaNeue",
+              "family": "Helvetica Neue",
+              "style": "Regular",
+              "syntheticPostScriptName": false
+            },
+            "fontSize": 50,
+            "letterSpacing": 0,
+            "kerning": true,
+            "underline": "NONE",
+            "linethrough": false,
+            "fills": [
+              {
+                "type": "COLOR",
+                "visible": true,
+                "blendMode": "NORMAL",
+                "color": {
+                  "r": 0.4392156862745098,
+                  "g": 0.4392156862745098,
+                  "b": 0.4392156862745098,
+                  "a": 1
+                }
+              }
+            ]
+          },
+          "baselinePolicy": "SET",
+          "transform": [
+            1,
+            0,
+            0,
+            1,
+            0,
+            48
+          ],
+          "styles": [
+            {
+              "style": {
+                "font": {
+                  "postScriptName": "HelveticaNeue",
+                  "family": "Helvetica Neue",
+                  "style": "Regular",
+                  "syntheticPostScriptName": false
+                },
+                "letterSpacing": 0,
+                "underline": "SINGLE",
+                "linethrough": false,
+                "letterCase": "NONE"
+              },
+              "ranges": [
+                {
+                  "from": 0,
+                  "to": 10
+                },
+                {
+                  "from": 15,
+                  "to": 26
+                },
+                {
+                  "from": 30,
+                  "to": 40
+                }
+              ]
+            },
+            {
+              "style": {
+                "font": {
+                  "postScriptName": "HelveticaNeue",
+                  "family": "Helvetica Neue",
+                  "style": "Regular",
+                  "syntheticPostScriptName": false
+                },
+                "letterSpacing": 0,
+                "underline": "NONE",
+                "linethrough": false,
+                "letterCase": "NONE"
+              },
+              "ranges": [
+                {
+                  "from": 10,
+                  "to": 14
+                },
+                {
+                  "from": 40,
+                  "to": 41
+                }
+              ]
+            },
+            {
+              "style": {
+                "font": {
+                  "postScriptName": "HelveticaNeue",
+                  "family": "Helvetica Neue",
+                  "style": "Regular",
+                  "syntheticPostScriptName": false
+                },
+                "letterSpacing": 0,
+                "underline": "NONE",
+                "linethrough": true,
+                "letterCase": "NONE"
+              },
+              "ranges": [
+                {
+                  "from": 14,
+                  "to": 15
+                },
+                {
+                  "from": 28,
+                  "to": 30
+                }
+              ]
+            },
+            {
+              "style": {
+                "font": {
+                  "postScriptName": "HelveticaNeue",
+                  "family": "Helvetica Neue",
+                  "style": "Regular",
+                  "syntheticPostScriptName": false
+                },
+                "letterSpacing": 0,
+                "underline": "DOUBLE",
+                "linethrough": true,
+                "letterCase": "NONE"
+              },
+              "ranges": [
+                {
+                  "from": 26,
+                  "to": 28
+                }
+              ]
+            }
+          ],
+          "frame": {
+            "mode": "FIXED",
+            "size": {
+              "width": 552,
+              "height": 137
+            }
+          },
+          "horizontalAlign": "LEFT"
+        }
+      }
+    ]
+  }
+}

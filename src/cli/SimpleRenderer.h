@@ -6,7 +6,7 @@
 #include "compat/basic-types.h"
 #include "octopus/shape.h"
 #include "octopus/text.h"
-#include "textify/textify-api.h"
+#include <open-design-text-renderer/text-renderer-api.h>
 #include "utils/Log.h"
 #include <cstddef>
 
@@ -15,7 +15,7 @@ namespace octopus {
     struct Layer;
 }
 
-namespace textify {
+namespace odtr {
 namespace cli {
 
 class SimpleRenderer
@@ -30,7 +30,7 @@ private:
     bool renderLayer(const octopus::Layer& layer, Canvas& canvas, const compat::Matrix3f& transform);
 
     bool renderTextLayer(const octopus::Layer& layer, Canvas& canvas, const compat::Matrix3f& transform);
-    bool renderText(const octopus::Text& text, Canvas& canvas, const compat::Matrix3f& transform, const std::optional<textify::Rectangle>& viewArea);
+    bool renderText(const octopus::Text& text, Canvas& canvas, const compat::Matrix3f& transform, const std::optional<odtr::Rectangle>& viewArea);
 
     bool renderShapeLayer(const octopus::Layer& layer, Canvas& canvas, const compat::Matrix3f& transform);
 
@@ -41,7 +41,7 @@ private:
     int scale(int x) const;
 
     const octopus::Octopus& octopus_;
-    textify::ContextHandle textifyCtx_;
+    odtr::ContextHandle textRendererCtx_;
     std::unique_ptr<utils::Log> log;
     float scale_;
     std::optional<compat::Rectangle> viewArea_;

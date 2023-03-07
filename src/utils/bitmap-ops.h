@@ -2,10 +2,10 @@
 #pragma once
 
 #include "compat/basic-types.h"
-#include "textify/textify-api.h"
+#include "text-renderer/text-renderer-api.h"
 
-namespace textify {
+namespace odtr {
 namespace utils {
 
 } // namespace utils
-} // namespace textify
+} // namespace odtr

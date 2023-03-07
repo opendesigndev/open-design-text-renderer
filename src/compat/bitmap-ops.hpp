@@ -6,7 +6,7 @@
 #include "basic-types.h"
 #include "Bitmap.hpp"
 
-namespace textify {
+namespace odtr {
 namespace compat {
 
 namespace {
@@ -65,4 +65,4 @@ void rescaleBitmap(BitmapGrayscale& dst, const BitmapGrayscale& src);
 void rescaleBitmap(BitmapRGBA& dst, const BitmapRGBA& src, int mode, const Vector2f &align);
 
 } // namespace compat
-} // namespace textify
+} // namespace odtr

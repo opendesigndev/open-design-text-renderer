@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_set>
 
-namespace textify {
+namespace odtr {
 namespace otf {
 
 namespace feature {
@@ -34,4 +34,4 @@ private:
 };
 
 } // namespace otf
-} // namespace textify
+} // namespace odtr

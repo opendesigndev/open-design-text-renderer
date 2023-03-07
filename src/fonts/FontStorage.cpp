@@ -2,7 +2,7 @@
 #include "FontCodec.h"
 
 
-namespace textify {
+namespace odtr {
 
 
 Byte *FontStorage::alloc(const std::string& name, std::size_t size)
@@ -49,5 +49,5 @@ void FontStorage::decode(Item &item)
     item.decoded = true;
 }
 
-} // namespace textify
+} // namespace odtr
 

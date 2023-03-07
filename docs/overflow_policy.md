@@ -2,7 +2,7 @@
 
 Overflow policy describes text visiblity in case it overflows its frame. Note that this **only applicable to frames of 'FIXED' type**.
 
-Overflow policy types in Octopus3+ and 'Textify':
+Overflow policy types in Octopus3+ and 'Text Renderer':
 
 - `NO_OVERFLOW` (Sketch)
 - `CLIP_LINE` (XD, Photoshop, Illustrator?)

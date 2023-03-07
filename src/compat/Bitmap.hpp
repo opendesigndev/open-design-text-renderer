@@ -8,7 +8,7 @@
 
 #include <memory>
 
-namespace textify {
+namespace odtr {
 namespace compat {
 
 /// Reperesents a bitmap of 32-bit RGBA pixels in memory
@@ -46,7 +46,7 @@ public:
 private:
     T* pixels_;
     int width_, height_;
-    bool ownsData_ = true;     // MODIFIED for use in textify 2!!!
+    bool ownsData_ = true;     // MODIFIED for use in text renderer 2!!!
 };
 
 typedef Bitmap<Pixel8> BitmapGrayscale;
@@ -226,4 +226,4 @@ inline BitmapRGBAPtr createBitmapRGBA(int width, int height) { return createBitm
 inline BitmapRGBAPtr createBitmapRGBA(const Vector2i &dimensions) { return createBitmap<Pixel32>(dimensions.x, dimensions.y); }
 
 } // namespace compat
-} // namespace textify
+} // namespace odtr

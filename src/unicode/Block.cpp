@@ -1,6 +1,6 @@
 #include "Block.h"
 
-namespace textify {
+namespace odtr {
 namespace unicode {
 
 using namespace compat;
@@ -19,4 +19,4 @@ bool Block::contains(qchar cp) const
 }
 
 } // namespace unicode
-} // namespace textify
+} // namespace odtr

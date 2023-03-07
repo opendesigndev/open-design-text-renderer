@@ -6,7 +6,7 @@
 
 #include <vector>
 
-namespace textify {
+namespace odtr {
 namespace unicode {
 
 class EmojiTable
@@ -45,4 +45,4 @@ private:
 };
 
 } // namespace unicode
-} // namespace textify
+} // namespace odtr

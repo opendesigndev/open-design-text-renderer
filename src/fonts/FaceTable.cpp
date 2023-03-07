@@ -14,7 +14,7 @@ bool wantFace(const FacesNames& faces, const std::string& name) {
 
 }
 
-namespace textify {
+namespace odtr {
 
 struct FT_FaceHandle
 {
@@ -170,4 +170,4 @@ bool FaceTable::loadItem(const std::string& name, Item item)
 
     return item.face->ready();
 }
-} // namespace textify
+} // namespace odtr

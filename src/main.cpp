@@ -5,11 +5,11 @@
 #include "cli/Canvas.h"
 #include "cli/SimpleRenderer.h"
 
+#include <open-design-text-renderer/text-renderer-api.h>
 #include "octopus/fill.h"
 #include "octopus/general.h"
-#include "textify/Context.h"
-#include "textify/base-types.h"
-#include "textify/textify-api.h"
+#include "text-renderer/Context.h"
+#include "text-renderer/base-types.h"
 
 #include "utils/fmt.h"
 #include "vendor/fmt/color.h"
@@ -24,7 +24,7 @@
 #include <type_traits>
 #include <vector>
 
-void printMatrix(const std::string& label, const textify::Matrix3f& r) {
+void printMatrix(const std::string& label, const odtr::Matrix3f& r) {
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             fmt::print("{} ", r.m[j][i]);
@@ -34,23 +34,23 @@ void printMatrix(const std::string& label, const textify::Matrix3f& r) {
 }
 
 
-class TextifyContext
+class TextRendererContext
 {
 public:
-    explicit TextifyContext(const textify::ContextOptions& opts)
-        : handle(textify::createContext(opts))
+    explicit TextRendererContext(const odtr::ContextOptions& opts)
+        : handle(odtr::createContext(opts))
     { }
 
-    ~TextifyContext() {
-        textify::destroyContext(handle);
+    ~TextRendererContext() {
+        odtr::destroyContext(handle);
     }
 
-    /* implicit */ operator textify::ContextHandle() const {
+    /* implicit */ operator odtr::ContextHandle() const {
         return handle;
     }
 
 private:
-    textify::ContextHandle handle;
+    odtr::ContextHandle handle;
 };
 
 struct File
@@ -83,7 +83,7 @@ struct File
 };
 
 bool minimalExample() {
-    textify::ContextOptions ctxOptions;
+    odtr::ContextOptions ctxOptions;
     ctxOptions.errorFunc = [](const std::string &msg) {
         fmt::print(fg(fmt::color::white) | bg(fmt::color::crimson) | fmt::emphasis::bold, "[ERROR] {}", msg);
         fmt::print("\n");
@@ -91,7 +91,7 @@ bool minimalExample() {
     ctxOptions.warnFunc = [](const std::string &msg) { fmt::print("[WARN] {}\n", msg); };
     ctxOptions.infoFunc = [](const std::string &msg) { fmt::print("[INFO] {}\n", msg); };
 
-    auto ctx = TextifyContext(ctxOptions);
+    auto ctx = TextRendererContext(ctxOptions);
     if (!ctx) {
         return false;
     }
@@ -128,44 +128,44 @@ bool minimalExample() {
 
     const auto& text = text1;
 
-    textify::addFontFile(ctx, "IBMPlexSans", "", "fonts/IBMPlexSans-Regular.ttf", false);
-    textify::addFontFile(ctx, "IBMPlexSans-Regular", "", "fonts/IBMPlexSans-Regular.ttf", false);
-    for (const auto& missing : textify::listMissingFonts(ctx, text)) {
+    odtr::addFontFile(ctx, "IBMPlexSans", "", "fonts/IBMPlexSans-Regular.ttf", false);
+    odtr::addFontFile(ctx, "IBMPlexSans-Regular", "", "fonts/IBMPlexSans-Regular.ttf", false);
+    for (const auto& missing : odtr::listMissingFonts(ctx, text)) {
         fmt::print("missing font: {}\n", missing.c_str());
     }
 
-    std::vector<textify::TextShape*> shapes;
+    std::vector<odtr::TextShape*> shapes;
     for (int i = 0; i < 64; ++i) {
-        shapes.emplace_back(textify::shapeText(ctx, text));
+        shapes.emplace_back(odtr::shapeText(ctx, text));
     }
 
-    std::vector<textify::TextShape*> toRemove;
+    std::vector<odtr::TextShape*> toRemove;
     for (int i = 0; i < shapes.size(); ++i) {
         if (i % 2) {
             toRemove.emplace_back(shapes[i]);
         }
     }
 
-    textify::destroyTextShapes(ctx, toRemove.data(), toRemove.size());
+    odtr::destroyTextShapes(ctx, toRemove.data(), toRemove.size());
 
-    // textify::addFontFile(ctx, "IBMPlexSans-Regular", "Avenir-Black", "fonts/Avenir.ttc", false);
+    // odtr::addFontFile(ctx, "IBMPlexSans-Regular", "Avenir-Black", "fonts/Avenir.ttc", false);
 
     auto textShape = shapes[0];
 
     auto scale = 2.0f;
 
-    auto bounds = textify::getBounds(ctx, textShape);
-    textify::utils::printRect("text bounds:", bounds);
+    auto bounds = odtr::getBounds(ctx, textShape);
+    odtr::utils::printRect("text bounds:", bounds);
 
     // width *= scale;
     // height *= scale;
 
-    auto viewArea = textify::Rectangle{141, 151, 80, 117};
-    textify::DrawOptions drawOptions;
+    auto viewArea = odtr::Rectangle{141, 151, 80, 117};
+    odtr::DrawOptions drawOptions;
     drawOptions.scale = scale;
     //drawOptions.viewArea = viewArea;
 
-    auto [width, height] = textify::getDrawBufferDimensions(ctx, textShape, drawOptions);
+    auto [width, height] = odtr::getDrawBufferDimensions(ctx, textShape, drawOptions);
 
     auto len = 4 * width * height;
     uint32_t* pixels = (uint32_t*)malloc(len);
@@ -173,12 +173,12 @@ bool minimalExample() {
 
     fmt::print("draw buffer dimensions: {} x {}\n", width, height);
 
-    auto drawResult = textify::drawText(ctx, textShape, pixels, width, height, drawOptions);
+    auto drawResult = odtr::drawText(ctx, textShape, pixels, width, height, drawOptions);
 
-    textify::utils::printRect("drawResult.bounds:", drawResult.bounds);
+    odtr::utils::printRect("drawResult.bounds:", drawResult.bounds);
     printMatrix("drawResult.bounds:", drawResult.transform);
 
-    auto bmp = textify::compat::BitmapRGBA{textify::compat::BitmapRGBA::Wrap::WRAP_NO_OWN, pixels, width, height};
+    auto bmp = odtr::compat::BitmapRGBA{odtr::compat::BitmapRGBA::Wrap::WRAP_NO_OWN, pixels, width, height};
 
     savePngImage(bmp, "preview.png");
 
@@ -199,14 +199,14 @@ bool runOctopusRenderer(const std::string& filename) {
         fmt::print("# layers: {}\n", octopus.content.get()->layers.value().size());
     }
 
-    auto renderer = textify::cli::SimpleRenderer{octopus, 1.0f};
+    auto renderer = odtr::cli::SimpleRenderer{octopus, 1.0f};
     renderer.renderToFile("preview.png");
 
     return true;
 }
 
 int main(int argc, char* argv[]) {
-    // printf("usage: textify-cli <octopus-file>\n");
+    // printf("usage: text-renderer-cli <octopus-file>\n");
 
     std::vector<std::string> args(argv, argv + argc);
     if (args.size() >= 2) {
