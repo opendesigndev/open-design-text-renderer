@@ -15,15 +15,12 @@ endif()
 option(TEXT_RENDERER_DEBUG "Debug Mode" OFF)
 option(TEXT_RENDERER_USE_ENCRYPTED_FONTS "Support Avocode fonts encoded via LZ4/Monocypher" ON)
 option(TEXT_RENDERER_BUILD_CLI "Build OD Text Renderer CLI utility" ${STANDALONE})
+option(TEXT_RENDERER_TEST_MODULES "Build tests and testing utilities (optional)" ON)
 
 # TEXT_RENDERER_HAVE_LIBOCTOPUS: if ON LIBOCTOPUS_INCLUDE variable and 'liboctopus' target are expected to be loaded into the current scope
 # option(TEXT_RENDERER_HAVE_LIBOCTOPUS "Liboctopus provided externally" $<BOOL:$<NOT,${STANDALONE}>>)
 option(TEXT_RENDERER_HAVE_LIBOCTOPUS "Liboctopus provided externally" ${HAVE_LIBOCTOPUS_DEFAULT})
 message("have Liboctopus:" ${TEXT_RENDERER_HAVE_LIBOCTOPUS})
-
-if (TEXT_RENDERER_DEBUG)
-    add_definitions(-DTEXT_RENDERER_DEBUG)
-endif()
 
 # set platform
 if(UNIX AND NOT APPLE)
@@ -58,7 +55,7 @@ if (NOT TEXT_RENDERER_HAVE_LIBOCTOPUS)
 endif()
 
 # Add test project if specified
-if(ODE_TEST_MODULES)
+if(TEXT_RENDERER_TEST_MODULES)
     add_subdirectory(test)
 endif()
 
@@ -233,6 +230,10 @@ set(TEXT_RENDERER_CLI_SOURCES
 
 set(TEXT_RENDERER_DEFINITIONS "")
 
+if (TEXT_RENDERER_DEBUG)
+    set(TEXT_RENDERER_DEFINITIONS ${TEXT_RENDERER_DEFINITIONS} TEXT_RENDERER_DEBUG)
+endif()
+
 if(TEXT_RENDERER_USE_ENCRYPTED_FONTS)
     set(TEXT_RENDERER_PRIVATE_HEADERS ${TEXT_RENDERER_PRIVATE_HEADERS} ${TEXT_RENDERER_SOURCE_DIR}/vendor/lz4/lz4.h)
     set(TEXT_RENDERER_SOURCES ${TEXT_RENDERER_SOURCES} ${TEXT_RENDERER_SOURCE_DIR}/vendor/lz4/lz4.c)
@@ -242,7 +243,6 @@ if(TEXT_RENDERER_USE_ENCRYPTED_FONTS)
     set(TEXT_RENDERER_SOURCES ${TEXT_RENDERER_SOURCES} ${TEXT_RENDERER_SOURCE_DIR}/vendor/monocypher/monocypher.c)
     set(TEXT_RENDERER_DEFINITIONS ${TEXT_RENDERER_DEFINITIONS} TEXT_RENDERER_USE_MONOCYPHER)
 endif()
-
 
 set (TEXT_RENDERER_HEADERS ${TEXT_RENDERER_PUBLIC_HEADERS} ${TEXT_RENDERER_PRIVATE_HEADERS})
 

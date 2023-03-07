@@ -6,13 +6,9 @@ set(TEST_NAME "${PROJECT_NAME}-test")
 # Google Test
 enable_testing()
 find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
 
 set(TEXT_RENDERER_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TEXT_RENDERER_DIR ${TEXT_RENDERER_TEST_DIR}/..)
-
-# Define a value for testing Octopus files directory
-add_definitions(-DTESTING_OCTOPUS_DIR="${TEXT_RENDERER_TEST_DIR}/test-files/")
 
 # Test header files
 set(TEST_HEADER_FILES
@@ -37,7 +33,7 @@ set(INTERNAL_LIBRARY_DEPENDENCIES
 )
 
 target_link_libraries(${TEST_NAME} PRIVATE
-    ${GTEST_BOTH_LIBRARIES} ${INTERNAL_LIBRARY_DEPENDENCIES})
+    GTest::gtest GTest::gtest_main ${INTERNAL_LIBRARY_DEPENDENCIES})
 
 target_include_directories(${TEST_NAME} PUBLIC
     ${TEXT_RENDERER_DIR}/src/)
@@ -49,6 +45,9 @@ set_target_properties(${TEST_NAME} PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS NO)
+
+# Define a value for testing Octopus files directory
+target_compile_definitions(${TEST_NAME} PRIVATE TESTING_OCTOPUS_DIR="${TEXT_RENDERER_TEST_DIR}/test-files/")
 
 target_compile_options(${TEST_NAME} PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:
