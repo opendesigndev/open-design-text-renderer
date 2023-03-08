@@ -552,15 +552,33 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
 
     for (size_t i = 0; i < paragraphResults.size(); i++) {
         const ParagraphShapePtr &paragraphShape = textShapeData->paragraphShapes[i];
-        const ParagraphShape::DrawResult &drawResult = paragraphResults[i];
+        const GlyphShapes &paragraphGlyphs = paragraphShape->glyphs();
+        const LineSpans &paragraphLineSpans = paragraphShape->lineSpans();
 
-        size_t j = 0;
+        const ParagraphShape::DrawResult &drawResult = paragraphResults[i];
+        const std::vector<TypesetJournal::LineRecord> &linesDrawn = drawResult.journal.getLines();
+
+        if (paragraphLineSpans.size() != linesDrawn.size()) {
+            continue;
+        }
+
         for (size_t k = 0; k < drawResult.journal.getLines().size(); k++) {
-            const TypesetJournal::LineRecord &lineRecord = drawResult.journal.getLines()[k];
+            const LineSpan &paragraphLineSpan = paragraphLineSpans[k];
+            const TypesetJournal::LineRecord &lineRecord = linesDrawn[k];
+
+            if (paragraphLineSpan.size() != lineRecord.glyphJournal_.size()) {
+                continue;
+            }
 
             for (size_t l = 0; l < lineRecord.glyphJournal_.size(); l++) {
-                const GlyphShape &glyphShape = paragraphShape->glyphs()[j];
+                const GlyphShape &glyphShape = paragraphGlyphs[l + paragraphLineSpan.start];
                 const GlyphPtr &glyph = lineRecord.glyphJournal_[l];
+
+                // Skips glyphs with empty bounds - empty spaces
+                if (!glyph->getBitmapBounds()) {
+                    ++glyphIndex;
+                    continue;
+                }
 
                 // Find the glyph index
                 for (size_t i = glyphIndex; i < inText.size(); ++i) {
@@ -584,7 +602,6 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
                     glyph->getOrigin().y + verticalAlignOffset,
                 };
 
-                ++j;
                 ++glyphIndex;
             }
 
