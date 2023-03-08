@@ -1,9 +1,9 @@
 .DS_Store
 .cache
 build
-fonts
+/fonts
 tmp
-third_party/platform
+/third_party/platform
 compile_commands.json
 TODO.md
-resources
+/resources
