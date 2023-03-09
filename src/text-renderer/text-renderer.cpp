@@ -550,9 +550,9 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
 
     const std::vector<compat::qchar> &inText = textShapeInput.formattedText->text();
 
-    for (size_t i = 0; i < paragraphResults.size(); i++) {
+    for (size_t i = 0; i < paragraphResults.size(); ++i) {
         const ParagraphShapePtr &paragraphShape = textShapeData->paragraphShapes[i];
-        const GlyphShapes &paragraphGlyphs = paragraphShape->glyphs();
+        const GlyphShapes &glyphShapes = paragraphShape->glyphs();
         const LineSpans &paragraphLineSpans = paragraphShape->lineSpans();
 
         const ParagraphShape::DrawResult &drawResult = paragraphResults[i];
@@ -562,17 +562,32 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
             continue;
         }
 
-        for (size_t k = 0; k < drawResult.journal.getLines().size(); k++) {
-            const LineSpan &paragraphLineSpan = paragraphLineSpans[k];
+        for (size_t k = 0; k < linesDrawn.size(); ++k) {
+            const LineSpan &lineSpan = paragraphLineSpans[k];
             const TypesetJournal::LineRecord &lineRecord = linesDrawn[k];
 
-            if (paragraphLineSpan.size() != lineRecord.glyphJournal_.size()) {
+            if (lineSpan.size() != lineRecord.glyphJournal_.size()) {
                 continue;
             }
 
-            for (size_t l = 0; l < lineRecord.glyphJournal_.size(); l++) {
-                const GlyphShape &glyphShape = paragraphGlyphs[l + paragraphLineSpan.start];
-                const GlyphPtr &glyph = lineRecord.glyphJournal_[l];
+            // Properly ordered glyph shapes on the line. Accounting for LTR-RTL combinations and multiple visual runs
+            std::vector<const GlyphShape *> glyphShapesOnLine(lineSpan.size());
+            long gsi = 0;
+            for (const VisualRun &vr : lineSpan.visualRuns) {
+                for (long vri = vr.start; vri < vr.end; ++vri) {
+                    glyphShapesOnLine[gsi++] = &glyphShapes[vri];
+                }
+            }
+
+            // Add placed glyphs
+            for (size_t li = 0; li < lineRecord.glyphJournal_.size(); ++li) {
+                const GlyphShape *glyphShape = glyphShapesOnLine[li];
+                const GlyphPtr &glyph = lineRecord.glyphJournal_[li];
+
+                // Should not happen
+                if (glyphShape == nullptr) {
+                    continue;
+                }
 
                 // Skips glyphs with empty bounds - empty spaces
                 if (!glyph->getBitmapBounds()) {
@@ -581,21 +596,21 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
                 }
 
                 // Find the glyph index
-                for (size_t i = glyphIndex; i < inText.size(); ++i) {
-                    if (inText[i] != glyphShape.character) {
+                for (size_t gi = glyphIndex; gi < inText.size(); ++gi) {
+                    if (inText[gi] != glyphShape->character) {
                         ++glyphIndex;
                     } else {
                         break;
                     }
                 }
 
-                PlacedGlyphs &placedGlyphsForFont = placedGlyphs[FontSpecifier { glyphShape.format.faceId }];
+                PlacedGlyphs &placedGlyphsForFont = placedGlyphs[FontSpecifier { glyphShape->format.faceId }];
                 placedGlyphsForFont.emplace_back();
                 PlacedGlyph &placedGlyph = placedGlyphsForFont.back();
 
-                placedGlyph.codepoint = glyphShape.codepoint;
-                placedGlyph.color = glyphShape.format.color;
-                placedGlyph.fontSize = glyphShape.format.size;
+                placedGlyph.codepoint = glyphShape->codepoint;
+                placedGlyph.color = glyphShape->format.color;
+                placedGlyph.fontSize = glyphShape->format.size;
                 placedGlyph.index = glyphIndex;
                 placedGlyph.originPosition = Vector2f {
                     glyph->getOrigin().x,
@@ -605,9 +620,8 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
                 ++glyphIndex;
             }
 
-            for (size_t l = 0; l < lineRecord.decorationJournal_.size(); l++) {
-                const TypesetJournal::DecorationRecord &decoration = lineRecord.decorationJournal_[l];
-
+            // Add placed decorations
+            for (const TypesetJournal::DecorationRecord &decoration : lineRecord.decorationJournal_) {
                 placedDecorations.emplace_back();
                 PlacedDecoration &placedDecoration = placedDecorations.back();
 
