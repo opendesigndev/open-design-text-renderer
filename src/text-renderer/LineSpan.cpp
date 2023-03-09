@@ -8,5 +8,13 @@ LineSpan::LineSpan(long start, long end, float lineWidth, TextDirection dir, Jus
     : start(start), end(end), lineWidth(lineWidth), baseDir(dir), justifiable(justifiable)
 { }
 
+long LineSpan::size() const {
+    long size = 0;
+    for (const VisualRun &vr : visualRuns) {
+        size += vr.size();
+    }
+    return size;
+}
+
 } // namespace priv
 } // namespace odtr

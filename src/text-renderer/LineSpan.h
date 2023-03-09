@@ -24,10 +24,13 @@ struct LineSpan
              TextDirection dir = TextDirection::LEFT_TO_RIGHT,
              Justifiable justifiable = Justifiable::POSITIVE);
 
-    //! Glyph indices in left-closed interval [start, end)
+    /// Line size - glyphs count in line
+    long size() const;
+
+    /// Glyph indices in left-closed interval [start, end)
     long start, end;
 
-    //! BiDi visual runs.
+    /// BiDi visual runs.
     VisualRuns visualRuns;
     float lineWidth;
     TextDirection baseDir;
