@@ -586,6 +586,7 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
 
                 // Should not happen
                 if (glyphShape == nullptr) {
+                    ++glyphIndex;
                     continue;
                 }
 
