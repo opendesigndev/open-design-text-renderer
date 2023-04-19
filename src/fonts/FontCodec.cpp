@@ -6,12 +6,12 @@
 #include <chrono>
 
 #ifdef TEXT_RENDERER_USE_LZ4
-#include "lz4/lz4.h"
+#include "../vendor/lz4/lz4.h"
 #endif
 
 #ifdef TEXT_RENDERER_USE_MONOCYPHER
 extern "C" {
-#include "monocypher/monocypher.h"
+#include "../vendor/monocypher/monocypher.h"
 }
 #endif
 

@@ -253,15 +253,13 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${TEXT_RENDERER_DEFINITIONS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC  ${TEXT_RENDERER_INCLUDE_DIR}
-                                           PRIVATE ${TEXT_RENDERER_SOURCE_DIR}
-                                                   ${TEXT_RENDERER_SOURCE_DIR}/vendor
-                                                   ${ICU_INCLUDE_DIR})
+                                           PRIVATE ${ICU_INCLUDE_DIR}
+                                                   ${TEXT_RENDERER_SOURCE_DIR}/vendor)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads PNG::PNG freetype harfbuzz harfbuzz::harfbuzz ${ICU_LIBRARY} liboctopus)
 
 # adds runnable target
 if(TEXT_RENDERER_BUILD_CLI AND NOT EMSCRIPTEN)
     add_executable(open-design-text-renderer-cli ${TEXT_RENDERER_CLI_SOURCES} ${TEXT_RENDERER_CLI_HEADERS})
-    target_include_directories(open-design-text-renderer-cli PRIVATE ${TEXT_RENDERER_SOURCE_DIR}/vendor ${TEXT_RENDERER_SOURCE_DIR})
     target_link_libraries(open-design-text-renderer-cli PRIVATE liboctopus open-design-text-renderer)
 endif()

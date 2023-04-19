@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compat/basic-types.h"
+#include "../compat/basic-types.h"
 #include <open-design-text-renderer/text-renderer-api.h>
 
 namespace odtr {

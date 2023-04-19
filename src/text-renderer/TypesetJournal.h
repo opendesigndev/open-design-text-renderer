@@ -3,8 +3,8 @@
 #include "base.h"
 #include "Face.h"
 
-#include "compat/basic-types.h"
-#include "common/result.hpp"
+#include "../compat/basic-types.h"
+#include "../common/result.hpp"
 
 #include <vector>
 

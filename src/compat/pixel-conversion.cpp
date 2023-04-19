@@ -1,5 +1,5 @@
 
-#include "compat/arithmetics.hpp"
+#include "arithmetics.hpp"
 #include "pixel-conversion.h"
 
 #include <cmath>

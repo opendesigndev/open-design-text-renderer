@@ -1,7 +1,7 @@
 #pragma once
 
-#include "compat/basic-types.h"
-#include "fmt/core.h"
+#include "../compat/basic-types.h"
+#include "../vendor/fmt/core.h"
 
 namespace odtr {
 namespace utils {

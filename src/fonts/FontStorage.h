@@ -1,7 +1,7 @@
 #pragma once
 
-#include "common/buffer_view.h"
-#include "text-renderer/base-types.h"
+#include "../common/buffer_view.h"
+#include "../text-renderer/base-types.h"
 
 #include <string>
 #include <unordered_map>

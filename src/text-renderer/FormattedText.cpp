@@ -4,9 +4,9 @@
 #include <cmath>
 #include <locale>
 
-#include "text-renderer/text-format.h"
-#include "fonts/FontManager.h"
-#include "unicode/EmojiTable.h"
+#include "text-format.h"
+#include "../fonts/FontManager.h"
+#include "../unicode/EmojiTable.h"
 
 
 namespace odtr {

@@ -1,22 +1,22 @@
 
 #include <open-design-text-renderer/text-renderer-api.h>
 
-#include "compat/affine-transform.h"
-#include "compat/basic-types.h"
+#include "../compat/affine-transform.h"
+#include "../compat/basic-types.h"
 
-#include "fonts/FontManager.h"
+#include "../fonts/FontManager.h"
 
-#include "text-renderer/Config.h"
-#include "text-renderer/Context.h"
-#include "text-renderer/text-renderer.h"
-#include "text-renderer/TextShape.h"
-#include "text-renderer/types.h"
+#include "../text-renderer/Config.h"
+#include "../text-renderer/Context.h"
+#include "../text-renderer/text-renderer.h"
+#include "../text-renderer/TextShape.h"
+#include "../text-renderer/types.h"
 
-#include "utils/utils.h"
-#include "utils/Log.h"
-#include "utils/fmt.h"
+#include "../utils/utils.h"
+#include "../utils/Log.h"
+#include "../utils/fmt.h"
 
-#include "vendor/fmt/core.h"
+#include "../vendor/fmt/core.h"
 
 #include <octopus/text.h>
 
