@@ -1,9 +1,9 @@
 #include "FontManager.h"
 
-#include "fonts/FaceTable.h"
-#include "fonts/FontStorage.h"
+#include "FaceTable.h"
+#include "FontStorage.h"
 
-#include "utils/Log.h"
+#include "../utils/Log.h"
 
 #include <algorithm>
 #include <fstream>

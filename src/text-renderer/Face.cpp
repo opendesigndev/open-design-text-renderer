@@ -1,5 +1,5 @@
 #include "Face.h"
-#include "otf/otf.h"
+#include "../otf/otf.h"
 // REFACTOR
 // #include "logging/BasicLogger.h"
 #include <limits>

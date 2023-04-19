@@ -2,7 +2,7 @@
 
 #define FULL_EMOJI_TABLE
 
-#include "compat/basic-types.h"
+#include "../compat/basic-types.h"
 
 #include <vector>
 

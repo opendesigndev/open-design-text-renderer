@@ -15,11 +15,11 @@
 #include "types.h"
 #include "PlacedTextRendering.h"
 
-#include "compat/affine-transform.h"
-#include "compat/basic-types.h"
-#include "compat/Bitmap.hpp"
+#include "../compat/affine-transform.h"
+#include "../compat/basic-types.h"
+#include "../compat/Bitmap.hpp"
 
-#include "utils/utils.h"
+#include "../utils/utils.h"
 
 #include <octopus/text.h>
 

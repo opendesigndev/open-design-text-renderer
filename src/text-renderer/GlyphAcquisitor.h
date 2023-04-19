@@ -3,7 +3,7 @@
 #include "Glyph.h"
 #include "base.h"
 
-#include "common/result.hpp"
+#include "../common/result.hpp"
 
 namespace odtr {
 

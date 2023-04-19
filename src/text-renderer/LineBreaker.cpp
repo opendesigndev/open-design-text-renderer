@@ -6,7 +6,7 @@
 
 #include "tabstops.h"
 
-#include "utils/Log.h"
+#include "../utils/Log.h"
 
 namespace odtr {
 namespace priv {

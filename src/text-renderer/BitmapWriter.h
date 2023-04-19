@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "compat/Bitmap.hpp"
+#include "../compat/Bitmap.hpp"
 
 namespace odtr {
 namespace priv {

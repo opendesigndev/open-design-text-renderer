@@ -3,7 +3,7 @@
 #include "base.h"
 #include "text-format.h"
 
-#include "compat/basic-types.h"
+#include "../compat/basic-types.h"
 
 #include <optional>
 

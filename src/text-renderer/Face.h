@@ -5,9 +5,9 @@
 #include "Glyph.h"
 #include "GlyphAcquisitor.h"
 
-#include "otf/otf.h"
+#include "../otf/otf.h"
 
-#include "common/result.hpp"
+#include "../common/result.hpp"
 
 #include <string>
 

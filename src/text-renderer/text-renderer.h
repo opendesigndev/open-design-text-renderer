@@ -7,8 +7,8 @@
 #include "text-format.h"
 #include "TextShapeData.h"
 
-#include "common/result.hpp"
-#include "compat/basic-types.h"
+#include "../common/result.hpp"
+#include "../compat/basic-types.h"
 
 // Forward declarations
 namespace octopus {

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "fonts/FontManager.h"
-#include "text-renderer/Config.h"
+#include "../fonts/FontManager.h"
+#include "../text-renderer/Config.h"
 #include "TextShape.h"
-#include "utils/Log.h"
+#include "../utils/Log.h"
 
 #include <memory>
 #include <optional>

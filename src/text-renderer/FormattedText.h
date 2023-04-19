@@ -5,7 +5,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "compat/basic-types.h"
+#include "../compat/basic-types.h"
 
 #include "text-format.h"
 

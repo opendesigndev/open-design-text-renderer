@@ -3,8 +3,8 @@
 #include "Glyph.h"
 #include "tabstops.h"
 
-#include "fonts/FontManager.h"
-#include "utils/Log.h"
+#include "../fonts/FontManager.h"
+#include "../utils/Log.h"
 
 #include <algorithm>
 #include <cmath>

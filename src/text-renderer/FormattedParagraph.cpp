@@ -1,10 +1,10 @@
 
 #include "FormattedParagraph.h"
 
-#include "fonts/FaceTable.h"
-#include "fonts/FontManager.h"
-#include "utils/Log.h"
-#include "unicode/EmojiTable.h"
+#include "../fonts/FaceTable.h"
+#include "../fonts/FontManager.h"
+#include "../utils/Log.h"
+#include "../unicode/EmojiTable.h"
 
 #include <unicode/ubidi.h>
 #include <unicode/uchar.h>

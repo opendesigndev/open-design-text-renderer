@@ -2,8 +2,8 @@
 
 #include "types.h"
 
-#include "common/hash_utils.hpp"
-#include "common/lexical_cast.hpp"
+#include "../common/hash_utils.hpp"
+#include "../common/lexical_cast.hpp"
 
 namespace std {
 template <>

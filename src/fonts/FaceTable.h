@@ -1,8 +1,8 @@
 #pragma once
 
-#include "text-renderer/Face.h"
+#include "../text-renderer/Face.h"
 
-#include "common/buffer_view.h"
+#include "../common/buffer_view.h"
 
 #include <string>
 #include <unordered_map>

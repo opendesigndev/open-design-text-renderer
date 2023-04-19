@@ -10,7 +10,7 @@
 #include "Glyph.h"
 #include "Face.h"
 
-#include "utils/utils.h"
+#include "../utils/utils.h"
 
 namespace odtr {
 namespace priv {
