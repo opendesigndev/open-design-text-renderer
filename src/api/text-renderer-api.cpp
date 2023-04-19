@@ -292,4 +292,17 @@ const PlacedTextData *getShapedText(ContextHandle ctx,
     return nullptr;
 }
 
+
+FT_Face getFreetypeFace(ContextHandle ctx,
+                        const std::string& faceId) {
+    if (ctx == nullptr) {
+        return nullptr;
+    }
+
+    const odtr::FaceTable::Item* faceItem = ctx->getFontManager().facesTable().getFaceItem(faceId);
+    if (!(faceItem && faceItem->face))
+        return nullptr;
+    return faceItem->face->getFtFace();
+}
+
 } // namespace odtr
