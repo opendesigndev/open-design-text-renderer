@@ -287,4 +287,19 @@ DrawTextResult drawText(ContextHandle ctx,
 const PlacedTextData *getShapedText(ContextHandle ctx,
                                     TextShapeHandle textShape);
 
+#ifdef FT_LOAD_DEFAULT // FreeType included by user before ODTR (FreeType dependency is not publicly exposed)
+
+/**
+ * @brief Provides internal FreeType handle for the specified font
+ * 
+ * @param ctx            context handle
+ * @param fontSpecifier  text shape handle
+ * 
+ * @returns              FreeType's FT_Face handle or null if font is not found
+ */
+FT_Face getFreetypeFace(ContextHandle ctx,
+                        const std::string& faceId);
+
+#endif
+
 }
