@@ -292,6 +292,18 @@ const PlacedTextData *getShapedText(ContextHandle ctx,
     return nullptr;
 }
 
+bool isColorFont(ContextHandle ctx,
+                 const std::string &faceId) {
+    if (ctx == nullptr) {
+        return false;
+    }
+
+    const odtr::FaceTable::Item *faceItem = ctx->getFontManager().facesTable().getFaceItem(faceId);
+    if (!(faceItem && faceItem->face))
+        return false;
+    return faceItem->face->isColorFont();
+}
+
 
 FT_Face getFreetypeFace(ContextHandle ctx,
                         const std::string& faceId) {

@@ -287,15 +287,26 @@ DrawTextResult drawText(ContextHandle ctx,
 const PlacedTextData *getShapedText(ContextHandle ctx,
                                     TextShapeHandle textShape);
 
+/**
+ * @brief Determines whether the font is a color font (e.g. contains emojis)
+ * 
+ * @param ctx        context handle
+ * @param faceId     font PostScript name
+ * 
+ * @returns          true if font is a color font
+ */
+bool isColorFont(ContextHandle ctx,
+                 const std::string& faceId);
+
 #ifdef FT_LOAD_DEFAULT // FreeType included by user before ODTR (FreeType dependency is not publicly exposed)
 
 /**
  * @brief Provides internal FreeType handle for the specified font
  * 
- * @param ctx            context handle
- * @param fontSpecifier  text shape handle
+ * @param ctx        context handle
+ * @param faceId     font PostScript name
  * 
- * @returns              FreeType's FT_Face handle or null if font is not found
+ * @returns          FreeType's FT_Face handle or null if font is not found
  */
 FT_Face getFreetypeFace(ContextHandle ctx,
                         const std::string& faceId);
