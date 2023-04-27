@@ -176,6 +176,7 @@ void FormattedParagraph::resolveEmoji(std::size_t glyphIndex, FontManager& fontM
 
     const bool hasGlyph = faceItem && faceItem->face->hasGlyph(text_[glyphIndex]);
 
+    // TODO: Detect if the glyph is an SVG glyph within the font face and use default emoji font
     if (!hasGlyph && emojiTable.lookup(text_[glyphIndex])) {
         format_[glyphIndex].faceId = FontManager::DEFAULT_EMOJI_FONT;
         fontManager.setRequiresDefaultEmojiFont();
