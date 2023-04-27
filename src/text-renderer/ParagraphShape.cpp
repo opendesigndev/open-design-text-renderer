@@ -257,6 +257,7 @@ ParagraphShape::DrawResult ParagraphShape::draw(const Context& ctx,
 
                 GlyphPtr glyph = face->acquireGlyph(unscaledGlyphShape.codepoint, offset, {scale,glyphScale}, true, ctx.config.internalDisableHinting);
                 if (!glyph) {
+                    log_.warn("Rendering glyph #{} from face \"{}\" failed.", unscaledGlyphShape.codepoint, faceID);
                     continue;
                 }
 
@@ -422,8 +423,8 @@ spacing ParagraphShape::evalLineHeight(const uint32_t codepoint, const Immediate
 
         if (lh == fmt.size) {
             // line height is typically expected to be larger than fmt.size
-            // setting it to span of ascender and descender is on of the options
-            // we can do with it to achieve extecpted results
+            // setting it to span of ascender and descender is one of the options
+            // we can do with it to achieve expected results
 
             spacing ascender = 0.0f;
             spacing descender = 0.0f;
@@ -437,21 +438,6 @@ spacing ParagraphShape::evalLineHeight(const uint32_t codepoint, const Immediate
             }
 
             lh = ascender - descender;
-
-            /*
-            // line height is typically expected to be larger than fmt.size
-            // adjusting by descender value is just because we currently don't
-            // know any better
-            auto descender = 0.0f;
-
-            if (face->isScalable()) {
-                descender = face->scaleFontUnits(face->getFtFace()->descender, true);
-            } else {
-                descender = FreetypeHandle::from26_6fixed(face->getFtFace()->size->metrics.descender);
-            }
-
-            lh -= descender;
-            */
         }
     }
 

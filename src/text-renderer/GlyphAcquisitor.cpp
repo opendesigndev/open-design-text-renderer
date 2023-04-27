@@ -71,6 +71,12 @@ GlyphPtr GlyphAcquisitor::acquire(FT_UInt codepoint, const Vector2f& offset, con
     }
 
     const FT_GlyphSlot glyphSlot = slotResult.value();
+
+    // Fail if the glyph is an SVG glyph. TODO: Add support for rendering SVG glyphs
+    if (render && glyphSlot->format == FT_GLYPH_FORMAT_SVG) {
+        return nullptr;
+    }
+
     GlyphPtr glyph = createGlyph(glyphSlot);
 
     const bool bitmapGlyph = glyphSlot->format == FT_GLYPH_FORMAT_BITMAP; // format will change after FT_Render_Glyph

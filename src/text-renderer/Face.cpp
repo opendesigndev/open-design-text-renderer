@@ -169,7 +169,7 @@ Result<font_size,bool> Face::setSize(font_size size)
         int best_match = 0;
         int diff = std::numeric_limits<int>::max();
         for (int i = 0; i < ftFace_->num_fixed_sizes; ++i) {
-            int ndiff = std::abs(charSize - ftFace_->available_sizes[i].size);
+            const int ndiff = static_cast<int>(std::abs(charSize - ftFace_->available_sizes[i].size));
             if (ndiff < diff) {
                 best_match = i;
                 diff = ndiff;
