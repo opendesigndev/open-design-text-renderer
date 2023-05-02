@@ -175,7 +175,9 @@ void FormattedText::generateFormat(std::vector<ImmediateFormat>& format) const
     cumulativeLengths.reserve(text_.size() + 1);
     cumulativeLengths.push_back(0);
     for (int i = 0; i < text_.size(); ++i) {
-        cumulativeLengths.push_back(cumulativeLengths[i] + 1);
+        // Increment the next cumulative length by char size in utf-16
+        const int utf16CharSize = text_[i] < 1<<16 ? 1 : 2;
+        cumulativeLengths.push_back(cumulativeLengths[i] + utf16CharSize);
     }
 
     const unsigned int textLen = static_cast<unsigned int>(text_.size());
