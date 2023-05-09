@@ -1,7 +1,7 @@
 #pragma once
 
-#include "common/buffer_view.h"
-#include "text-renderer/types.h"
+#include "../common/buffer_view.h"
+#include "../text-renderer/types.h"
 
 #include <memory>
 #include <string>

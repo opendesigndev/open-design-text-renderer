@@ -15,11 +15,11 @@
 #include "types.h"
 #include "PlacedTextRendering.h"
 
-#include "compat/affine-transform.h"
-#include "compat/basic-types.h"
-#include "compat/Bitmap.hpp"
+#include "../compat/affine-transform.h"
+#include "../compat/basic-types.h"
+#include "../compat/Bitmap.hpp"
 
-#include "utils/utils.h"
+#include "../utils/utils.h"
 
 #include <octopus/text.h>
 
@@ -540,8 +540,10 @@ PlacedTextResult shapePlacedText(Context &ctx, const TextShapeInput &textShapeIn
     // Vertical align offset
     const float verticalAlignOffset = verticalOffset - stretchedGlyphsBounds.t;
 
-    const compat::FRectangle textBoundsNotScaled = stretchBounds(textBounds, stretchedGlyphsBounds);
-    const Matrix3f transformMatrix = convertMatrix(textShapeInput.textTransform);
+    const compat::Matrix3f translationMatrix = compat::translationMatrix(compat::Vector2f { textBounds.l, textBounds.t });
+    const compat::FRectangle textBoundsCentered { 0.0f, 0.0f, textBounds.w, textBounds.h };
+    const compat::FRectangle textBoundsNotScaled = stretchBounds(textBoundsCentered, stretchedGlyphsBounds);
+    const Matrix3f transformMatrix = convertMatrix(translationMatrix*textShapeInput.textTransform);
 
     PlacedGlyphsPerFont placedGlyphs;
     PlacedDecorations placedDecorations;

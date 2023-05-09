@@ -1,6 +1,6 @@
 #include "Glyph.h"
-#include "compat/bitmap-ops.hpp"
-#include "compat/pixel-conversion.h"
+#include "../compat/bitmap-ops.hpp"
+#include "../compat/pixel-conversion.h"
 
 #include <cmath>
 

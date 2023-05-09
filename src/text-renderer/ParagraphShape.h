@@ -6,7 +6,7 @@
 #include "TypesetJournal.h"
 #include "reported-fonts-utils.h"
 
-#include "fonts/FaceTable.h"
+#include "../fonts/FaceTable.h"
 
 #include <unordered_set>
 

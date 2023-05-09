@@ -1,22 +1,22 @@
 
 #include <open-design-text-renderer/text-renderer-api.h>
 
-#include "compat/affine-transform.h"
-#include "compat/basic-types.h"
+#include "../compat/affine-transform.h"
+#include "../compat/basic-types.h"
 
-#include "fonts/FontManager.h"
+#include "../fonts/FontManager.h"
 
-#include "text-renderer/Config.h"
-#include "text-renderer/Context.h"
-#include "text-renderer/text-renderer.h"
-#include "text-renderer/TextShape.h"
-#include "text-renderer/types.h"
+#include "../text-renderer/Config.h"
+#include "../text-renderer/Context.h"
+#include "../text-renderer/text-renderer.h"
+#include "../text-renderer/TextShape.h"
+#include "../text-renderer/types.h"
 
-#include "utils/utils.h"
-#include "utils/Log.h"
-#include "utils/fmt.h"
+#include "../utils/utils.h"
+#include "../utils/Log.h"
+#include "../utils/fmt.h"
 
-#include "vendor/fmt/core.h"
+#include "../vendor/fmt/core.h"
 
 #include <octopus/text.h>
 
@@ -290,6 +290,31 @@ const PlacedTextData *getShapedText(ContextHandle ctx,
         return textShape->data.get();
     }
     return nullptr;
+}
+
+bool isColorFont(ContextHandle ctx,
+                 const std::string &faceId) {
+    if (ctx == nullptr) {
+        return false;
+    }
+
+    const odtr::FaceTable::Item *faceItem = ctx->getFontManager().facesTable().getFaceItem(faceId);
+    if (!(faceItem && faceItem->face))
+        return false;
+    return faceItem->face->isColorFont();
+}
+
+
+FT_Face getFreetypeFace(ContextHandle ctx,
+                        const std::string& faceId) {
+    if (ctx == nullptr) {
+        return nullptr;
+    }
+
+    const odtr::FaceTable::Item* faceItem = ctx->getFontManager().facesTable().getFaceItem(faceId);
+    if (!(faceItem && faceItem->face))
+        return nullptr;
+    return faceItem->face->getFtFace();
 }
 
 } // namespace odtr

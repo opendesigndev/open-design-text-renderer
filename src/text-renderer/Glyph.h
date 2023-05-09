@@ -1,7 +1,7 @@
 #pragma once
 
 #include "base.h"
-#include "compat/Bitmap.hpp"
+#include "../compat/Bitmap.hpp"
 
 namespace odtr {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compat/basic-types.h"
+#include "../compat/basic-types.h"
 
 #include <unordered_map>
 #include <string>

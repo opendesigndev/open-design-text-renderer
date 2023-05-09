@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "common/result.hpp"
-#include "text-renderer/base-types.h"
+#include "../common/result.hpp"
+#include "../text-renderer/base-types.h"
 
 namespace odtr {
 namespace codec {

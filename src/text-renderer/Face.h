@@ -5,9 +5,9 @@
 #include "Glyph.h"
 #include "GlyphAcquisitor.h"
 
-#include "otf/otf.h"
+#include "../otf/otf.h"
 
-#include "common/result.hpp"
+#include "../common/result.hpp"
 
 #include <string>
 
@@ -36,7 +36,7 @@ public:
      */
     float scaleFontUnits(int fontParam, bool y_scale = false) const;
 
-    const FT_Face& getFtFace() const { return ftFace_; }
+    FT_Face getFtFace() const { return ftFace_; }
     hb_font_t* getHbFont() const;
 
     Result<font_size, bool> setSize(font_size size);

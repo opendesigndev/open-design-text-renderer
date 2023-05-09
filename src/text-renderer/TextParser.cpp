@@ -1,9 +1,9 @@
 #include "TextParser.h"
 
 #include "FormattedText.h"
-#include "compat/affine-transform.h"
-#include "compat/basic-types.h"
-#include "compat/pixel-conversion.h"
+#include "../compat/affine-transform.h"
+#include "../compat/basic-types.h"
+#include "../compat/pixel-conversion.h"
 #include "text-format.h"
 // #include "parser_common.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "common/buffer_view.h"
-#include "common/result.hpp"
+#include "../common/buffer_view.h"
+#include "../common/result.hpp"
 
 #include <cstdint>
 
