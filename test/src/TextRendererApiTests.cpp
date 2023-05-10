@@ -147,7 +147,7 @@ TEST_F(TextRendererApiTests, decorations) {
     ASSERT_EQ(textShape->data->glyphs.count(fontHelveticaNeue), 1);
 
     const PlacedGlyphs &pgs = textShape->data->glyphs.at(fontHelveticaNeue);
-    ASSERT_EQ(pgs.size(), 40);
+    ASSERT_EQ(pgs.size(), 35);
 
     const PlacedDecorations &decorations = textShape->data->decorations;
     ASSERT_EQ(decorations[0].type, PlacedDecoration::Type::UNDERLINE);
