@@ -26,15 +26,12 @@ private:
 
     struct Item {
         BufferType buffer;
-        bool decoded;
         bool success;
     };
 
     using StorageType = std::unordered_map<std::string, Item>;
 
     StorageType storage_;
-
-    void decode( Item & item );
 };
 
 } // namespace odtr
