@@ -182,6 +182,8 @@ bool FontManager::storeFile(const std::string& storageKey, const std::string& fi
 
     ifs.read((char*)buffer, size);
 
+    fontStorage_->mark(storageKey, true);
+
     return true;
 }
 

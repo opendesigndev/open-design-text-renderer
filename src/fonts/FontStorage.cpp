@@ -3,9 +3,7 @@
 
 namespace odtr {
 
-
-Byte *FontStorage::alloc(const std::string& name, std::size_t size)
-{
+Byte *FontStorage::alloc(const FontStorage::Key& name, std::size_t size) {
     auto [it, _] = storage_.insert(std::make_pair(name, Item { BufferType {}, false }));
 
     it->second.buffer.resize(size);
@@ -13,8 +11,7 @@ Byte *FontStorage::alloc(const std::string& name, std::size_t size)
     return it->second.buffer.data();
 }
 
-BufferView FontStorage::get(const std::string& name)
-{
+BufferView FontStorage::get(const FontStorage::Key& name) {
     auto it = storage_.find(name);
 
     if (it != std::end(storage_) && it->second.buffer.size()) {
@@ -26,8 +23,15 @@ BufferView FontStorage::get(const std::string& name)
     return BufferView::createEmpty();
 }
 
-bool FontStorage::contains(const std::string& name) const
-{
+void FontStorage::mark(const FontStorage::Key& name, bool success) {
+    auto it = storage_.find(name);
+
+    if (it != std::end(storage_) && it->second.buffer.size()) {
+        it->second.success = success;
+    }
+}
+
+bool FontStorage::contains(const FontStorage::Key& name) const {
     return storage_.find(name) != std::end(storage_);
 }
 

@@ -4,34 +4,32 @@
 #include "../text-renderer/base-types.h"
 
 #include <string>
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
 
 
 namespace odtr {
 
-typedef std::vector<Byte> BufferType;
-
-
 class FontStorage
 {
 public:
-    Byte *alloc(const std::string& name, std::size_t size);
+    using Key = std::string;
 
-    BufferView get(const std::string& name);
+    Byte *alloc(const Key& name, std::size_t size);
 
-    bool contains(const std::string& name) const;
+    BufferView get(const Key& name);
+
+    void mark(const Key& name, bool success);
+
+    bool contains(const Key& name) const;
 
 private:
-
     struct Item {
         BufferType buffer;
         bool success;
     };
 
-    using StorageType = std::unordered_map<std::string, Item>;
-
-    StorageType storage_;
+    std::unordered_map<Key, Item> storage_;
 };
 
 } // namespace odtr
